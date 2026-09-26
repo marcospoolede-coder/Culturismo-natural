@@ -1,0 +1,17 @@
+{
+  "name": "Cuaderno de Fuerza",
+  "short_name": "Cuaderno",
+  "description": "Plan de entrenamiento por ciclos, con cronometro de descanso y calculo de pesos",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#EFEEE9",
+  "theme_color": "#1B4DE4",
+  "lang": "es",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
