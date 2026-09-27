@@ -12,6 +12,8 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Cuaderno">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"></script>
+<script src="supabase-config.js"></script>
 <style>
   :root{color-scheme:light dark;
         padding-top:env(safe-area-inset-top, 0px);
@@ -239,6 +241,13 @@
   .chip.test{background:var(--warn-soft); color:var(--warn)}
   .chip.now{background:var(--accent-soft); color:var(--accent)}
 
+  /* formulario de cuenta */
+  .campo{display:flex; flex-direction:column; gap:5px; margin-bottom:10px}
+  .campo label{font-size:12px; color:var(--ink-2); font-weight:500}
+  .campo input{padding:11px 12px; border-radius:11px; border:1px solid var(--line-2);
+               background:var(--surface-2); font-size:16px; width:100%}
+  .campo input::placeholder{color:var(--ink-3)}
+
   /* guia de pasos */
   .guia{list-style:none; counter-reset:paso; margin:0; padding:0; display:flex;
         flex-direction:column; gap:13px}
@@ -437,6 +446,73 @@ LIFTS.forEach(function(l){ state.rms[l.k] = l.ej; });
 
 var db = null, uid = null, subs = null, saveT = null, sesion = {}, tab = "hoy";
 var cuenta = {nombre:"", avatar:"", sync:"local"}, dl = null;
+var nube = null, sesionNube = null, nubeT = null;
+
+/* La nube solo entra en juego en la web: dentro del visor de Claude manda su
+   propia cuenta, y las llamadas de red a otros dominios están bloqueadas. */
+function nubeInit(){
+  var c = window.CUADERNO_SUPABASE;
+  if(window.claude || !window.supabase) return;
+  if(!c || !c.url || !c.anonKey) return;
+  try{ nube = window.supabase.createClient(c.url, c.anonKey); }
+  catch(e){ nube = null; return; }
+  nube.auth.getSession().then(function(r){
+    aplicaSesion(r && r.data ? r.data.session : null);
+  })["catch"](function(){ render(); });
+  nube.auth.onAuthStateChange(function(ev, ses){ aplicaSesion(ses); });
+}
+function aplicaSesion(ses){
+  sesionNube = ses || null;
+  if(sesionNube && sesionNube.user){
+    cuenta.sync = "nube";
+    cuenta.nombre = sesionNube.user.email || "";
+    cargaNube();
+  }else{
+    cuenta.sync = "local"; cuenta.nombre = "";
+    render();
+  }
+}
+function cargaNube(){
+  if(!nube || !sesionNube) return;
+  nube.from("entrenamientos").select("estado").eq("user_id", sesionNube.user.id).maybeSingle()
+    .then(function(r){
+      if(r.error){ avisoCuenta("No se han podido leer tus datos. " + r.error.message); render(); return; }
+      var o = r.data && r.data.estado;
+      if(o && o.v === 1 && (o.ts || 0) > (state.ts || 0)){
+        state = merge(state, o);
+        try{ localStorage.setItem(LS, JSON.stringify(state)); }catch(e){}
+      }else if(!o){
+        guardaNube();
+      }
+      render();
+    })["catch"](function(){ render(); });
+}
+function guardaNube(){
+  if(!nube || !sesionNube) return;
+  nube.from("entrenamientos").upsert({
+    user_id: sesionNube.user.id,
+    estado: JSON.parse(JSON.stringify(state)),
+    actualizado: new Date().toISOString()
+  }).then(function(r){
+    if(r.error) avisoCuenta("No se ha podido guardar en tu cuenta. " + r.error.message);
+  })["catch"](function(){});
+}
+function avisoCuenta(t){
+  var e = document.getElementById("au-estado");
+  if(e) e.textContent = t;
+}
+function traduceError(m){
+  m = String(m || "");
+  if(/Invalid login credentials/i.test(m)) return "Correo o contraseña incorrectos.";
+  if(/already registered|already been registered/i.test(m)) return "Ese correo ya tiene cuenta. Dale a Entrar.";
+  if(/Password should be at least/i.test(m)) return "La contraseña necesita al menos 6 caracteres.";
+  if(/valid email|invalid format/i.test(m)) return "Ese correo no tiene buena pinta, revísalo.";
+  if(/Email not confirmed/i.test(m)) return "Te falta confirmar la cuenta desde el correo que te mandamos.";
+  if(/rate limit|too many/i.test(m)) return "Demasiados intentos seguidos. Espera un minuto.";
+  if(/failed to fetch|network|load failed/i.test(m))
+    return "No se ha podido conectar. Revisa la conexión, y si acabas de configurar las cuentas, revisa la dirección del proyecto.";
+  return m;
+}
 
 function cap(n){ return (window.claude && window.claude.use) ? window.claude.use(n) : Promise.resolve(null); }
 function docRef(){
@@ -463,6 +539,10 @@ function merge(base, o){
 function save(){
   state.ts = Date.now();
   try{ localStorage.setItem(LS, JSON.stringify(state)); }catch(e){}
+  if(nube && sesionNube){
+    clearTimeout(nubeT);
+    nubeT = setTimeout(guardaNube, 900);
+  }
   if(!db) return;
   clearTimeout(saveT);
   saveT = setTimeout(function(){
@@ -967,25 +1047,59 @@ function vRM(){
   view.innerHTML = h;
 }
 
+function cuentaHTML(){
+  var h = '<div class="sect"><div class="eyebrow">Tu cuenta</div><div class="card">';
+
+  /* dentro de Claude manda la cuenta de Claude */
+  if(window.claude){
+    h += '<div class="rm" style="padding-top:0">' +
+      (cuenta.avatar ? '<img class="avat" src="' + esc(cuenta.avatar) + '" alt="">' : '<div class="avat"></div>') +
+      '<div class="rm-n">' + esc(cuenta.nombre || "Este dispositivo") +
+      '<small>' + (cuenta.sync === "cuenta"
+        ? "Guardado en tu cuenta, privado y en todos tus dispositivos"
+        : "Guardado en este navegador") + '</small></div></div>' +
+      '<p class="note" style="margin:0">Entras con tu cuenta de Claude y la app te reconoce. ' +
+      'Cada persona que abra el enlace ve su propio entrenamiento, nunca el tuyo.</p>';
+    return h + '</div></div>';
+  }
+
+  /* con sesión iniciada en la nube */
+  if(nube && sesionNube){
+    h += '<div class="rm" style="padding-top:0"><div class="avat"></div>' +
+      '<div class="rm-n">' + esc(cuenta.nombre) +
+      '<small>Guardado en tu cuenta, en todos tus dispositivos</small></div></div>' +
+      '<button class="btn" id="au-salir" style="margin-top:4px">Cerrar sesión</button>' +
+      '<p class="note" id="au-estado" style="margin-bottom:0"></p>';
+    return h + '</div></div>';
+  }
+
+  /* con la nube disponible, pero sin entrar */
+  if(nube){
+    h += '<p class="note" style="margin:0 0 11px">Crea una cuenta con tu correo y tendrás tu entrenamiento ' +
+      'en cualquier dispositivo. Si prefieres no registrarte, la app funciona igual y guarda en este navegador.</p>' +
+      '<div class="campo"><label for="au-mail">Correo</label>' +
+      '<input id="au-mail" type="email" autocomplete="email" inputmode="email" placeholder="tu@correo.com"></div>' +
+      '<div class="campo"><label for="au-pass">Contraseña</label>' +
+      '<input id="au-pass" type="password" autocomplete="current-password" placeholder="mínimo 6 caracteres"></div>' +
+      '<div class="row" style="margin-top:11px">' +
+      '<button class="btn primary" style="flex:1" id="au-entrar">Entrar</button>' +
+      '<button class="btn" style="flex:1" id="au-crear">Crear cuenta</button></div>' +
+      '<p class="note" id="au-estado" style="margin-bottom:0"></p>';
+    return h + '</div></div>';
+  }
+
+  /* sin nube configurada: solo este navegador */
+  h += '<div class="rm" style="padding-top:0"><div class="avat"></div>' +
+    '<div class="rm-n">Este dispositivo<small>Guardado en este navegador</small></div></div>' +
+    '<p class="note" style="margin:0">Tus pesos, tus marcas y por dónde vas se guardan en este navegador. ' +
+    'Nadie más los ve, tampoco quien te pasó el enlace. Si cambias de dispositivo o borras los datos del ' +
+    'navegador empiezas de cero, así que guarda el código de más abajo.</p>';
+  return h + '</div></div>';
+}
+
 function vAjustes(){
   var p = state.pos;
-  var h = '<div class="sect"><div class="eyebrow">Tu cuenta</div><div class="card">' +
-    '<div class="rm" style="padding-top:0">' +
-    (cuenta.avatar ? '<img class="avat" src="' + esc(cuenta.avatar) + '" alt="">' : '<div class="avat"></div>') +
-    '<div class="rm-n" id="cuenta-n">' + esc(cuenta.nombre || "Este dispositivo") +
-    '<small>' + (cuenta.sync === "cuenta"
-      ? "Guardado en tu cuenta, privado y en todos tus dispositivos"
-      : cuenta.sync === "artefacto"
-        ? "Guardado en la app, sin identificar"
-        : "Guardado en este navegador") + '</small></div></div>' +
-    (cuenta.sync === "cuenta"
-      ? '<p class="note" style="margin:0">No hace falta ninguna contraseña aparte. Entras con tu cuenta y la ' +
-        'app te reconoce, así que ves lo mismo en el móvil y en el ordenador. Cada persona que abra el enlace ' +
-        've su propio entrenamiento, nunca el tuyo.</p>'
-      : '<p class="note" style="margin:0">Tus pesos, tus marcas y por dónde vas se guardan en este navegador. ' +
-        'Nadie más los ve, tampoco quien te pasó el enlace. Si cambias de dispositivo o borras los datos del ' +
-        'navegador empiezas de cero, así que descarga el CSV de vez en cuando.</p>') +
-    '</div></div>';
+  var h = cuentaHTML();
 
   h += '<div class="sect"><div class="eyebrow">Descargar la progresión</div><div class="card">' +
     '<div class="row"><button class="btn primary" style="flex:1" id="dl-marcas">Maximales</button>' +
@@ -1246,6 +1360,29 @@ document.addEventListener("click", function(ev){
     sesion = {}; saveSesion(); save(); stopTimer(); render();
     window.scrollTo({top:0, behavior:"smooth"}); return;
   }
+  if(ev.target.id === "au-entrar" || ev.target.id === "au-crear"){
+    var crear = ev.target.id === "au-crear";
+    var mail = (document.getElementById("au-mail") || {}).value || "";
+    var pass = (document.getElementById("au-pass") || {}).value || "";
+    if(!mail.trim() || !pass){ avisoCuenta("Rellena el correo y la contraseña."); return; }
+    avisoCuenta(crear ? "Creando la cuenta." : "Entrando.");
+    var cred = {email:mail.trim(), password:pass};
+    var pr = crear ? nube.auth.signUp(cred) : nube.auth.signInWithPassword(cred);
+    pr.then(function(r){
+      if(r.error){ avisoCuenta(traduceError(r.error.message)); return; }
+      if(crear && r.data && r.data.user && !r.data.session){
+        avisoCuenta("Cuenta creada. Te hemos mandado un correo: confírmalo y vuelve a entrar.");
+        return;
+      }
+      avisoCuenta("");
+    })["catch"](function(e){ avisoCuenta(traduceError(e && e.message)); });
+    return;
+  }
+  if(ev.target.id === "au-salir"){
+    avisoCuenta("Cerrando sesión.");
+    nube.auth.signOut().then(function(){ avisoCuenta(""); })["catch"](function(){});
+    return;
+  }
   if(ev.target.id === "cod-sacar"){
     var c = codigo(), caja = document.getElementById("cod-caja");
     document.getElementById("cod-ok").hidden = true;
@@ -1383,6 +1520,7 @@ function arranca(){
 }
 
 cap("downloads").then(function(d){ dl = d; })["catch"](function(){});
+nubeInit();
 
 Promise.all([cap("db"), cap("user")]).then(function(res){
   db = res[0];
