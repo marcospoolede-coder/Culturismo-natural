@@ -415,19 +415,19 @@ var FUERZA_SEM = [
 ];
 
 var FASES = [
-  {id:"c1", tipo:"hip", n:"Ciclo 1", nota:"Hipertrofia", rut:"AB", sem:3,
+  {id:"c1", tipo:"hip", n:"Ciclo 1", nota:"hipertrofia", rut:"AB", sem:3,
    int:"60%", coef:[0.58,0.67], reps:[12,10], desc:90, test:"Punto de partida"},
-  {id:"c2", tipo:"hip", n:"Ciclo 2", nota:"Subir peso", rut:"AB", sem:3,
+  {id:"c2", tipo:"hip", n:"Ciclo 2", nota:"subir peso", rut:"AB", sem:3,
    int:"65%", coef:[0.67], reps:[12,10,8], desc:105},
-  {id:"c3", tipo:"hip", n:"Ciclo 3", nota:"Seguimos subiendo", rut:"AB", sem:3,
+  {id:"c3", tipo:"hip", n:"Ciclo 3", nota:"seguimos subiendo", rut:"AB", sem:3,
    int:"70%", coef:[0.73], reps:[10,8,6], desc:120},
-  {id:"c4", tipo:"hip", n:"Ciclo 4", nota:"Nueva fase A, B y C", rut:"ABC", sem:3,
+  {id:"c4", tipo:"hip", n:"Ciclo 4", nota:"nueva fase A, B y C", rut:"ABC", sem:3,
    int:"70 a 75%", coef:[0.73,0.79], reps:[10,8,6], desc:120, test:"Antes de abrir la fase A, B y C"},
-  {id:"c5", tipo:"hip", n:"Ciclo 5", nota:"Subir peso, bajar reps", rut:"ABC", sem:3,
+  {id:"c5", tipo:"hip", n:"Ciclo 5", nota:"subir peso, bajar reps", rut:"ABC", sem:3,
    int:"77,5 a 80%", coef:[0.79,0.82], reps:[8,6,4], desc:120},
-  {id:"c6", tipo:"hip", n:"Ciclo 6", nota:"Rest pause en el básico", rut:"ABC", sem:3,
+  {id:"c6", tipo:"hip", n:"Ciclo 6", nota:"rest pause en el básico", rut:"ABC", sem:3,
    int:"80%", coef:[0.82], reps:[8,6,4], desc:120, rp:1},
-  {id:"f",  tipo:"fuerza", n:"Bloque de fuerza", nota:"Siete semanas hasta el 95%", rut:"ABC", sem:7,
+  {id:"f",  tipo:"fuerza", n:"Bloque de fuerza", nota:"siete semanas hasta el 95%", rut:"ABC", sem:7,
    int:"80 a 95%", desc:180},
   {id:"fin", tipo:"final", n:"Cierre", nota:"A, B y C al 80%", rut:"ABC", sem:3,
    int:"80%", coef:[0.82], desc:180, test:"Con el pico de fuerza reciente"}
@@ -690,6 +690,12 @@ var view = document.getElementById("view");
 function esc(s){ return String(s).replace(/[&<>"]/g, function(c){
   return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
 function nf(n){ return (Math.round(n * 10) / 10).toString().replace(".", ","); }
+/* Coeficientes y discos pequeños necesitan dos decimales: con uno solo,
+   0,58 se convierte en 0,6 y un disco de 1,25 en 1,3. */
+function nf2(n){
+  var t = (Math.round(n * 100) / 100).toFixed(2).replace(/\.?0+$/, "");
+  return (t || "0").replace(".", ",");
+}
 function mmss(s){ var m = Math.floor(Math.abs(s) / 60), r = Math.abs(s) % 60;
   return (s < 0 ? "-" : "") + m + ":" + (r < 10 ? "0" : "") + r; }
 
@@ -734,7 +740,7 @@ function avisos(p){
     var sig = fase(p.f + 1 < FASES.length ? p.f + 1 : 0);
     h += '<div class="flag info"><div class="ic">' + r + '</div><div><h3>' +
       (r === 1 ? "Última sesión de " : r + " sesiones para cerrar ") + esc(f.n.toLowerCase()) + '</h3>' +
-      '<p>Después entras en ' + esc(sig.n.toLowerCase()) + ', ' + esc(sig.nota.toLowerCase()) +
+      '<p>Después entras en el ' + esc(sig.n.toLowerCase()) + ', ' + esc(sig.nota) +
       (sig.test ? ', con test de maximales antes' : '') + '.</p></div></div>';
   }
   return h;
@@ -785,7 +791,7 @@ function vHoy(){
              (e.js ? '<span class="tag js">jump set</span>' : '<span class="tag">compl</span>');
     var kg = c[0].kg, manual = state.pesos[e.n];
     var carga = kg ? nf(kg) + (c[c.length - 1].kg !== kg ? " a " + nf(c[c.length - 1].kg) : "") + " kg"
-                   : (manual ? nf(manual) + " kg" : "–");
+                   : (manual ? nf(manual) + " kg" : "a tu peso");
     if(e.bw && kg) carga = "+" + nf(Math.max(0, kg - 75)) + " kg";
     h += '<div class="ex' + (done ? " done" : "") + '" data-ex="' + i + '">' +
       '<button class="ex-head" data-open="' + i + '">' + tag +
@@ -796,7 +802,7 @@ function vHoy(){
       '<div class="sets">';
     c.forEach(function(x, j){
       h += '<button class="set' + (sets[j] ? " on" : "") + '" data-set="' + i + ',' + j + '">' +
-        '<b>' + (x.kg ? nf(x.kg) : (manual ? nf(manual) : "–")) + '</b>' +
+        '<b>' + (x.kg ? nf(x.kg) : (manual ? nf(manual) : "libre")) + '</b>' +
         '<small>' + x.reps + (f.rp && e.t === "b" && j === c.length - 1 ? " + RP" : "") + ' reps</small></button>';
     });
     h += '</div>';
@@ -805,14 +811,14 @@ function vHoy(){
       h += '<div class="plates"><span>Por lado</span>';
       pl.forEach(function(d){
         h += '<span class="plate' + (d === 5 ? " l" : "") + '" style="background:var(' + PCOL[d] + ')">' +
-          nf(d) + '</span>';
+          nf2(d) + '</span>';
       });
       h += '</div>';
     }
     if(!e.rm){
       h += '<div class="wfield"><label for="w' + i + '">Peso</label>' +
         '<input id="w' + i + '" class="mono" inputmode="decimal" data-peso="' + esc(e.n) + '" value="' +
-        (manual ? nf(manual) : "") + '" placeholder="–"><span>kg</span></div>';
+        (manual ? nf(manual) : "") + '" placeholder="kg"><span>kg</span></div>';
     }
     h += '<p class="note">' + (e.js ? "Jump set, alterna cada 30 segundos."
         : "Descanso " + mmss(descansoDe(p, e)) + (e.t === "b" ? " entre series" : "")) +
@@ -835,12 +841,12 @@ function vPlan(){
   FASES.forEach(function(f, i){
     var cls = i === p.f ? "now" : (i < p.f ? "past" : "");
     var det = f.tipo === "fuerza"
-      ? "7 semanas, del 80% al 95%, 4 series"
-      : f.int + ", coef " + f.coef.map(nf).join(" a ") +
+      ? "del 80% al 95%, 4 series"
+      : f.int + ", coef " + f.coef.map(nf2).join(" a ") +
         (f.reps ? ", " + f.reps.join("/") + " reps" : ", 8 y 12 reps") +
         ", descanso " + mmss(f.desc);
     h += '<div class="ph ' + cls + '"><div class="ph-dot">' + (i + 1) + '</div><div class="ph-t">' +
-      '<b>' + esc(f.n) + ', ' + esc(f.nota.toLowerCase()) + '</b>' +
+      '<b>' + esc(f.n) + ', ' + esc(f.nota) + '</b>' +
       '<small>' + esc(det) + ', entrenos ' + (f.rut === "AB" ? "A y B" : "A, B y C") +
       ', ' + f.sem + ' semanas</small>';
     if(f.test) h += '<span class="chip test">' + (state.tests[f.id] ? "test hecho" : "test de maximales") + '</span>';
@@ -851,10 +857,13 @@ function vPlan(){
 
   var t = proximoTest(p);
   h += '<div class="sect"><div class="eyebrow">Qué viene</div><div class="card stack">';
-  h += '<div>' + (t >= 0
-    ? '<b>Próximo test de maximales:</b> antes de ' + esc(FASES[t].n.toLowerCase()) +
-      ', dentro de ' + Math.max(0, semanasA(p, t)) + ' semanas.'
-    : '<b>No queda ningún test pendiente</b> en este macrociclo.') + '</div>';
+  var sem = t >= 0 ? Math.max(0, semanasA(p, t)) : 0;
+  h += '<div>' + (t < 0
+    ? '<b>No queda ningún test pendiente</b> en este macrociclo.'
+    : sem === 0
+      ? '<b>Test de maximales:</b> te toca ahora, antes de seguir con el ' + esc(FASES[t].n.toLowerCase()) + '.'
+      : '<b>Próximo test de maximales:</b> antes de ' + esc(FASES[t].n.toLowerCase()) +
+        ', dentro de ' + sem + (sem === 1 ? ' semana.' : ' semanas.')) + '</div>';
   var fi = FASES.length - 1;
   h += '<div><b>Cierre del macrociclo:</b> dentro de ' +
     Math.max(0, semanasA(p, fi) + FASES[fi].sem) + ' semanas, ' +
@@ -862,14 +871,14 @@ function vPlan(){
   h += '</div></div>';
 
   h += '<div class="sect"><div class="eyebrow">De dónde sale cada coeficiente</div><div class="card">' +
-    '<p class="note" style="margin:0">Los del bloque de fuerza son la tabla Maurice y Rydin casi clavada: ' +
-    'a 7 repeticiones te sale 0,85 y el plan pone 0,85. Los de hipertrofia van por debajo a propósito, ' +
-    '0,73 para 8 repeticiones frente al 0,83 de la tabla, porque ahí se entrena dejando repeticiones ' +
+    '<p class="note" style="margin:0">Los del bloque de fuerza son la tabla Maurice y Rydin casi clavada. ' +
+    'A 7 repeticiones te sale 0,85 y el plan pone 0,85. Los de hipertrofia van por debajo a propósito: ' +
+    '0,73 para 8 repeticiones frente al 0,83 de la tabla. Ahí se entrena dejando repeticiones ' +
     'en reserva. Por eso en fuerza aprietas y en hipertrofia no.</p></div></div>';
 
   h += '<div class="sect"><div class="eyebrow">Protocolo de descarga</div><div class="card">' +
-    '<p class="note" style="margin:0">La última semana de cada ciclo reduce el volumen ~40%: ' +
-    'los básicos bajan de 3 a 2 series, los complementarios a 1 y el jump set a 2. ' +
+    '<p class="note" style="margin:0">La última semana de cada ciclo reduce el volumen ~40%. ' +
+    'Los básicos bajan de 3 a 2 series, los complementarios a 1 y el jump set a 2. ' +
     'El peso no baja, la técnica manda.</p></div></div>';
   view.innerHTML = h;
 }
@@ -904,7 +913,7 @@ function evoHTML(){
   var h = '<div class="sect"><div class="eyebrow">Evolución por ciclo</div><div class="card">';
   if(!m.length){
     return h + '<p class="note" style="margin:0">Todavía no hay marcas guardadas. Cada vez que cambies ' +
-      'un maximal o cierres un ciclo se guarda una foto con la fecha y el ciclo en el que estabas.</p></div></div>';
+      'un maximal o cierres un ciclo se guarda una foto, con su fecha y su ciclo.</p></div></div>';
   }
   var alguno = false;
   LIFTS.forEach(function(l){
@@ -957,7 +966,11 @@ function convHTML(pk, rp){
 function vRM(){
   var p = state.pos, f = fase(p.f);
   var h = "";
-  if(tocaTest(p) || semanaPico(p)) h += avisos(p).replace(/<button class="act"[\s\S]*?<\/button>/g, "");
+  if(tocaTest(p) || semanaPico(p)){
+    h += avisos(p)
+      .replace(/<button class="act"[\s\S]*?<\/button>/g, "")
+      .replace(/<div class="flag info">[\s\S]*?<\/div><\/div>/g, "");
+  }
 
   h += '<div class="sect"><div class="eyebrow">Maximales</div><div class="card">';
   LIFTS.forEach(function(l){
@@ -971,22 +984,33 @@ function vRM(){
 
   h += evoHTML();
 
-  h += '<div class="sect"><div class="eyebrow">Convertidor de pesos</div><div class="card">' +
-    '<p class="note" style="margin:0 0 10px">Maurice y Rydin, la tabla de tu Excel. ' +
-    'Cada repetición que quitas o pones vale un 3% del peso.</p>' +
-    '<div class="row"><div class="wfield" style="margin:0"><label for="cp">Levantaste</label>' +
-    '<input id="cp" class="mono" inputmode="decimal" value="100"><span>kg</span></div>' +
-    '<div class="wfield" style="margin:0"><label for="cr">a</label>' +
-    '<input id="cr" class="mono" inputmode="numeric" value="8"><span>reps</span></div></div>' +
-    '<div id="conv-out">' + convHTML(100, 8) + '</div></div></div>';
+  h += '<div class="sect"><div class="eyebrow">Cómo se hace un test de maximales</div><div class="card">' +
+    '<p class="note" style="margin:0 0 12px">Un maximal es el peso máximo que mueves una sola vez con ' +
+    'técnica limpia. De ese número salen todos los pesos del plan, así que vale la pena hacerlo bien.</p>' +
+    guia([
+      ["Elige el día", "Descansado, no al final de una semana dura ni con agujetas. Un solo ejercicio por sesión: " +
+       "no se testea sentadilla y peso muerto el mismo día."],
+      ["Calienta de menos a más", "Cinco o diez minutos de cardio suave, movilidad de cadera y hombro, y después " +
+       "las series de abajo con tu peso ya calculado. El calentamiento no cansa, prepara."],
+      ["Sube en intentos de una repetición", "Del 90% en adelante, una sola repetición por intento y descansos " +
+       "largos, de minuto y medio a dos minutos. Vas al 90, al 93, al 97 y al 100%."],
+      ["Empuja siempre a la máxima velocidad", "Aunque la barra vaya lenta, la intención es moverla rápido. " +
+       "Es lo que marca tu plan como máxima aceleración voluntaria."],
+      ["Para a tiempo", "Si un intento se frena a mitad de recorrido y tienes que pelearlo, ese es tu tope de hoy. " +
+       "No hagas un intento más: lo que ganas es un número y lo que arriesgas es una lesión."],
+      ["Ponte a salvo antes de empezar", "Coloca los pines del rack a la altura del punto más bajo del recorrido. " +
+       "Si haces banca solo, no pongas cierres en la barra: así puedes inclinarla y soltar los discos."],
+      ["Apúntalo aquí mismo", "Mete el peso arriba, en Maximales. Queda guardado con la fecha y el ciclo, y todos " +
+       "los pesos del plan se recalculan solos."]
+    ]) + '</div></div>';
 
   var rmSel = state.rms.sentadilla || 125;
   h += '<div class="sect"><div class="eyebrow">Protocolo del test</div><div class="card">' +
-    '<p class="note" style="margin:0 0 8px">Sobre un 1RM teórico de ' + nf(redondea(rmSel)) +
+    '<p class="note" style="margin:0 0 8px">Los pesos del paso 2, sobre un 1RM teórico de ' + nf(redondea(rmSel)) +
     ' kg. Cambia el maximal de sentadilla arriba y la tabla se recalcula.</p>' +
     '<div class="scroll"><table><thead><tr><th>Serie</th><th class="n">Peso</th><th class="n">%</th>' +
     '<th class="n">Reposo</th></tr></thead><tbody>';
-  [[6,0.50,"30 s"],[4,0.65,"45 s"],[2,0.80,"1:00"],[1,0.90,"1:30"],[1,0.93,"1:45"],[1,0.97,"2:00"],[1,1.00,"–"]]
+  [[6,0.50,"30 s"],[4,0.65,"45 s"],[2,0.80,"1:00"],[1,0.90,"1:30"],[1,0.93,"1:45"],[1,0.97,"2:00"],[1,1.00,""]]
     .forEach(function(r){
       h += '<tr><td>' + r[0] + ' rep' + (r[0] > 1 ? "s" : "") + '</td><td class="n">' +
         nf(redondea(rmSel * r[1])) + ' kg</td><td class="n">' + Math.round(r[1] * 100) + '%</td>' +
@@ -1000,46 +1024,37 @@ function vRM(){
   }
   h += '</div></div>';
 
-  h += '<div class="sect"><div class="eyebrow">Cómo se hace un test de maximales</div><div class="card">' +
-    '<p class="note" style="margin:0 0 12px">Un maximal es el peso máximo que mueves una sola vez con ' +
-    'técnica limpia. De ese número salen todos los pesos del plan, así que vale la pena hacerlo bien.</p>' +
-    guia([
-      ["Elige el día", "Descansado, no al final de una semana dura ni con agujetas. Un solo ejercicio por sesión: " +
-       "no se testea sentadilla y peso muerto el mismo día."],
-      ["Calienta de menos a más", "Cinco o diez minutos de cardio suave, movilidad de cadera y hombro, y después " +
-       "las series de abajo con tu peso ya calculado. El calentamiento no cansa, prepara."],
-      ["Sube en intentos de una repetición", "Del 90% en adelante, una sola repetición por intento y descansos " +
-       "largos, de minuto y medio a dos minutos. Vas al 90, al 93, al 97 y al 100%."],
-      ["Empuja siempre a la máxima velocidad", "Aunque la barra vaya lenta, la intención es moverla rápido. " +
-       "Es lo que marca tu plan como máxima aceleración voluntaria."],
-      ["Sabe cuándo parar", "Si un intento se frena a mitad de recorrido y tienes que pelearlo, ese es tu tope de hoy. " +
-       "No hagas un intento más: lo que ganas es un número y lo que arriesgas es una lesión."],
-      ["Ponte a salvo antes de empezar", "Coloca los pines del rack a la altura del punto más bajo del recorrido. " +
-       "Si haces banca solo, no pongas cierres en la barra: así puedes inclinarla y soltar los discos."],
-      ["Apúntalo aquí mismo", "Mete el peso arriba, en Maximales. Queda guardado con la fecha y el ciclo, y todos " +
-       "los pesos del plan se recalculan solos."]
-    ]) + '</div></div>';
-
   h += '<div class="sect"><div class="eyebrow">Cada cuánto se testea</div><div class="card">' +
-    '<p class="note" style="margin:0">En hipertrofia natural no se maxima dentro del mesociclo: se testea ' +
-    'cada 8 a 16 semanas, y casi siempre al cerrar un bloque, porque un test antes de tiempo mide poco ' +
-    'y deja fatiga. Tu macrociclo cae justo en esa horquilla, con los tres puntos separados unas 10, 15 ' +
-    'y 10 semanas.</p>' +
+    '<p class="note" style="margin:0">En hipertrofia natural no se maxima dentro del mesociclo. ' +
+    'Se testea cada 8 a 16 semanas, y casi siempre al cerrar un bloque. Un test antes de tiempo ' +
+    'mide poco y deja fatiga.</p>' +
+    '<p class="note">Tu macrociclo cae justo en esa horquilla: los tres puntos van separados unas ' +
+    '10, 15 y 10 semanas.</p>' +
     '<p class="note">Entre test no hace falta subir a un máximo real. Si un día mueves más peso del ' +
-    'previsto en una serie, métela en el convertidor de aquí abajo y guárdala como maximal estimado.</p>' +
+    'previsto en una serie, métela en el convertidor y guárdala como maximal estimado.</p>' +
     '</div></div>';
+
+  h += '<div class="sect"><div class="eyebrow">Convertidor de pesos</div><div class="card">' +
+    '<p class="note" style="margin:0 0 10px">Maurice y Rydin, la tabla de tu Excel. ' +
+    'Cada repetición que quitas o pones vale un 3% del peso.</p>' +
+    '<div class="row"><div class="wfield" style="margin:0"><label for="cp">Levantaste</label>' +
+    '<input id="cp" class="mono" inputmode="decimal" value="100"><span>kg</span></div>' +
+    '<div class="wfield" style="margin:0"><label for="cr">a</label>' +
+    '<input id="cr" class="mono" inputmode="numeric" value="8"><span>reps</span></div></div>' +
+    '<div id="conv-out">' + convHTML(100, 8) + '</div></div></div>';
 
   h += '<div class="sect"><div class="eyebrow">Peso por semana del bloque de fuerza</div><div class="card scroll">' +
     '<table><thead><tr><th>Sem</th><th class="n">Coef</th>';
+  var CORTO = {sentadilla:"Sentadilla", banca:"Banca", muerto:"Muerto", militar:"Militar"};
   ["sentadilla","banca","muerto","militar"].forEach(function(k){
-    h += '<th class="n">' + esc(LIFTS.filter(function(l){ return l.k === k; })[0].n.split(" ")[0]) + '</th>';
+    h += '<th class="n">' + esc(CORTO[k]) + '</th>';
   });
   h += '</tr></thead><tbody>';
   FUERZA_SEM.forEach(function(w, i){
     h += '<tr><td>' + (i + 1) + ' <small style="color:var(--ink-3)">' + w.reps + ' rep' +
-      (w.reps > 1 ? "s" : "") + '</small></td><td class="n">' + nf(w.coef) + '</td>';
+      (w.reps > 1 ? "s" : "") + '</small></td><td class="n">' + nf2(w.coef) + '</td>';
     ["sentadilla","banca","muerto","militar"].forEach(function(k){
-      h += '<td class="n">' + (state.rms[k] ? nf(redondea(state.rms[k] * w.coef)) : "–") + '</td>';
+      h += '<td class="n">' + (state.rms[k] ? nf(redondea(state.rms[k] * w.coef)) : "sin marca") + '</td>';
     });
     h += '</tr>';
   });
@@ -1092,8 +1107,8 @@ function cuentaHTML(){
   h += '<div class="rm" style="padding-top:0"><div class="avat"></div>' +
     '<div class="rm-n">Este dispositivo<small>Guardado en este navegador</small></div></div>' +
     '<p class="note" style="margin:0">Tus pesos, tus marcas y por dónde vas se guardan en este navegador. ' +
-    'Nadie más los ve, tampoco quien te pasó el enlace. Si cambias de dispositivo o borras los datos del ' +
-    'navegador empiezas de cero, así que guarda el código de más abajo.</p>';
+    'Nadie más los ve, tampoco quien te pasó el enlace. Si cambias de dispositivo o borras los datos ' +
+    'del navegador, empiezas de cero. Guarda el código de más abajo.</p>';
   return h + '</div></div>';
 }
 
@@ -1160,9 +1175,9 @@ function vAjustes(){
     '<p class="note">También arranca solo al marcar una serie, con el descanso que toque a ese ejercicio.</p></div></div>';
 
   h += '<p class="foot">Los coeficientes, las repeticiones y los descansos salen del cuaderno manuscrito ' +
-    'del 31 de mayo de 2025 y de las tablas por microciclo. El reparto del coeficiente entre las series ' +
-    'de una pirámide y los puntos de test de maximales son una lectura razonable del plan, no están escritos ' +
-    'en el papel.</p>';
+    'del 31 de mayo de 2025 y de las tablas por microciclo. Dos cosas no están en el papel y son una ' +
+    'lectura razonable del plan: el reparto del coeficiente entre las series de una pirámide, y en qué ' +
+    'puntos toca el test de maximales.</p>';
   view.innerHTML = h;
 }
 
