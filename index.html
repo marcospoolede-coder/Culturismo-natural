@@ -168,6 +168,12 @@
   .wfield input{width:74px; padding:6px 8px; border-radius:9px; border:1px solid var(--line-2);
                 background:var(--surface-2); font-family:"IBM Plex Mono",monospace; font-size:14px}
 
+  /* demostración del ejercicio */
+  .demo{margin:13px 0 0; padding:0}
+  .demo img{display:block; width:100%; height:auto; aspect-ratio:1000/334;
+            border-radius:10px; background:var(--surface-2)}
+  .demo figcaption{font-size:11.5px; color:var(--ink-3); margin-top:5px; text-align:center}
+
   /* botones */
   .btn{display:inline-flex; align-items:center; justify-content:center; gap:7px; border-radius:11px;
        padding:12px 15px; font-weight:600; font-size:14.5px; background:var(--surface-2);
@@ -513,6 +519,33 @@ var RUT = {
         ex("Leg extensión",{js:1, sin:1}),
         ex("Crunch invertido",{js:1, sin:1}) ]
   }
+};
+
+/* Foto de ejecución por ejercicio: dos fotogramas, inicio y final.
+   Catálogo abierto free-exercise-db, reescaladas a 1000 px de ancho. */
+var FOTOS = {
+  "Box squat":"06_box_squat",
+  "Box squat 6x2 al 8RM, pausa 2 s":"06_box_squat",
+  "Squat":"01_sentadilla",
+  "Press banca":"11_press_banca",
+  "Press inclinado":"16_press_inclinado",
+  "Press militar":"20_press_militar",
+  "Press mancuernas":"03_press_mancuernas_hombro",
+  "Peso muerto":"24_peso_muerto",
+  "Remo o seal row":"28_remo_seal_row",
+  "Dominadas":"31_dominadas_supinas",
+  "Dominadas supinas":"31_dominadas_supinas",
+  "Curl con barra":"34_curl_barra",
+  "Hiperextensión":"25_hiperextension",
+  "Hiperextensión 45 grados":"26_hiperextension_45",
+  "Calf machine":"29_calf_machine",
+  "Calf prensa":"32_calf_prensa",
+  "Prensa 45 grados":"02_prensa_45",
+  "Leg curl":"12_leg_curl",
+  "Leg extensión":"07_leg_extension",
+  "Crunch invertido":"19_crunch_invertido",
+  "Crunch inverso":"19_crunch_invertido",
+  "Fondos tríceps":"22_fondos_triceps"
 };
 
 /* series por microciclo: [micro1, micro2, micro3 de descarga] */
@@ -1049,6 +1082,13 @@ function vHoy(){
     }
 
     h += '<div class="ex-body"' + (done || i !== act ? " hidden" : "") + '>';
+
+    if(FOTOS[e.n]){
+      /* carga diferida: no se descarga hasta que abres el ejercicio */
+      h += '<figure class="demo"><img src="img/' + FOTOS[e.n] + '.webp" width="1000" height="334" ' +
+        'loading="lazy" decoding="async" alt="Ejecución de ' + esc(e.n) + '">' +
+        '<figcaption>Inicio y final del movimiento</figcaption></figure>';
+    }
 
     if(esBasico(e)){
       h += '<p class="note">Apunta el peso que levantas de verdad, las repeticiones que te sobran ' +
@@ -2105,6 +2145,7 @@ Promise.all([cap("db"), cap("user")]).then(function(res){
 
 document.getElementById("foot").textContent =
   "Plan propio, cuaderno del 31 de mayo de 2025. Los pesos son orientativos: manda la técnica. "
+  + "Fotos de ejecución del catálogo abierto free-exercise-db. "
   + "Versión del " + VERSION + ".";
 })();
 </script>
