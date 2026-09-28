@@ -546,6 +546,8 @@ LIFTS.forEach(function(l){ state.rms[l.k] = l.ej; });
 var db = null, uid = null, subs = null, saveT = null, sesion = {}, tab = "hoy";
 var cuenta = {nombre:"", avatar:"", sync:"local"}, dl = null;
 var nube = null, sesionNube = null, nubeT = null;
+/* "pendiente" | "aprobado" | "denegado" | "sin-control" (todavia no hay tabla) */
+var acceso = null;
 
 /* La nube solo entra en juego en la web: dentro del visor de Claude manda su
    propia cuenta, y las llamadas de red a otros dominios están bloqueadas. */
@@ -565,11 +567,28 @@ function aplicaSesion(ses){
   if(sesionNube && sesionNube.user){
     cuenta.sync = "nube";
     cuenta.nombre = sesionNube.user.email || "";
-    cargaNube();
+    cargaAcceso().then(function(){
+      if(aprobado()) cargaNube(); else render();
+    });
   }else{
-    cuenta.sync = "local"; cuenta.nombre = "";
+    cuenta.sync = "local"; cuenta.nombre = ""; acceso = null;
     render();
   }
+}
+
+/* Mientras no este aprobado, la nube no guarda nada: lo impiden las politicas
+   de Supabase. La app sigue funcionando y guardando en este dispositivo. */
+function aprobado(){ return acceso === "aprobado" || acceso === "sin-control"; }
+
+function cargaAcceso(){
+  if(!nube || !sesionNube) return Promise.resolve(null);
+  return nube.from("acceso").select("estado").eq("user_id", sesionNube.user.id).maybeSingle()
+    .then(function(r){
+      /* si la tabla todavia no existe, no hay control de acceso montado */
+      if(r && r.error) acceso = "sin-control";
+      else acceso = (r && r.data && r.data.estado) ? r.data.estado : "pendiente";
+      return acceso;
+    })["catch"](function(){ acceso = "sin-control"; return acceso; });
 }
 function cargaNube(){
   if(!nube || !sesionNube) return;
@@ -587,7 +606,7 @@ function cargaNube(){
     })["catch"](function(){ render(); });
 }
 function guardaNube(){
-  if(!nube || !sesionNube) return;
+  if(!nube || !sesionNube || !aprobado()) return;
   nube.from("entrenamientos").upsert({
     user_id: sesionNube.user.id,
     estado: JSON.parse(JSON.stringify(state)),
@@ -1506,19 +1525,36 @@ function cuentaHTML(){
 
   /* con sesión iniciada en la nube */
   if(nube && sesionNube){
+    var pend = acceso === "pendiente", deneg = acceso === "denegado";
     h += '<div class="rm" style="padding-top:0"><div class="avat"></div>' +
-      '<div class="rm-n">' + esc(cuenta.nombre) +
-      '<small>Guardado en tu cuenta, en todos tus dispositivos</small></div></div>' +
-      '<button class="btn" id="au-salir" style="margin-top:4px">Cerrar sesión</button>' +
+      '<div class="rm-n">' + esc(cuenta.nombre) + '<small>' +
+      (pend  ? "Pendiente de aprobación, guardando en este dispositivo"
+     : deneg ? "Sin acceso, guardando en este dispositivo"
+             : "Guardado en tu cuenta, en todos tus dispositivos") + '</small></div></div>';
+    if(pend){
+      h += '<div class="flag deload" style="margin-top:10px"><div class="ic">·</div><div>' +
+        '<h3>Tu cuenta está pendiente</h3>' +
+        '<p>Hasta que te den acceso, la aplicación funciona entera y guarda en este ' +
+        'dispositivo. En cuanto te aprueben, tu entrenamiento se sincroniza solo.</p>' +
+        '</div></div>' +
+        '<button class="btn" id="au-revisar" style="margin-top:10px">Comprobar si ya tengo acceso</button>';
+    }
+    if(deneg){
+      h += '<div class="flag test" style="margin-top:10px"><div class="ic">!</div><div>' +
+        '<h3>Esta cuenta no tiene acceso</h3>' +
+        '<p>Habla con quien te pasó la aplicación. Mientras, puedes seguir usándola ' +
+        'en este dispositivo.</p></div></div>';
+    }
+    h += '<button class="btn" id="au-salir" style="margin-top:10px">Cerrar sesión</button>' +
       '<p class="note" id="au-estado" style="margin-bottom:0"></p>';
     return h + '</div></div>';
   }
 
   /* con la nube disponible, pero sin entrar */
   if(nube){
-    h += '<p class="note" style="margin:0 0 11px">El acceso va por invitación: crea la cuenta con el correo ' +
-      'que diste y tendrás tu entrenamiento en cualquier dispositivo. Si tu correo no está autorizado, ' +
-      'la app funciona igual y guarda en este navegador.</p>' +
+    h += '<p class="note" style="margin:0 0 11px">Crea una cuenta y tendrás tu entrenamiento en ' +
+      'cualquier dispositivo, en cuanto te den acceso. Mientras tanto, y también si prefieres no ' +
+      'registrarte, la aplicación funciona igual y guarda en este navegador.</p>' +
       '<div class="campo"><label for="au-mail">Correo</label>' +
       '<input id="au-mail" type="email" autocomplete="email" inputmode="email" placeholder="tu@correo.com"></div>' +
       '<div class="campo"><label for="au-pass">Contraseña</label>' +
@@ -1855,6 +1891,14 @@ document.addEventListener("click", function(ev){
       }
       avisoCuenta("");
     })["catch"](function(e){ avisoCuenta(traduceError(e && e.message)); });
+    return;
+  }
+  if(ev.target.id === "au-revisar"){
+    avisoCuenta("Comprobando.");
+    cargaAcceso().then(function(e){
+      if(aprobado()){ avisoCuenta("Ya tienes acceso, sincronizando."); cargaNube(); }
+      else{ avisoCuenta("Todavía no. Vuelve a probar más tarde."); render(); }
+    });
     return;
   }
   if(ev.target.id === "au-salir"){
