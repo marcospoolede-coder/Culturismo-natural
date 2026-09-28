@@ -358,13 +358,28 @@
         background:var(--surface-2); border:1px solid var(--line); color:var(--ink-2);
         font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums}
 
-  /* ---------- maximal teórico ---------- */
-  .teo-row{display:flex; align-items:center; gap:10px; padding:9px 11px; margin:0 0 2px;
-           background:var(--accent-soft); border-radius:11px}
-  .teo-t{flex:1 1 auto; font-size:13px; color:var(--accent); line-height:1.3}
-  .teo-t b{font-size:15.5px; font-weight:600}
-  .teo-t small{display:block; font-size:11.5px; opacity:.85; margin-top:1px}
-  .teo-row .btn{flex:0 0 auto; background:var(--accent); color:var(--accent-ink); border-color:transparent}
+  /* ---------- maximales, ejercicio, teórico y tu marca ---------- */
+  .rmgrid{display:grid; grid-template-columns:minmax(0,1fr) 76px 94px; gap:0 8px; align-items:center}
+  .rmgrid .th{font-family:"Saira Condensed",sans-serif; font-size:11px; letter-spacing:.08em;
+              text-transform:uppercase; color:var(--ink-3); font-weight:600; padding-bottom:7px}
+  .rmgrid .th.n{text-align:right}
+  .rmgrid .sep{border-top:1px solid var(--line)}
+  .rmgrid .cel{padding:10px 0}
+  .rm-teo{display:flex; flex-direction:column; align-items:flex-end; gap:3px; text-align:right}
+  .rm-teo b{font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums;
+            font-size:16px; font-weight:600; color:var(--accent); line-height:1}
+  .rm-teo small{font-size:10.5px; color:var(--ink-3); line-height:1.15}
+  .usar-teo{background:var(--accent); color:var(--accent-ink); border-radius:7px;
+            padding:3px 9px; font-size:11.5px; font-weight:600}
+  .rm-in{display:flex; align-items:center; gap:5px; justify-content:flex-end}
+  .rm-in input{width:100%; min-width:0; padding:8px 9px; border-radius:10px;
+               border:1px solid var(--line-2); background:var(--surface-2);
+               font-family:"IBM Plex Mono",monospace; font-size:16px; text-align:right;
+               font-variant-numeric:tabular-nums}
+  @media (max-width:380px){
+    .rmgrid{grid-template-columns:minmax(0,1fr) 66px 84px; gap:0 6px}
+    .rm-in input{font-size:15px; padding:7px 7px}
+  }
 
   /* ---------- calendario ---------- */
   .cal-nav{display:flex; align-items:center; gap:10px; margin-bottom:10px}
@@ -1266,40 +1281,46 @@ function vRM(){
       .replace(/<div class="flag info">[\s\S]*?<\/div><\/div>/g, "");
   }
 
-  h += '<div class="sect"><div class="eyebrow">Maximales</div><div class="card">';
+  h += '<div class="sect"><div class="eyebrow">Maximales</div><div class="card">' +
+    '<div class="rmgrid">' +
+    '<span class="th">Ejercicio</span>' +
+    '<span class="th n">Teórico</span>' +
+    '<span class="th n">Tu marca</span>';
   var hayTeo = false;
-  LIFTS.forEach(function(l){
-    h += '<div class="rm"><div class="rm-n">' + esc(l.n) +
-      '<small>' + esc(l.s) + (state.rmsFecha[l.k] ? ", " + esc(state.rmsFecha[l.k]) : "") + '</small></div>' +
+  LIFTS.forEach(function(l, i){
+    var t = rmTeorico(l.k), act = state.rms[l.k] || 0, sp = i ? " sep" : "";
+    if(t) hayTeo = true;
+    h += '<div class="cel' + sp + ' rm-n">' + esc(l.n) +
+      '<small>' + esc(l.s) + (state.rmsFecha[l.k] ? ", " + esc(state.rmsFecha[l.k]) : "") + '</small></div>';
+    h += '<div class="cel' + sp + ' rm-teo">' + (t
+      ? '<b>' + nf(t.kg) + '</b>' + (t.kg !== act
+          ? '<button class="usar-teo" data-teo="' + l.k + '" data-kg="' + t.kg + '" ' +
+            'title="Usar ' + nf(t.kg) + ' kg como maximal de ' + esc(l.n) + '">' +
+            (t.kg > act ? "+" : "") + nf(t.kg - act) + '</button>'
+          : '<small>coincide</small>')
+      : '<small>sin series</small>') + '</div>';
+    h += '<div class="cel' + sp + ' rm-in">' +
       '<input class="mono" inputmode="decimal" data-rm="' + l.k + '" value="' +
       (state.rms[l.k] ? nf(state.rms[l.k]) : "") + '" aria-label="1RM de ' + esc(l.n) + '">' +
       '<span class="u">kg</span></div>';
-    var t = rmTeorico(l.k);
-    if(!t) return;
-    hayTeo = true;
-    var act = state.rms[l.k] || 0, d = t.kg - act;
-    h += '<div class="teo-row"><div class="teo-t">Teórico <b class="mono">' + nf(t.kg) + ' kg</b>' +
-      (act ? ' <span class="chip ' + (d >= 0 ? "up" : "down") + '">' + (d >= 0 ? "+" : "") +
-        nf(d) + ' kg</span>' : '') +
-      '<small>' + t.n + ' serie' + (t.n > 1 ? "s" : "") + ' de ' +
-      esc(t.fn.replace("Bloque de fuerza", "Fuerza").toLowerCase()) + ', ' + esc(t.d) + '</small></div>' +
-      (d === 0 ? '' : '<button class="btn sm" data-teo="' + l.k + '" data-kg="' + t.kg + '">Usar</button>') +
-      '</div>';
   });
+  h += '</div>';
+  h += '<p class="note">' + (hayTeo
+    ? 'El teórico sale al revés: de las series que apuntas en los básicos. Toca la diferencia ' +
+      'para adoptarlo y todos los pesos del plan se recalculan.'
+    : 'La columna del teórico se llena sola en cuanto cierres una sesión apuntando peso real, ' +
+      'recámara y técnica en los básicos. Sale al revés que el resto: en vez de calcular el peso ' +
+      'desde tu marca, calcula tu marca desde el peso que has movido.') + '</p>';
   h += '</div></div>';
 
-  if(hayTeo){
-    h += '<div class="sect"><div class="eyebrow">De dónde sale el teórico</div><div class="card">' +
-      '<p class="note" style="margin:0">Va al revés que el resto de la app: en vez de sacar el peso ' +
-      'de tu maximal, saca tu maximal del peso que has movido. De cada serie del último ciclo coge el ' +
-      'peso real, le suma las repeticiones que hiciste y las que te sobraron, y aplica Maurice y Rydin. ' +
-      'Se queda con la estimación más alta.</p>' +
-      '<p class="note">No cuentan las series con técnica C ni las de recámara 5 o más: con la técnica ' +
-      'rota el peso no vale, y tan lejos del fallo la estimación se dispara. En dominadas se calcula ' +
-      'sobre ' + nf(PESO_CORP) + ' kg de peso corporal.</p>' +
-      '<p class="note">Es una estimación, no un test. Si te cuadra, dale a Usar y todos los pesos del ' +
-      'plan se recalculan.</p></div></div>';
-  }
+  h += '<div class="sect"><div class="eyebrow">Cómo se calcula el teórico</div><div class="card">' +
+    '<p class="note" style="margin:0">De cada serie del último ciclo coge el peso real, le suma las ' +
+    'repeticiones que hiciste y las que te sobraron, y aplica Maurice y Rydin. Se queda con la ' +
+    'estimación más alta.</p>' +
+    '<p class="note">No cuentan las series con técnica C ni las de recámara 5 o más: con la técnica ' +
+    'rota el peso no vale, y tan lejos del fallo la estimación se dispara. En dominadas se calcula ' +
+    'sobre ' + nf(PESO_CORP) + ' kg de peso corporal.</p>' +
+    '<p class="note">Es una estimación, no un test. Si te cuadra, adóptala.</p></div></div>';
 
   h += evoHTML();
 
