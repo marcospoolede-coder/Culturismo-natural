@@ -608,6 +608,10 @@ function traduceError(m){
   if(/valid email|invalid format/i.test(m)) return "Ese correo no tiene buena pinta, revísalo.";
   if(/Email not confirmed/i.test(m)) return "Te falta confirmar la cuenta desde el correo que te mandamos.";
   if(/rate limit|too many/i.test(m)) return "Demasiados intentos seguidos. Espera un minuto.";
+  /* lista blanca en Supabase: el disparador corta el alta y GoTrue devuelve un
+     error genérico, así que aquí se traduce a algo que se entienda */
+  if(/database error saving new user|no autorizado|not authorized|signups? not allowed/i.test(m))
+    return "Ese correo no tiene acceso todavía. Pídeselo a quien te pasó la aplicación.";
   if(/failed to fetch|network|load failed/i.test(m))
     return "No se ha podido conectar. Revisa la conexión, y si acabas de configurar las cuentas, revisa la dirección del proyecto.";
   return m;
@@ -1512,8 +1516,9 @@ function cuentaHTML(){
 
   /* con la nube disponible, pero sin entrar */
   if(nube){
-    h += '<p class="note" style="margin:0 0 11px">Crea una cuenta con tu correo y tendrás tu entrenamiento ' +
-      'en cualquier dispositivo. Si prefieres no registrarte, la app funciona igual y guarda en este navegador.</p>' +
+    h += '<p class="note" style="margin:0 0 11px">El acceso va por invitación: crea la cuenta con el correo ' +
+      'que diste y tendrás tu entrenamiento en cualquier dispositivo. Si tu correo no está autorizado, ' +
+      'la app funciona igual y guarda en este navegador.</p>' +
       '<div class="campo"><label for="au-mail">Correo</label>' +
       '<input id="au-mail" type="email" autocomplete="email" inputmode="email" placeholder="tu@correo.com"></div>' +
       '<div class="campo"><label for="au-pass">Contraseña</label>' +
