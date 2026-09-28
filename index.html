@@ -168,8 +168,15 @@
   .wfield input{width:74px; padding:6px 8px; border-radius:9px; border:1px solid var(--line-2);
                 background:var(--surface-2); font-family:"IBM Plex Mono",monospace; font-size:14px}
 
+  /* duración estimada */
+  .dura{display:flex; align-items:center; gap:5px; margin-top:7px; font-size:12px; color:var(--ink-2)}
+  .dura svg{width:14px; height:14px; stroke:currentColor; fill:none; stroke-width:2;
+            stroke-linecap:round; flex:0 0 auto}
+
   /* demostración del ejercicio */
   .demo{margin:13px 0 0; padding:0}
+  .demo.previa{margin:11px 0 0}
+  .demo.previa img{opacity:.75}
   .demo img{display:block; width:100%; height:auto; aspect-ratio:1000/334;
             border-radius:10px; background:var(--surface-2)}
   .demo figcaption{font-size:11.5px; color:var(--ink-3); margin-top:5px; text-align:center}
@@ -1022,6 +1029,26 @@ function avisos(p){
   return h;
 }
 
+/* Duración estimada de la sesión. Cuenta el tiempo bajo barra, los descansos
+   que marca el plan, las series de aproximación de cada básico y diez minutos
+   de calentamiento general. Es una estimación, por eso se muestra con ~. */
+function duracion(p, lista){
+  var seg = 600;
+  lista.forEach(function(e){
+    var c = cargas(p, e), desc = descansoDe(p, e);
+    c.forEach(function(x){ seg += (+x.reps || 10) * 4 + 15; });
+    seg += desc * c.length;
+    if(e.t === "b") seg += 120;
+  });
+  /* los jump set se alternan, así que su descanso ya lo ocupa el otro ejercicio */
+  return Math.round(seg / 60);
+}
+function enHoras(min){
+  if(min < 60) return min + " min";
+  var h = Math.floor(min / 60), m = min % 60;
+  return h + " h" + (m ? " " + m + " min" : "");
+}
+
 function hechosSesion(p, lista){
   var n = 0;
   lista.forEach(function(e, i){ if(exHecho(p, e, i)) n++; });
@@ -1041,6 +1068,9 @@ function vHoy(){
        '<div class="prog"><div class="prog-t"><i style="width:' +
        Math.round(hechosSesion(p, lista) / lista.length * 100) + '%"></i></div>' +
        '<span>' + hechosSesion(p, lista) + ' de ' + lista.length + '</span></div>' +
+       '<div class="dura"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="8"/>' +
+       '<path d="M12 9v4l2.5 2.5M9 2h6"/></svg>~' + enHoras(duracion(p, lista)) +
+       ' con el calentamiento</div>' +
        '</div></div>';
 
   if(f.tipo === "fuerza"){
@@ -1073,6 +1103,12 @@ function vHoy(){
       c.map(function(x){ return x.reps; }).join("-") + '</small></span></button>';
 
     if(lock){
+      /* la foto se ve igual, para saber de antemano qué máquina hace falta */
+      if(FOTOS[e.n]){
+        h += '<div class="ex-body" style="padding-top:0"><figure class="demo previa">' +
+          '<img src="img/' + FOTOS[e.n] + '.webp" width="1000" height="334" loading="lazy" ' +
+          'decoding="async" alt="Ejecución de ' + esc(e.n) + '"></figure></div>';
+      }
       h += '<div class="lockmsg"><svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="10" rx="2"/>' +
         '<path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>' +
         'Termina ' + esc(lista[i - 1] ? lista[i - 1].n.toLowerCase() : "el anterior") +
@@ -1103,14 +1139,14 @@ function vHoy(){
           '<span class="teo">teórico <b>' + (teo ? (e.bw ? "+" : "") + nf(teo) : "libre") + '</b> kg</span></div>';
         var pl = discos(x.kg, e.bw);
         if(pl){
-          h += '<div class="plates"><span>Por lado</span>';
+          h += '<div class="plates"><span>Barra de ' + nf(BARRA) + ' kg y, por lado</span>';
           pl.forEach(function(d){
             h += '<span class="plate' + (d === 5 ? " l" : "") + '" style="background:var(' + PCOL[d] + ')">' +
               nf2(d) + '</span>';
           });
           h += '</div>';
         }else if(x.kg && x.kg <= BARRA && !e.bw){
-          h += '<div class="plates"><span>Solo la barra de ' + nf(BARRA) + ' kg</span></div>';
+          h += '<div class="plates"><span>Solo la barra olímpica de ' + nf(BARRA) + ' kg</span></div>';
         }
         h += '<div class="campos">' +
           '<label class="campo-s"><span>Peso real</span><div class="inw">' +
@@ -1141,7 +1177,7 @@ function vHoy(){
       h += '</div>';
       var pl2 = discos(c[0].kg, e.bw);
       if(pl2){
-        h += '<div class="plates"><span>Por lado</span>';
+        h += '<div class="plates"><span>Barra de ' + nf(BARRA) + ' kg y, por lado</span>';
         pl2.forEach(function(d){
           h += '<span class="plate' + (d === 5 ? " l" : "") + '" style="background:var(' + PCOL[d] + ')">' +
             nf2(d) + '</span>';
@@ -1681,6 +1717,14 @@ function vAjustes(){
     }).join("") + '</select></div></div>' +
     '<p class="note" style="margin:0">Úsalo solo si te saltas semanas o retomas el plan por otro sitio.</p>' +
     '</div></div>';
+
+  h += '<div class="sect"><div class="eyebrow">Material que se asume</div><div class="card">' +
+    '<p class="note" style="margin:0"><b>Barra olímpica de ' + nf(BARRA) + ' kg.</b> Todos los pesos ' +
+    'del plan la incluyen: cuando pone 80 kg son la barra más 30 kg de discos por lado, no 80 kg de discos.</p>' +
+    '<p class="note">Discos de ' + DISCOS.map(nf2).join(", ") + ' kg. Como el disco más pequeño va en ' +
+    'pareja, el salto mínimo en la barra es de 2,5 kg, y a eso se redondea todo.</p>' +
+    '<p class="note">Si tu barra pesa otra cosa, la barra Z o una de mujer de 15 kg, resta la diferencia ' +
+    'a los discos que te dice cada serie.</p></div></div>';
 
   h += '<div class="sect"><div class="eyebrow">Cronómetro</div><div class="card">' +
     '<div class="row">' + [90,105,120,180].map(function(s){
