@@ -168,6 +168,31 @@
   .wfield input{width:74px; padding:6px 8px; border-radius:9px; border:1px solid var(--line-2);
                 background:var(--surface-2); font-family:"IBM Plex Mono",monospace; font-size:14px}
 
+  /* jump set por vueltas */
+  .js-bloque .ex-load b{font-size:19px}
+  .vuelta{border:1.5px solid var(--line-2); border-radius:13px; padding:9px 10px 10px; margin-top:9px;
+          background:var(--surface)}
+  .vuelta.ok{border-color:var(--ok); background:var(--ok-soft)}
+  .vuelta-n{font-family:"Saira Condensed",sans-serif; font-size:12px; letter-spacing:.1em;
+            text-transform:uppercase; font-weight:600; color:var(--ink-3); margin-bottom:7px}
+  .vuelta.ok .vuelta-n{color:var(--ok)}
+  .vuelta-ej{display:flex; flex-direction:column; gap:6px}
+  .jchip{display:flex; align-items:center; gap:9px; width:100%; text-align:left;
+         border:1.5px solid var(--line-2); border-radius:11px; padding:9px 10px;
+         background:var(--surface-2); transition:transform .1s ease}
+  .jchip:active{transform:scale(.98)}
+  .jchip .jn{flex:0 0 auto; width:21px; height:21px; border-radius:7px; background:var(--line);
+             color:var(--ink-2); display:grid; place-items:center;
+             font-family:"IBM Plex Mono",monospace; font-size:11px; font-weight:600}
+  .jchip .jt{flex:1 1 auto; font-weight:600; font-size:14.5px; line-height:1.2; min-width:0}
+  .jchip .jr{flex:0 0 auto; font-size:12px; color:var(--ink-2); white-space:nowrap;
+             font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums}
+  .jchip .jr b{font-size:17px; color:var(--ink); font-weight:600}
+  .jchip.on{background:var(--ok); border-color:var(--ok); color:var(--surface)}
+  .jchip.on .jn{background:rgba(255,255,255,.25); color:var(--surface)}
+  .jchip.on .jr,.jchip.on .jr b{color:var(--surface)}
+  .jchip.on .jt::after{content:" ✓"; opacity:.85}
+
   /* duración estimada */
   .dura{display:flex; align-items:center; gap:5px; margin-top:7px; font-size:12px; color:var(--ink-2)}
   .dura svg{width:14px; height:14px; stroke:currentColor; fill:none; stroke-width:2;
@@ -334,7 +359,11 @@
   .srow.ok{border-color:var(--ok); background:var(--ok-soft)}
   .srow-h{display:flex; align-items:baseline; gap:8px; flex-wrap:wrap}
   .srow-h b{font-family:"Saira Condensed",sans-serif; font-size:16px; letter-spacing:.02em}
-  .srow-h .reps{font-size:12.5px; color:var(--ink-2)}
+  .srow-h .objetivo{font-size:12.5px; color:var(--ink-2); display:flex; align-items:baseline; gap:4px}
+  .srow-h .objetivo b{font-family:"IBM Plex Mono",monospace; font-size:26px; font-weight:600;
+                      color:var(--ink); line-height:1; letter-spacing:-.02em;
+                      font-variant-numeric:tabular-nums}
+  .srow.ok .srow-h .objetivo b{color:color-mix(in srgb, var(--ok) 80%, var(--ink))}
   .srow-h .teo{margin-left:auto; font-size:12.5px; color:var(--ink-2); white-space:nowrap}
   .srow-h .teo b{font-family:"IBM Plex Mono",monospace; font-size:15px; color:var(--ink);
                  font-variant-numeric:tabular-nums; letter-spacing:0}
@@ -355,6 +384,7 @@
         background-size:5px 5px, 5px 5px; background-repeat:no-repeat; padding-right:28px}
   .campo-s input.falta,.campo-s select.falta{border-color:var(--warn); background:var(--warn-soft)}
   .campo-s .u{font-size:12px; color:var(--ink-3)}
+  .campo-s.ancho{grid-column:1 / -1}
   .tecs{grid-column:1 / -1; display:flex; gap:5px}
   .tecs button{flex:1 1 0; padding:9px 4px; border-radius:10px; border:1px solid var(--line-2);
                background:var(--surface-2); font-weight:600; font-size:13.5px; line-height:1.15;
@@ -472,9 +502,10 @@
 /* Coeficientes, repeticiones y descansos salen del cuaderno manuscrito
    del 31 de mayo de 2025 y de las tablas de rutina por microciclo.     */
 
-var VERSION = "28 de septiembre de 2026";
+var VERSION = "1 de octubre de 2026";
 var BARRA = 20;
-var PESO_CORP = 75;   /* peso corporal de referencia para dominadas con lastre */
+var PESO_CORP_DEF = 75;   /* peso corporal por defecto, se cambia en Ajustes */
+function pesoCorp(){ return state.peso > 0 ? state.peso : PESO_CORP_DEF; }
 var DISCOS = [25, 20, 15, 10, 5, 2.5, 1.25];
 var PCOL = {25:"--p25", 20:"--p20", 15:"--p15", 10:"--p10", 5:"--p5", 2.5:"--p2", 1.25:"--p1"};
 
@@ -592,6 +623,8 @@ var state = {
   v:1, ts:0,
   pos:{f:0, s:0, e:0},            /* fase, semana, sesión dentro de la semana */
   porSemana:{AB:4, ABC:3},
+  inicio:{AB:0, ABC:0},        /* por qué letra empieza cada rutina */
+  peso:PESO_CORP_DEF,          /* peso corporal, para el lastre de las dominadas */
   rms:{}, rmsFecha:{}, ejemplo:true,
   tests:{}, pesos:{}, hechas:[], marcas:[], registros:[]
 };
@@ -710,6 +743,7 @@ function merge(base, o){
   out.rms = Object.assign({}, base.rms, o.rms || {});
   out.rmsFecha = Object.assign({}, base.rmsFecha, o.rmsFecha || {});
   out.porSemana = Object.assign({}, base.porSemana, o.porSemana || {});
+  out.inicio = Object.assign({}, base.inicio, o.inicio || {});
   return out;
 }
 function save(){
@@ -754,17 +788,22 @@ function kgApuntado(i, j, teo){
   var r = apunte(i, j);
   return (r && r.kg != null && r.kg !== "") ? r.kg : teo;
 }
-function setHecho(e, i, j, teo){
+function repsApuntadas(i, j, obj){
+  var r = apunte(i, j);
+  return (r && r.reps != null && r.reps !== "") ? r.reps : obj;
+}
+function setHecho(e, i, j, teo, obj){
   if(esBasico(e)){
     var r = apunte(i, j);
-    return !!(r && r.rir !== undefined && r.rir !== null && r.rir !== "" && r.tec && kgApuntado(i, j, teo) > 0);
+    return !!(r && r.rir !== undefined && r.rir !== null && r.rir !== "" && r.tec &&
+              kgApuntado(i, j, teo) > 0 && repsApuntadas(i, j, obj) > 0);
   }
   return !!((sesion.sets || {})[i] || [])[j];
 }
 function exHecho(p, e, i){
   var c = cargas(p, e), n = c.length;
   if(!n) return false;
-  for(var j = 0; j < n; j++) if(!setHecho(e, i, j, c[j].kg)) return false;
+  for(var j = 0; j < n; j++) if(!setHecho(e, i, j, teoDe(e, c[j].kg), c[j].reps)) return false;
   return true;
 }
 /* los jump set seguidos se alternan, así que se abren como un solo bloque */
@@ -791,7 +830,7 @@ function activo(p, lista){
   return -1;
 }
 /* lo que se apunta en un básico con lastre es el lastre, no el total */
-function teoDe(e, kg){ return e.bw ? Math.max(0, (kg || 0) - PESO_CORP) : kg; }
+function teoDe(e, kg){ return e.bw ? Math.max(0, (kg || 0) - pesoCorp()) : kg; }
 
 function guardaApuntes(p, f, L, lista){
   var d = iso(), n = 0;
@@ -804,7 +843,7 @@ function guardaApuntes(p, f, L, lista){
       var teo = teoDe(e, x.kg);
       state.registros.push({
         d:d, f:f.id, fn:f.n, w:p.s + 1, r:L, ex:e.n, rm:e.rm || "", bw:e.bw ? 1 : 0, s:j + 1,
-        reps:x.reps, teo:teo, kg:kgApuntado(i, j, teo),
+        obj:x.reps, reps:repsApuntadas(i, j, x.reps), teo:teo, kg:kgApuntado(i, j, teo),
         rir:r.rir, tec:r.tec
       });
       n++;
@@ -830,9 +869,9 @@ function rmTeorico(k){
   if(!del.length) return null;
   var mejor = 0;
   del.forEach(function(x){
-    var total = (+x.kg) + (x.bw ? PESO_CORP : 0);
-    var est = total * mrFactor(+x.reps + (+x.rir), 1);
-    if(x.bw) est -= PESO_CORP;
+    var total = (+x.kg) + (x.bw ? pesoCorp() : 0);
+    var est = total * mrFactor((+x.reps || +x.obj || 0) + (+x.rir), 1);
+    if(x.bw) est -= pesoCorp();
     if(est > mejor) mejor = est;
   });
   if(!(mejor > 0)) return null;
@@ -857,7 +896,10 @@ function fotoDelCiclo(f, motivo){
 
 function fase(i){ return FASES[Math.min(i, FASES.length - 1)]; }
 function porSemana(f){ return state.porSemana[f.rut] || (f.rut === "AB" ? 4 : 3); }
-function letra(f, e){ var L = RUT[f.rut].letras; return L[e % L.length]; }
+function letra(f, e){
+  var L = RUT[f.rut].letras, d = (state.inicio && state.inicio[f.rut]) || 0;
+  return L[(e + d) % L.length];
+}
 function esDescarga(p){ var f = fase(p.f); return f.tipo !== "fuerza" && p.s === f.sem - 1; }
 function micro(p){ return Math.min(p.s, 2); }
 
@@ -1055,6 +1097,89 @@ function hechosSesion(p, lista){
   return n;
 }
 
+/* Un jump set es una serie de cada ejercicio, seguidas, y vuelta a empezar.
+   Por eso se pinta por vueltas y no por ejercicio. */
+function bloqueJS(p, f, lista, ini, fin, act){
+  var ejs = [], i;
+  for(i = ini; i <= fin; i++) ejs.push({e:lista[i], i:i, c:cargas(p, lista[i])});
+
+  var vueltas = 0;
+  ejs.forEach(function(q){ vueltas = Math.max(vueltas, q.c.length); });
+
+  var done = ejs.every(function(q){ return exHecho(p, q.e, q.i); });
+  var lock = bloqueado(p, lista, ini);
+  var abierto = false;
+  ejs.forEach(function(q){ if(q.i === act) abierto = true; });
+
+  var nombres = ejs.map(function(q){ return q.e.n; });
+  var titulo = nombres.length > 1
+    ? nombres.slice(0, -1).join(", ") + " y " + nombres[nombres.length - 1]
+    : nombres[0];
+
+  var h = '<div class="ex js-bloque' + (done ? " done" : "") + (lock ? " lock" : "") + '">' +
+    '<button class="ex-head"' + (lock ? " disabled" : ' data-open="js' + ini + '"') + '>' +
+    '<span class="tag js">jump set</span>' +
+    '<span class="ex-name">' + esc(titulo) + '</span>' +
+    '<span class="ex-load"><b>' + vueltas + '</b><small>vueltas</small></span></button>';
+
+  if(lock){
+    h += '<div class="lockmsg"><svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="10" rx="2"/>' +
+      '<path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>' +
+      'Termina ' + esc(lista[ini - 1] ? lista[ini - 1].n.toLowerCase() : "el anterior") +
+      ' y este se abre solo.</div></div>';
+    return h;
+  }
+
+  h += '<div class="ex-body"' + (done || !abierto ? " hidden" : "") + '>';
+  h += '<p class="note">Haces una serie de cada ejercicio, seguidas, y vuelves a empezar. ' +
+    'Cambias de ejercicio cada 30 segundos.</p>';
+
+  for(var v = 0; v < vueltas; v++){
+    var completa = ejs.every(function(q){
+      return !q.c[v] || setHecho(q.e, q.i, v, teoDe(q.e, q.c[v].kg), q.c[v].reps);
+    });
+    h += '<div class="vuelta' + (completa ? " ok" : "") + '">' +
+      '<div class="vuelta-n">Vuelta ' + (v + 1) + ' de ' + vueltas + '</div>' +
+      '<div class="vuelta-ej">';
+    ejs.forEach(function(q, orden){
+      var x = q.c[v];
+      if(!x){ return; }
+      var marcada = ((sesion.sets || {})[q.i] || [])[v];
+      var manual = state.pesos[q.e.n];
+      h += '<button class="jchip' + (marcada ? " on" : "") + '" data-set="' + q.i + ',' + v + '">' +
+        '<span class="jn">' + (orden + 1) + '</span>' +
+        '<span class="jt">' + esc(q.e.n) + '</span>' +
+        '<span class="jr"><b>' + x.reps + '</b> reps' +
+        (x.kg ? ", " + nf(x.kg) + " kg" : (manual ? ", " + nf(manual) + " kg" : "")) + '</span>' +
+        '</button>';
+    });
+    h += '</div></div>';
+  }
+
+  ejs.forEach(function(q){
+    if(q.e.rm) return;
+    var manual = state.pesos[q.e.n];
+    h += '<div class="wfield"><label for="wj' + q.i + '">' + esc(q.e.n) + '</label>' +
+      '<input id="wj' + q.i + '" class="mono" inputmode="decimal" data-peso="' + esc(q.e.n) + '" value="' +
+      (manual ? nf(manual) : "") + '" placeholder="kg"><span>kg</span></div>';
+  });
+
+  ejs.forEach(function(q){
+    if(!FOTOS[q.e.n]) return;
+    h += '<figure class="demo"><img src="img/' + FOTOS[q.e.n] + '.webp" width="1000" height="334" ' +
+      'loading="lazy" decoding="async" alt="Ejecución de ' + esc(q.e.n) + '">' +
+      '<figcaption>' + esc(q.e.n) + '</figcaption></figure>';
+  });
+
+  h += '</div>';
+
+  if(done){
+    h += '<div class="resumen" style="padding:0 13px 12px"><span class="pill">' +
+      vueltas + ' vueltas completas</span></div>';
+  }
+  return h + '</div>';
+}
+
 function vHoy(){
   var p = state.pos, f = fase(p.f), L = letra(f, p.e), lista = RUT[f.rut][L];
   var clave = p.f + "-" + p.s + "-" + p.e;
@@ -1087,7 +1212,20 @@ function vHoy(){
 
   var act = activo(p, lista);
   h += '<div class="sect"><div class="eyebrow">La sesión</div>';
-  lista.forEach(function(e, i){
+
+  for(var i = 0; i < lista.length; i++){
+    var e = lista[i];
+
+    /* los jump set seguidos se pintan juntos: una vuelta tras otra */
+    if(e.js){
+      var fin = i;
+      while(fin + 1 < lista.length && lista[fin + 1].js) fin++;
+      h += bloqueJS(p, f, lista, i, fin, act);
+      i = fin;
+      continue;
+    }
+
+    (function(e, i){
     var c = cargas(p, e), sets = sesion.sets[i] || [];
     var done = exHecho(p, e, i), lock = bloqueado(p, lista, i);
     var tag = e.t === "b" ? '<span class="tag b">básico</span>' :
@@ -1095,7 +1233,7 @@ function vHoy(){
     var kg = c[0].kg, manual = state.pesos[e.n];
     var carga = kg ? nf(kg) + (c[c.length - 1].kg !== kg ? " a " + nf(c[c.length - 1].kg) : "") + " kg"
                    : (manual ? nf(manual) + " kg" : "a tu peso");
-    if(e.bw && kg) carga = "+" + nf(Math.max(0, kg - PESO_CORP)) + " kg";
+    if(e.bw && kg) carga = "+" + nf(Math.max(0, kg - pesoCorp())) + " kg";
     h += '<div class="ex' + (done ? " done" : "") + (lock ? " lock" : "") + '" data-ex="' + i + '">' +
       '<button class="ex-head"' + (lock ? " disabled" : ' data-open="' + i + '"') + '>' + tag +
       '<span class="ex-name">' + esc(e.n) + '</span>' +
@@ -1129,13 +1267,13 @@ function vHoy(){
       h += '<p class="note">Apunta el peso que levantas de verdad, las repeticiones que te sobran ' +
         'y qué tal ha ido la técnica. Sin las tres cosas no se abre el siguiente ejercicio.</p>';
       c.forEach(function(x, j){
-        var r = apunte(i, j) || {}, ok = setHecho(e, i, j, x.kg);
         var teo = teoDe(e, x.kg);
-        var val = kgApuntado(i, j, teo);
+        var r = apunte(i, j) || {}, ok = setHecho(e, i, j, teo, x.reps);
+        var val = kgApuntado(i, j, teo), vrep = repsApuntadas(i, j, x.reps);
         h += '<div class="srow' + (ok ? " ok" : "") + '">' +
           '<div class="srow-h"><b>Serie ' + (j + 1) + '</b>' +
-          '<span class="reps">' + x.reps +
-          (f.rp && j === c.length - 1 ? " reps más rest pause" : " repeticiones") + '</span>' +
+          '<span class="objetivo"><b>' + x.reps + '</b> reps' +
+          (f.rp && j === c.length - 1 ? " más rest pause" : "") + '</span>' +
           '<span class="teo">teórico <b>' + (teo ? (e.bw ? "+" : "") + nf(teo) : "libre") + '</b> kg</span></div>';
         var pl = discos(x.kg, e.bw);
         if(pl){
@@ -1153,7 +1291,11 @@ function vHoy(){
           '<input inputmode="decimal" data-real="' + i + ',' + j + '" value="' +
           (val ? nf(val) : "") + '" aria-label="Peso real de la serie ' + (j + 1) + '">' +
           '<span class="u">kg</span></div></label>' +
-          '<label class="campo-s"><span>Recámara</span>' +
+          '<label class="campo-s"><span>Reps reales</span><div class="inw">' +
+          '<input inputmode="numeric" data-reps="' + i + ',' + j + '" value="' +
+          (vrep ? vrep : "") + '" aria-label="Repeticiones reales de la serie ' + (j + 1) + '">' +
+          '<span class="u">reps</span></div></label>' +
+          '<label class="campo-s ancho"><span>Recámara</span>' +
           '<select data-rir="' + i + ',' + j + '"' + (r.rir === undefined || r.rir === "" ? ' class="falta"' : '') +
           ' aria-label="Repeticiones en recámara de la serie ' + (j + 1) + '">' +
           '<option value="">Elegir</option>' +
@@ -1200,13 +1342,16 @@ function vHoy(){
       h += '<div class="resumen" style="padding:0 13px 12px">';
       c.forEach(function(x, j){
         var r = apunte(i, j) || {};
-        h += '<span class="pill">' + nf(kgApuntado(i, j, x.kg)) + ' kg, ' + x.reps +
-          ' reps, RIR ' + esc(String(r.rir)) + ', ' + esc(r.tec || "") + '</span>';
+        var tj = teoDe(e, x.kg);
+        h += '<span class="pill">' + nf(kgApuntado(i, j, tj)) + ' kg, ' +
+          repsApuntadas(i, j, x.reps) + ' reps, RIR ' + esc(String(r.rir)) +
+          ', ' + esc(r.tec || "") + '</span>';
       });
       h += '</div>';
     }
     h += '</div>';
-  });
+    })(e, i);
+  }
   h += '</div>';
 
   var quedan = lista.length - hechosSesion(p, lista);
@@ -1394,7 +1539,7 @@ function vRM(){
     'estimación más alta.</p>' +
     '<p class="note">No cuentan las series con técnica C ni las de recámara 5 o más: con la técnica ' +
     'rota el peso no vale, y tan lejos del fallo la estimación se dispara. En dominadas se calcula ' +
-    'sobre ' + nf(PESO_CORP) + ' kg de peso corporal.</p>' +
+    'sobre ' + nf(pesoCorp()) + ' kg de peso corporal.</p>' +
     '<p class="note">Es una estimación, no un test. Si te cuadra, adóptala.</p></div></div>';
 
   h += evoHTML();
@@ -1705,6 +1850,31 @@ function vAjustes(){
       return '<button data-v="' + n + '" aria-pressed="' + (state.porSemana.ABC === n) + '">' + n + '</button>';
     }).join("") + '</div></div></div></div>';
 
+  h += '<div class="sect"><div class="eyebrow">Por cuál empiezas</div><div class="card stack">' +
+    '<p class="note" style="margin:0">Cambia el orden de las letras dentro de la semana. ' +
+    'Útil si el gimnasio está lleno el día que te toca sentadilla, o si prefieres abrir por el entreno ' +
+    'que peor llevas.</p>';
+  [["AB", "Entrenos A y B"], ["ABC", "Entrenos A, B y C"]].forEach(function(r){
+    var L = RUT[r[0]].letras, d = (state.inicio && state.inicio[r[0]]) || 0;
+    h += '<div><b>' + esc(r[1]) + '</b>' +
+      '<p class="note" style="margin:2px 0 8px">Orden actual: ' +
+      L.map(function(_, k){ return L[(k + d) % L.length]; }).join(", ") + '</p>' +
+      '<div class="seg" data-ini="' + r[0] + '">' + L.map(function(x, k){
+        return '<button data-v="' + k + '" aria-pressed="' + (d === k) + '">' + x + '</button>';
+      }).join("") + '</div></div>';
+  });
+  h += '</div></div>';
+
+  h += '<div class="sect"><div class="eyebrow">Tu peso corporal</div><div class="card">' +
+    '<div class="rm" style="padding-top:0"><div class="rm-n">Peso corporal' +
+    '<small>Se usa para calcular el lastre de las dominadas</small></div>' +
+    '<input class="mono" inputmode="decimal" id="peso-corp" value="' + nf(pesoCorp()) + '" ' +
+    'aria-label="Tu peso corporal"><span class="u">kg</span></div>' +
+    '<p class="note" style="margin-bottom:0">En dominadas, el plan calcula sobre el total que mueves, ' +
+    'que es tu peso más el lastre. Si tu maximal de dominadas es ' + nf(state.rms.dominadas || 0) +
+    ' kg y pesas ' + nf(pesoCorp()) + ' kg, el lastre que te toca poner es la diferencia.</p>' +
+    '</div></div>';
+
   h += '<div class="sect"><div class="eyebrow">Dónde estoy</div><div class="card stack">' +
     '<div class="row"><div style="flex:1"><label class="note" for="selF">Fase</label>' +
     '<select id="selF" class="btn" style="margin-top:4px">' + FASES.map(function(f, i){
@@ -1766,10 +1936,11 @@ function csvMarcas(){
   return l.join("\r\n");
 }
 function csvSeries(){
-  var l = ['"fecha";"ciclo";"semana";"entreno";"ejercicio";"serie";"reps";"teorico_kg";"real_kg";"recamara";"tecnica"'];
+  var l = ['"fecha";"ciclo";"semana";"entreno";"ejercicio";"serie";"reps_objetivo";"reps_reales";"teorico_kg";"real_kg";"recamara";"tecnica"'];
   (state.registros || []).forEach(function(x){
     l.push(['"' + x.d + '"', '"' + (x.fn || "") + '"', '"' + x.w + '"', '"' + x.r + '"',
-            '"' + x.ex + '"', '"' + x.s + '"', '"' + x.reps + '"',
+            '"' + x.ex + '"', '"' + x.s + '"', '"' + (x.obj != null ? x.obj : x.reps) + '"',
+            '"' + x.reps + '"',
             '"' + nf(x.teo || 0) + '"', '"' + nf(x.kg || 0) + '"',
             '"' + x.rir + '"', '"' + x.tec + '"'].join(";"));
   });
@@ -1918,9 +2089,9 @@ document.addEventListener("click", function(ev){
     var p4 = state.pos, f4 = fase(p4.f), e4 = RUT[f4.rut][letra(f4, p4.e)][ti];
     var c4 = cargas(p4, e4);
     /* al completar la serie arranca el descanso, como en el resto de la app */
-    if(setHecho(e4, ti, tj, c4[tj] ? c4[tj].kg : 0)){
+    if(setHecho(e4, ti, tj, c4[tj] ? teoDe(e4, c4[tj].kg) : 0, c4[tj] ? c4[tj].reps : 0)){
       var q4 = 0;
-      c4.forEach(function(x, k){ if(!setHecho(e4, ti, k, x.kg)) q4++; });
+      c4.forEach(function(x, k){ if(!setHecho(e4, ti, k, teoDe(e4, x.kg), x.reps)) q4++; });
       startTimer(descansoDe(p4, e4), e4.n,
         q4 > 0 ? "Quedan " + q4 + " serie" + (q4 > 1 ? "s" : "") : "Ejercicio terminado");
     }
@@ -1959,6 +2130,11 @@ document.addEventListener("click", function(ev){
   }
   if((el = ev.target.closest("[data-timer]"))){ startTimer(+el.dataset.timer, "Descanso", ""); return; }
   if((el = ev.target.closest(".tab"))){ tab = el.dataset.t; render(); return; }
+  if((el = ev.target.closest("[data-ini] button"))){
+    var rut = el.closest("[data-ini]").dataset.ini;
+    state.inicio[rut] = +el.dataset.v;
+    state.pos.e = 0; sesion = {}; saveSesion(); save(); render(); return;
+  }
   if((el = ev.target.closest("[data-seg] button"))){
     var seg = el.closest("[data-seg]").dataset.seg;
     state.porSemana[seg] = +el.dataset.v; state.pos.e = 0; save(); render(); return;
@@ -2065,6 +2241,14 @@ document.addEventListener("click", function(ev){
 
 document.addEventListener("input", function(ev){
   var t = ev.target;
+  if(t.dataset.reps){
+    var ra = t.dataset.reps.split(","), rri = +ra[0], rrj = +ra[1];
+    var rlg = logEx(rri); rlg[rrj] = rlg[rrj] || {};
+    var rv = parseInt(String(t.value).replace(/[^0-9]/g, ""), 10);
+    rlg[rrj].reps = (!isNaN(rv) && rv > 0) ? rv : null;
+    saveSesion();
+    return;
+  }
   if(t.dataset.real){
     var a = t.dataset.real.split(","), ri = +a[0], rj = +a[1];
     var lg = logEx(ri); lg[rj] = lg[rj] || {};
@@ -2083,6 +2267,11 @@ document.addEventListener("input", function(ev){
       if(f.test) state.tests[f.id] = true;
       save();
     }
+    return;
+  }
+  if(t.id === "peso-corp"){
+    var pc = parseFloat(String(t.value).replace(",", "."));
+    if(!isNaN(pc) && pc > 25 && pc < 250){ state.peso = pc; save(); }
     return;
   }
   if(t.dataset.peso){
@@ -2106,9 +2295,9 @@ document.addEventListener("change", function(ev){
     lg[rj].rir = ev.target.value;
     var p5 = state.pos, f5 = fase(p5.f), e5 = RUT[f5.rut][letra(f5, p5.e)][ri];
     var c5 = cargas(p5, e5);
-    if(setHecho(e5, ri, rj, c5[rj] ? c5[rj].kg : 0)){
+    if(setHecho(e5, ri, rj, c5[rj] ? teoDe(e5, c5[rj].kg) : 0, c5[rj] ? c5[rj].reps : 0)){
       var q5 = 0;
-      c5.forEach(function(x, k){ if(!setHecho(e5, ri, k, x.kg)) q5++; });
+      c5.forEach(function(x, k){ if(!setHecho(e5, ri, k, teoDe(e5, x.kg), x.reps)) q5++; });
       startTimer(descansoDe(p5, e5), e5.n,
         q5 > 0 ? "Quedan " + q5 + " serie" + (q5 > 1 ? "s" : "") : "Ejercicio terminado");
     }
