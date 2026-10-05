@@ -1959,14 +1959,15 @@ function vCal(){
   var y = ref.getFullYear(), mo = ref.getMonth(), hoyI = iso(new Date());
   var mes = ref.toLocaleDateString("es-ES", {month:"long", year:"numeric"});
 
-  var k = lunesIso(), hechas = sesionesEn(k), m = meta(), r = racha();
+  /* ojo con los nombres: m y k ya los usa la rejilla del mes más abajo */
+  var kSem = lunesIso(), hechas = sesionesEn(kSem), mSem = meta(), r = racha();
   var h = '<div class="sect"><div class="card semana">' +
-    anilloHTML(hechas, m, 104) +
+    anilloHTML(hechas, mSem, 104) +
     '<div class="semana-t"><b>' +
-      (hechas >= m ? "Semana cumplida" : "Esta semana") + '</b>' +
-      '<p>' + (hechas >= m
-        ? "Ya tienes las " + m + " sesiones. Lo que venga de más es regalo."
-        : "Te " + (m - hechas === 1 ? "queda una sesión" : "quedan " + (m - hechas) + " sesiones") +
+      (hechas >= mSem ? "Semana cumplida" : "Esta semana") + '</b>' +
+      '<p>' + (hechas >= mSem
+        ? "Ya tienes las " + mSem + " sesiones. Lo que venga de más es regalo."
+        : "Te " + (mSem - hechas === 1 ? "queda una sesión" : "quedan " + (mSem - hechas) + " sesiones") +
           " para cumplir el objetivo.") + '</p>' +
       '<div class="rachafila"><span class="rachapill' + (r > 0 ? " on" : "") + '">' +
         '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c3 4 5 6 5 9a5 5 0 0 1-10 0c0-1 .5-2 1.5-3C9 10 12 7 12 2z"/></svg>' +
