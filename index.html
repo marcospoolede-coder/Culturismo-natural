@@ -2574,21 +2574,22 @@ document.addEventListener("pointerdown", function(ev){
   cuadro.setPointerCapture(ev.pointerId);
   cuadro.classList.add("arrastrando");
 
+  /* el destino se mide siempre contra la posición de partida, no contra la
+     última, para que el cuadrado siga al dedo y pueda saltar varios huecos */
+  var origen = cuadros.indexOf(cuadro);
   function mueve(e){
     var dx = e.clientX - x0;
     if(!movido && Math.abs(dx) < 4) return;
     movido = true;
-    cuadro.style.transform = "translateX(" + dx + "px)";
+    var destino = Math.max(0, Math.min(cuadros.length - 1, origen + Math.round(dx / ancho)));
     var actual = cuadros.indexOf(cuadro);
-    var destino = Math.max(0, Math.min(cuadros.length - 1, actual + Math.round(dx / ancho)));
     if(destino !== actual){
       cuadros.splice(actual, 1);
       cuadros.splice(destino, 0, cuadro);
       cuadros.forEach(function(c){ fila.appendChild(c); });
-      x0 = e.clientX;
-      cuadro.style.transform = "";
       pintaOrden(fila);
     }
+    cuadro.style.transform = "translateX(" + (dx - (destino - origen) * ancho) + "px)";
   }
   function suelta(){
     cuadro.releasePointerCapture(ev.pointerId);
