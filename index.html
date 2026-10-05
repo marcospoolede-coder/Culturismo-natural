@@ -168,6 +168,44 @@
   .wfield input{width:74px; padding:6px 8px; border-radius:9px; border:1px solid var(--line-2);
                 background:var(--surface-2); font-family:"IBM Plex Mono",monospace; font-size:14px}
 
+  /* objetivo semanal, racha y logros */
+  .semana{display:flex; align-items:center; gap:15px}
+  .semana-t{flex:1 1 auto; min-width:0}
+  .semana-t b{font-family:"Saira Condensed",sans-serif; font-size:19px; line-height:1.1; display:block}
+  .semana-t p{margin:3px 0 0; font-size:13px; color:var(--ink-2); line-height:1.35}
+  .anillo{position:relative; flex:0 0 auto}
+  .anillo svg{width:100%; height:100%; transform:rotate(-90deg)}
+  .anillo circle{fill:none; stroke-width:7; stroke-linecap:round}
+  .anillo .apista{stroke:var(--line)}
+  .anillo .atrazo{stroke:var(--accent); transition:stroke-dashoffset .5s ease}
+  .anillo .atrazo.ok{stroke:var(--ok)}
+  .acentro{position:absolute; inset:0; display:flex; flex-direction:column;
+           align-items:center; justify-content:center; gap:0}
+  .acentro b{font-family:"IBM Plex Mono",monospace; font-size:25px; font-weight:600; line-height:1}
+  .acentro small{font-size:10.5px; color:var(--ink-2); line-height:1.2}
+  .rachafila{display:flex; flex-wrap:wrap; gap:6px; margin-top:9px}
+  .rachapill{display:inline-flex; align-items:center; gap:4px; font-size:12px; font-weight:600;
+             padding:3px 9px; border-radius:99px; background:var(--surface-2);
+             border:1px solid var(--line); color:var(--ink-3)}
+  .rachapill svg{width:13px; height:13px; fill:currentColor; stroke:none}
+  .rachapill.on{background:var(--accent-soft); color:var(--accent); border-color:transparent}
+  .rachapill.esc.on{background:var(--ok-soft); color:var(--ok)}
+  .rachapill.pts{font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums}
+
+  .logros{display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:8px}
+  .logro{border:1px solid var(--line); border-radius:11px; padding:9px 10px; background:var(--surface-2);
+         opacity:.55}
+  .logro.on{opacity:1; background:var(--ok-soft); border-color:transparent}
+  .logro-n{font-weight:600; font-size:13.5px; line-height:1.2}
+  .logro.on .logro-n{color:var(--ok)}
+  .logro-d{font-size:11.5px; color:var(--ink-2); margin-top:2px; line-height:1.3}
+
+  .avisofel{background:var(--accent-soft); color:var(--accent); border-radius:10px;
+            padding:9px 11px; font-size:13px; line-height:1.35; margin:0 0 12px; text-align:left}
+  .logrosfel{display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin:0 0 13px}
+  .logropill{background:var(--ok); color:#fff; border-radius:99px; padding:4px 11px;
+             font-size:12.5px; font-weight:600}
+
   /* orden de los entrenos, cuadrados que se arrastran */
   .ordfila{display:flex; gap:7px; margin-top:9px; touch-action:none}
   .ordcuadro{flex:1 1 0; min-width:0; touch-action:none; cursor:grab;
@@ -764,6 +802,12 @@ var state = {
   orden:{AB:null, ABC:null},   /* el orden de las letras, null es el del plan */
   peso:PESO_CORP_DEF,          /* peso corporal, para el lastre de las dominadas */
   alt:{},                      /* complementarios cambiados por una alternativa */
+  meta:3,                      /* sesiones por semana que te pones como objetivo */
+  escudos:0,                   /* semanas que puedes salvar si te quedas corto */
+  salvadas:{},                 /* semanas rescatadas con un escudo */
+  puntos:0,
+  logros:{},                   /* id del logro, fecha en que cayó */
+  premiada:0,                  /* última racha que ya dio escudo */
   rms:{}, rmsFecha:{}, ejemplo:true,
   tests:{}, pesos:{}, hechas:[], marcas:[], registros:[]
 };
@@ -892,6 +936,8 @@ function merge(base, o){
     });
   }
   out.alt = Object.assign({}, base.alt, o.alt || {});
+  out.salvadas = Object.assign({}, base.salvadas, o.salvadas || {});
+  out.logros = Object.assign({}, base.logros, o.logros || {});
   return out;
 }
 function save(){
@@ -1849,15 +1895,55 @@ function lunes(d){
 }
 function deIso(k){ var p = String(k).split("-"); return new Date(+p[0], +p[1] - 1, +p[2]); }
 
-/* semanas seguidas con al menos una sesión, contando hacia atrás */
+/* ---------- objetivo semanal ----------
+   Entrenar fuerza no es diario: hace falta descansar. Por eso el objetivo es
+   de sesiones por semana y la racha cuenta semanas cumplidas, no días. */
+function meta(){ return state.meta > 0 ? state.meta : 3; }
+function lunesIso(d){ return iso(lunes(d || new Date())); }
+
+function porSemanaHechas(){
+  var m = porDia(), out = {};
+  Object.keys(m).forEach(function(d){
+    var k = lunesIso(deIso(d));
+    out[k] = (out[k] || 0) + m[d].length;
+  });
+  return out;
+}
+function sesionesEn(k){ return porSemanaHechas()[k] || 0; }
+function cumplida(k){ return sesionesEn(k) >= meta() || !!(state.salvadas || {})[k]; }
+
+/* semanas seguidas cumpliendo el objetivo, contando hacia atrás */
 function racha(){
-  var m = porDia(), ks = Object.keys(m), sem = {};
-  if(!ks.length) return 0;
-  ks.forEach(function(k){ sem[iso(lunes(deIso(k)))] = 1; });
   var n = 0, cur = lunes(new Date());
-  if(!sem[iso(cur)]) cur.setDate(cur.getDate() - 7);   /* la semana en curso aún puede llenarse */
-  while(sem[iso(cur)]){ n++; cur.setDate(cur.getDate() - 7); }
+  /* la semana en curso solo cuenta si ya está cumplida, pero si no lo está
+     todavía no rompe nada: aún le quedan días */
+  if(!cumplida(iso(cur))) cur.setDate(cur.getDate() - 7);
+  while(cumplida(iso(cur))){ n++; cur.setDate(cur.getDate() - 7); }
   return n;
+}
+
+/* ---------- escudos ----------
+   La idea es de Duolingo y resuelve un problema real: que una semana mala,
+   por un viaje o una lesión, no borre meses de trabajo y te haga abandonar. */
+function ganaEscudo(){
+  var r = racha();
+  if(r > 0 && r % 4 === 0 && state.premiada !== r){
+    state.premiada = r;
+    if((state.escudos || 0) < 2){ state.escudos = (state.escudos || 0) + 1; return true; }
+  }
+  return false;
+}
+/* al abrir semana nueva, si la anterior quedó corta se gasta un escudo */
+function gastaEscudo(){
+  var ant = lunes(new Date());
+  ant.setDate(ant.getDate() - 7);
+  var k = iso(ant);
+  if(cumplida(k) || !sesionesEn(k)) return false;      /* cumplida, o semana en blanco */
+  if(!(state.escudos > 0)) return false;
+  state.escudos--;
+  state.salvadas = state.salvadas || {};
+  state.salvadas[k] = 1;
+  return true;
 }
 function delMes(ref){
   var m = porDia(), n = 0, y = ref.getFullYear(), mo = ref.getMonth();
@@ -1873,10 +1959,28 @@ function vCal(){
   var y = ref.getFullYear(), mo = ref.getMonth(), hoyI = iso(new Date());
   var mes = ref.toLocaleDateString("es-ES", {month:"long", year:"numeric"});
 
-  var h = '<div class="sect"><div class="kpis">' +
+  var k = lunesIso(), hechas = sesionesEn(k), m = meta(), r = racha();
+  var h = '<div class="sect"><div class="card semana">' +
+    anilloHTML(hechas, m, 104) +
+    '<div class="semana-t"><b>' +
+      (hechas >= m ? "Semana cumplida" : "Esta semana") + '</b>' +
+      '<p>' + (hechas >= m
+        ? "Ya tienes las " + m + " sesiones. Lo que venga de más es regalo."
+        : "Te " + (m - hechas === 1 ? "queda una sesión" : "quedan " + (m - hechas) + " sesiones") +
+          " para cumplir el objetivo.") + '</p>' +
+      '<div class="rachafila"><span class="rachapill' + (r > 0 ? " on" : "") + '">' +
+        '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c3 4 5 6 5 9a5 5 0 0 1-10 0c0-1 .5-2 1.5-3C9 10 12 7 12 2z"/></svg>' +
+        r + (r === 1 ? " semana" : " semanas") + '</span>' +
+        '<span class="rachapill esc' + ((state.escudos || 0) > 0 ? " on" : "") + '">' +
+        '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/></svg>' +
+        (state.escudos || 0) + (state.escudos === 1 ? " escudo" : " escudos") + '</span>' +
+        '<span class="rachapill pts">' + (state.puntos || 0) + ' puntos</span>' +
+      '</div></div></div></div>';
+
+  h += '<div class="sect"><div class="kpis">' +
     '<div class="kpi"><b>' + delMes(ref) + '</b><small>sesiones en ' +
       esc(ref.toLocaleDateString("es-ES", {month:"long"})) + '</small></div>' +
-    '<div class="kpi"><b>' + racha() + '</b><small>semanas seguidas</small></div>' +
+    '<div class="kpi"><b>' + Object.keys(state.salvadas || {}).length + '</b><small>semanas salvadas</small></div>' +
     '<div class="kpi"><b>' + (state.hechas || []).length + '</b><small>sesiones en total</small></div>' +
     '</div></div>';
 
@@ -1905,6 +2009,17 @@ function vCal(){
     '<span><i style="border:1.5px solid var(--accent)"></i>Hoy</span></div>';
   h += '</div></div>';
 
+  var ganados = Object.keys(state.logros || {}).length;
+  h += '<div class="sect"><div class="eyebrow">Logros, ' + ganados + ' de ' + LOGROS.length +
+    '</div><div class="card"><div class="logros">';
+  LOGROS.forEach(function(l){
+    var f = (state.logros || {})[l.id];
+    h += '<div class="logro' + (f ? " on" : "") + '">' +
+      '<div class="logro-n">' + esc(l.n) + '</div>' +
+      '<div class="logro-d">' + (f ? "conseguido el " + esc(f) : esc(l.d)) + '</div></div>';
+  });
+  h += '</div></div></div>';
+
   var ultimas = (state.hechas || []).slice(-10).reverse();
   h += '<div class="sect"><div class="eyebrow">Últimas sesiones</div><div class="card">';
   if(!ultimas.length){
@@ -1920,15 +2035,68 @@ function vCal(){
   view.innerHTML = h;
 }
 
+/* anillo de progreso del objetivo semanal */
+function anilloHTML(hechas, m, tam){
+  var r = (tam / 2) - 7, c = 2 * Math.PI * r;
+  var p = Math.max(0, Math.min(1, m ? hechas / m : 0));
+  return '<div class="anillo" style="width:' + tam + 'px;height:' + tam + 'px">' +
+    '<svg viewBox="0 0 ' + tam + ' ' + tam + '" aria-hidden="true">' +
+    '<circle cx="' + (tam/2) + '" cy="' + (tam/2) + '" r="' + r + '" class="apista"/>' +
+    '<circle cx="' + (tam/2) + '" cy="' + (tam/2) + '" r="' + r + '" class="atrazo' +
+      (p >= 1 ? " ok" : "") + '" stroke-dasharray="' + c.toFixed(1) +
+      '" stroke-dashoffset="' + (c * (1 - p)).toFixed(1) + '"/></svg>' +
+    '<div class="acentro"><b>' + hechas + '</b><small>de ' + m + '</small></div></div>';
+}
+
+/* ---------- logros ----------
+   Nada de insignias inventadas: cada una marca algo que ha pasado de verdad
+   en el entrenamiento o en la constancia. */
+var LOGROS = [
+  {id:"s1",   n:"La primera",        d:"Cerrar la primera sesión"},
+  {id:"w1",   n:"Primera semana",    d:"Cumplir el objetivo una semana"},
+  {id:"w4",   n:"Un mes entero",     d:"Cuatro semanas seguidas cumpliendo"},
+  {id:"w12",  n:"Un trimestre",      d:"Doce semanas seguidas cumpliendo"},
+  {id:"w24",  n:"Medio año",         d:"Veinticuatro semanas seguidas"},
+  {id:"s25",  n:"25 sesiones",       d:"Veinticinco sesiones cerradas"},
+  {id:"s50",  n:"50 sesiones",       d:"Cincuenta sesiones cerradas"},
+  {id:"s100", n:"100 sesiones",      d:"Cien sesiones cerradas"},
+  {id:"ciclo",n:"Ciclo cerrado",     d:"Terminar un ciclo entero del plan"},
+  {id:"pr",   n:"Marca nueva",       d:"Subir un maximal"},
+  {id:"pico", n:"Pico de fuerza",    d:"Terminar el bloque de fuerza"}
+];
+function daLogro(id){
+  state.logros = state.logros || {};
+  if(state.logros[id]) return false;
+  state.logros[id] = hoy();
+  return true;
+}
+function revisaLogros(cerroFase, eraFuerza){
+  var tot = (state.hechas || []).length, r = racha(), nuevos = [];
+  function mira(c, id){ if(c && daLogro(id)) nuevos.push(id); }
+  mira(tot >= 1, "s1");
+  mira(tot >= 25, "s25");
+  mira(tot >= 50, "s50");
+  mira(tot >= 100, "s100");
+  mira(r >= 1, "w1");
+  mira(r >= 4, "w4");
+  mira(r >= 12, "w12");
+  mira(r >= 24, "w24");
+  mira(cerroFase, "ciclo");
+  mira(cerroFase && eraFuerza, "pico");
+  return nuevos;
+}
+
 /* ---------- felicitación al cerrar ---------- */
-function felicita(f, L, nApuntes, cerroFase){
-  var tot = (state.hechas || []).length, r = racha(), mes = delMes(new Date());
-  var frase;
-  if(tot === 1) frase = "La primera está hecha. Las que cuentan son las que vienen detrás.";
+function felicita(f, L, nApuntes, cerroFase, extra){
+  extra = extra || {};
+  var tot = (state.hechas || []).length, r = racha(), k = lunesIso();
+  var hechas = sesionesEn(k), m = meta(), frase;
+  if(extra.meta) frase = "Objetivo de la semana cumplido, " + hechas + " de " + m + ".";
+  else if(tot === 1) frase = "La primera está hecha. Las que cuentan son las que vienen detrás.";
   else if(cerroFase) frase = "Ciclo cerrado entero. Eso es lo difícil de un plan, llegar al final.";
   else if(f.tipo === "fuerza") frase = "Una semana menos para el pico.";
-  else if(r >= 4) frase = r + " semanas seguidas. Ya no es una racha, es una costumbre.";
-  else if(tot % 10 === 0) frase = tot + " sesiones apuntadas. El cuaderno empieza a pesar.";
+  else if(hechas < m) frase = "Te " + (m - hechas === 1 ? "queda una" : "quedan " + (m - hechas)) +
+    " para cerrar la semana.";
   else frase = ["Una más en el cajón.", "Eso ya no te lo quita nadie.",
                 "Hecho y apuntado.", "El plan va por donde tiene que ir.",
                 "Así se construye un ciclo."][tot % 5];
@@ -1939,13 +2107,23 @@ function felicita(f, L, nApuntes, cerroFase){
     '<div class="fel-ic"><svg viewBox="0 0 24 24"><path d="M4 12.5l5.5 5.5L20 7"/></svg></div>' +
     '<h2>Entreno ' + esc(L) + ' cerrado</h2>' +
     '<p class="frase">' + esc(frase) + '</p>' +
+    anilloHTML(hechas, m, 86) +
     '<div class="kpis">' +
-      '<div class="kpi"><b>' + mes + '</b><small>este mes</small></div>' +
       '<div class="kpi"><b>' + r + '</b><small>semanas seguidas</small></div>' +
-      '<div class="kpi"><b>' + tot + '</b><small>en total</small></div>' +
+      '<div class="kpi"><b>' + tot + '</b><small>sesiones</small></div>' +
+      '<div class="kpi"><b>' + (state.puntos || 0) + '</b><small>puntos</small></div>' +
     '</div>' +
+    (extra.salvada ? '<div class="avisofel">Has gastado un escudo para salvar la semana pasada. ' +
+      'Te ' + (state.escudos === 1 ? "queda 1" : "quedan " + state.escudos) + '.</div>' : '') +
+    (extra.escudo ? '<div class="avisofel">Cuatro semanas seguidas, te has ganado un escudo. ' +
+      'Salva una semana que se te tuerza.</div>' : '') +
+    ((extra.logros || []).length ? '<div class="logrosfel">' +
+      extra.logros.map(function(id){
+        var l = LOGROS.filter(function(x){ return x.id === id; })[0];
+        return l ? '<span class="logropill">' + esc(l.n) + '</span>' : "";
+      }).join("") + '</div>' : "") +
     (nApuntes ? '<p class="note" style="margin:0 0 14px">' + nApuntes +
-      ' series apuntadas con peso, recámara y técnica.</p>' : '') +
+      ' series apuntadas, ' + (10 + nApuntes + (extra.meta ? 25 : 0)) + ' puntos.</p>' : '') +
     '<button class="btn primary" id="fel-ok">Seguir</button></div>';
   document.body.appendChild(el);
   try{ if(navigator.vibrate) navigator.vibrate([25, 60, 25]); }catch(e){}
@@ -2059,6 +2237,30 @@ function vAjustes(){
     '<div class="seg" data-seg="ABC">' + [3,4,5,6].map(function(n){
       return '<button data-v="' + n + '" aria-pressed="' + (state.porSemana.ABC === n) + '">' + n + '</button>';
     }).join("") + '</div></div></div></div>';
+
+  h += '<div class="sect"><div class="eyebrow">Llevártela al móvil</div><div class="card">' +
+    '<p class="note" style="margin:0 0 10px">No está en ninguna tienda, se instala desde el navegador ' +
+    'y queda con su icono en la pantalla de inicio, a pantalla completa y sin barra del navegador.</p>' +
+    '<ol class="guia" style="margin-bottom:11px">' +
+    '<li><b>En iPhone</b><span>Abre esta página en Safari, dale al botón de Compartir, el cuadrado con ' +
+    'la flecha, y elige Añadir a pantalla de inicio. Tiene que ser Safari, desde Chrome no sale.</span></li>' +
+    '<li><b>En Android</b><span>Ábrela en Chrome, menú de los tres puntos, Instalar aplicación o ' +
+    'Añadir a pantalla de inicio.</span></li>' +
+    '</ol>' +
+    '<p class="note" style="margin-bottom:0"><b>Funciona sin cobertura.</b> Una vez instalada se guarda ' +
+    'entera en el móvil, fotos incluidas, así que en el sótano del gimnasio abre igual. Los cambios que ' +
+    'haga yo te llegan solos la próxima vez que la abras con datos.</p></div></div>';
+
+  h += '<div class="sect"><div class="eyebrow">Objetivo semanal</div><div class="card">' +
+    '<p class="note" style="margin:0 0 10px">Cuántas sesiones quieres hacer por semana. La racha ' +
+    'cuenta semanas que cumples, no días seguidos: entrenar fuerza necesita descanso, así que una ' +
+    'racha diaria te empujaría justo a lo que el plan quiere evitar.</p>' +
+    '<div class="seg" data-meta="1">' + [2,3,4,5].map(function(n){
+      return '<button data-v="' + n + '" aria-pressed="' + (meta() === n) + '">' + n + '</button>';
+    }).join("") + '</div>' +
+    '<p class="note">Cada cuatro semanas cumplidas ganas un <b>escudo</b>, y puedes guardar hasta dos. ' +
+    'Si una semana te quedas corto, se gasta solo y la racha sigue viva. Es para que un viaje o unas ' +
+    'agujetas no borren tres meses de trabajo.</p></div></div>';
 
   h += '<div class="sect"><div class="eyebrow">Orden de los entrenos</div><div class="card stack">' +
     '<p class="note" style="margin:0">Arrastra los cuadrados para cambiar el orden de la semana. ' +
@@ -2363,6 +2565,9 @@ document.addEventListener("click", function(ev){
   }
   if((el = ev.target.closest("[data-timer]"))){ startTimer(+el.dataset.timer, "Descanso", ""); return; }
   if((el = ev.target.closest(".tab"))){ tab = el.dataset.t; render(); return; }
+  if((el = ev.target.closest("[data-meta] button"))){
+    state.meta = +el.dataset.v; save(); render(); return;
+  }
   if((el = ev.target.closest("[data-seg] button"))){
     var seg = el.closest("[data-seg]").dataset.seg;
     state.porSemana[seg] = +el.dataset.v; state.pos.e = 0; save(); render(); return;
@@ -2373,14 +2578,22 @@ document.addEventListener("click", function(ev){
     if(faltan && !window.confirm("Quedan " + faltan + " ejercicio" + (faltan > 1 ? "s" : "") +
        " sin terminar. Lo que no esté apuntado no se guarda. ¿Cierro la sesión igual?")) return;
     var nAp = guardaApuntes(p2, f2, L2, lista2);
+    var kSem = lunesIso(), antes = sesionesEn(kSem), cumpliaAntes = cumplida(kSem);
+    var salvada = antes === 0 ? gastaEscudo() : false;   /* primera de la semana */
     state.hechas.push({d:new Date().toLocaleDateString("es-ES", {day:"2-digit", month:"short"}),
                        iso:iso(), f:f2.n, w:p2.s + 1, r:L2});
     if(state.hechas.length > 300) state.hechas = state.hechas.slice(-300);
+
+    var cierraMeta = !cumpliaAntes && cumplida(kSem);
+    state.puntos = (state.puntos || 0) + 10 + nAp + (cierraMeta ? 25 : 0);
+    var escudo = cierraMeta ? ganaEscudo() : false;
     var sig = avanzar(p2), cerroFase = sig.f !== p2.f;
+    var eraFuerza = f2.tipo === "fuerza";
     if(cerroFase && !state.ejemplo) fotoDelCiclo(f2, "cierre de ciclo");
+    var nuevos = revisaLogros(cerroFase, eraFuerza);
     state.pos = sig;
     sesion = {}; saveSesion(); save(); stopTimer(); render();
-    felicita(f2, L2, nAp, cerroFase);
+    felicita(f2, L2, nAp, cerroFase, {meta:cierraMeta, escudo:escudo, salvada:salvada, logros:nuevos});
     window.scrollTo({top:0, behavior:"smooth"}); return;
   }
   if(ev.target.id === "au-entrar" || ev.target.id === "au-crear"){
@@ -2679,6 +2892,13 @@ function arranca(){
       escucha(); save();
     });
   })["catch"](function(){ cuenta.sync = "local"; render(); });
+}
+
+/* la app se instala y funciona sin cobertura gracias a esto */
+if("serviceWorker" in navigator && location.protocol === "https:"){
+  window.addEventListener("load", function(){
+    navigator.serviceWorker.register("sw.js")["catch"](function(){});
+  });
 }
 
 cap("downloads").then(function(d){ dl = d; })["catch"](function(){});
