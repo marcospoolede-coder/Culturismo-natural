@@ -168,17 +168,21 @@
   .wfield input{width:74px; padding:6px 8px; border-radius:9px; border:1px solid var(--line-2);
                 background:var(--surface-2); font-family:"IBM Plex Mono",monospace; font-size:14px}
 
-  /* orden de los entrenos */
-  .ordgrid{display:grid; grid-template-columns:repeat(auto-fit, minmax(96px, 1fr)); gap:7px}
-  .ordop{display:flex; align-items:center; justify-content:center; gap:3px;
-         border:1.5px solid var(--line-2); border-radius:11px; padding:11px 8px;
-         background:var(--surface-2)}
-  .ordop .ordl{font-family:"Saira Condensed",sans-serif; font-weight:700; font-size:17px;
-               line-height:1; color:var(--ink)}
-  .ordop .ordf{color:var(--ink-3); font-size:13px; line-height:1}
-  .ordop.on{background:var(--accent); border-color:transparent}
-  .ordop.on .ordl{color:var(--accent-ink)}
-  .ordop.on .ordf{color:var(--accent-ink); opacity:.7}
+  /* orden de los entrenos, cuadrados que se arrastran */
+  .ordfila{display:flex; gap:7px; margin-top:9px; touch-action:none}
+  .ordcuadro{flex:1 1 0; min-width:0; touch-action:none; cursor:grab;
+             display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
+             border:1.5px solid var(--line-2); border-radius:13px; padding:12px 6px;
+             background:var(--surface-2); transition:box-shadow .15s ease, background .15s ease}
+  .ordcuadro .ordpos{font-family:"Saira Condensed",sans-serif; font-size:11px; letter-spacing:.08em;
+                     color:var(--ink-3); font-weight:600; line-height:1}
+  .ordcuadro .ordletra{font-family:"Saira Condensed",sans-serif; font-weight:700; font-size:26px;
+                       line-height:1; color:var(--ink)}
+  .ordcuadro:first-child{background:var(--accent); border-color:transparent}
+  .ordcuadro:first-child .ordletra{color:var(--accent-ink)}
+  .ordcuadro:first-child .ordpos{color:var(--accent-ink); opacity:.75}
+  .ordcuadro.arrastrando{cursor:grabbing; box-shadow:var(--shadow); z-index:2;
+                         position:relative; transition:none}
 
   /* alternativas sin máquina */
   .altzona{margin-top:11px}
@@ -237,7 +241,7 @@
   .demo{margin:13px 0 0; padding:0}
   .demo.previa{margin:11px 0 0}
   .demo.previa img{opacity:.75}
-  .demo img{display:block; width:100%; height:auto; aspect-ratio:1000/334;
+  .demo img{display:block; width:100%; height:auto; max-width:100%;
             border-radius:10px; background:var(--surface-2)}
   .demo figcaption{font-size:11.5px; color:var(--ink-3); margin-top:5px; text-align:center}
 
@@ -625,8 +629,36 @@ var FOTOS = {
   "Elevación lateral":"08_elevacion_lateral",
   "Curl 45 grados":"05_curl_45",
   "Plancha abdominal":"23_plancha_abdominal",
-  "Crunch":"15_crunch"
+  "Crunch":"15_crunch",
+  "Elevación de talón con la barra en la espalda":"alt_01_elevacion_talon_barra_espalda",
+  "Elevación de talón con mancuerna, a una pierna":"alt_02_elevacion_talon_mancuerna_una_pierna",
+  "Elevación de talón en un escalón":"alt_03_elevacion_talon_escalon",
+  "Peso muerto rumano con barra":"alt_04_peso_muerto_rumano_barra",
+  "Buenos días con barra":"alt_05_buenos_dias_barra",
+  "Superman en el suelo":"alt_06_superman_suelo",
+  "Elevación de piernas colgado de la barra":"alt_07_elevacion_piernas_colgado",
+  "Sentadilla goblet con mancuerna":"alt_08_sentadilla_goblet",
+  "Sentadilla búlgara con mancuernas":"alt_09_sentadilla_bulgara_mancuernas",
+  "Sentadilla sissy":"alt_10_sentadilla_sissy",
+  "Step up a un banco con mancuernas":"alt_11_step_up_mancuernas",
+  "Peso muerto rumano con mancuernas":"alt_12_peso_muerto_rumano_mancuernas",
+  "Puente de glúteo a una pierna":"alt_13_puente_gluteo_una_pierna",
+  "Extensión de tríceps sobre la cabeza":"alt_14_extension_triceps_sobre_cabeza",
+  "Press inclinado con mancuernas":"alt_15_press_inclinado_mancuernas",
+  "Flexiones con los pies elevados":"alt_16_flexiones_pies_elevados",
+  "Press de banca con mancuernas":"alt_17_press_banca_mancuernas",
+  "Press militar con barra, sentado":"alt_18_press_militar_barra_sentado",
+  "Press Arnold con mancuernas":"alt_19_press_arnold_mancuernas",
+  "Curl con mancuernas, alterno":"alt_20_curl_mancuernas_alterno",
+  "Curl martillo con mancuernas":"alt_21_curl_martillo_mancuernas"
 };
+
+/* alto real de las fotos que no son 334, para que no se deformen */
+var FOTO_ALTO = {
+  "alt_08_sentadilla_goblet":335,
+  "alt_09_sentadilla_bulgara_mancuernas":750
+};
+function altoFoto(f){ return FOTO_ALTO[f] || 334; }
 
 /* Alternativas sin máquina para los complementarios. Todas se hacen con
    mancuernas, con la barra olímpica o con el peso del cuerpo. */
@@ -1335,7 +1367,7 @@ function bloqueJS(p, f, lista, ini, fin, act){
   ejs.forEach(function(q){
     var ft = fotoDe(q.e);
     if(!ft) return;
-    h += '<figure class="demo"><img src="img/' + ft + '.webp" width="1000" height="334" ' +
+    h += '<figure class="demo"><img src="img/' + ft + '.webp" width="1000" height="' + altoFoto(ft) + '" ' +
       'loading="lazy" decoding="async" alt="Ejecución de ' + esc(nombreEj(q.e)) + '">' +
       '<figcaption>' + esc(nombreEj(q.e)) + '</figcaption></figure>';
   });
@@ -1414,7 +1446,7 @@ function vHoy(){
       /* la foto se ve igual, para saber de antemano qué máquina hace falta */
       if(fotoDe(e)){
         h += '<div class="ex-body" style="padding-top:0"><figure class="demo previa">' +
-          '<img src="img/' + fotoDe(e) + '.webp" width="1000" height="334" loading="lazy" ' +
+          '<img src="img/' + fotoDe(e) + '.webp" width="1000" height="' + altoFoto(fotoDe(e)) + '" loading="lazy" ' +
           'decoding="async" alt="Ejecución de ' + esc(nombreEj(e)) + '"></figure></div>';
       }
       h += '<div class="lockmsg"><svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="10" rx="2"/>' +
@@ -1428,7 +1460,7 @@ function vHoy(){
 
     if(fotoDe(e)){
       /* carga diferida: no se descarga hasta que abres el ejercicio */
-      h += '<figure class="demo"><img src="img/' + fotoDe(e) + '.webp" width="1000" height="334" ' +
+      h += '<figure class="demo"><img src="img/' + fotoDe(e) + '.webp" width="1000" height="' + altoFoto(fotoDe(e)) + '" ' +
         'loading="lazy" decoding="async" alt="Ejecución de ' + esc(nombreEj(e)) + '">' +
         '<figcaption>Inicio y final del movimiento</figcaption></figure>';
     }else if(esAlt(e)){
@@ -2028,25 +2060,21 @@ function vAjustes(){
     }).join("") + '</div></div></div></div>';
 
   h += '<div class="sect"><div class="eyebrow">Orden de los entrenos</div><div class="card stack">' +
-    '<p class="note" style="margin:0">Elige en qué orden van las letras dentro de la semana. ' +
-    'Útil si el gimnasio está lleno el día que toca sentadilla, o si prefieres abrir por el entreno ' +
-    'que peor llevas.</p>';
+    '<p class="note" style="margin:0">Arrastra los cuadrados para cambiar el orden de la semana. ' +
+    'También puedes tocar uno y moverlo con las flechas del teclado.</p>';
   [["AB", "Entrenos A y B"], ["ABC", "Entrenos A, B y C"]].forEach(function(r){
-    var act = ordenDe(r[0]), combis = combinaciones(RUT[r[0]].letras);
+    var act = ordenDe(r[0]);
     h += '<div><b>' + esc(r[1]) + '</b>' +
-      '<p class="note" style="margin:2px 0 9px">Ahora mismo empiezas la semana por el ' +
-      act[0] + ', luego el ' + act.slice(1).join(", luego el ") + ', y vuelta a empezar.</p>' +
-      '<div class="ordgrid" data-ord="' + r[0] + '">';
-    combis.forEach(function(c){
-      var sel = c.join("") === act.join("");
-      h += '<button class="ordop' + (sel ? " on" : "") + '" data-v="' + c.join("") + '" ' +
-        'aria-pressed="' + sel + '">' +
-        c.map(function(x, k){
-          return '<span class="ordl">' + x + '</span>' +
-            (k < c.length - 1 ? '<span class="ordf">›</span>' : "");
-        }).join("") + '</button>';
-    });
-    h += '</div></div>';
+      '<div class="ordfila" data-ord="' + r[0] + '">' +
+      act.map(function(x, k){
+        return '<button class="ordcuadro" data-l="' + x + '" tabindex="0" ' +
+          'aria-label="Entreno ' + x + ', posición ' + (k + 1) + ' de ' + act.length + '">' +
+          '<span class="ordpos">' + (k + 1) + 'º</span>' +
+          '<span class="ordletra">' + x + '</span></button>';
+      }).join("") + '</div>' +
+      '<p class="note ordtxt" style="margin:8px 0 0">Empiezas por el ' + act[0] +
+      ', luego el ' + act.slice(1).join(", luego el ") + ', y vuelta a empezar.</p>' +
+      '</div>';
   });
   h += '</div></div>';
 
@@ -2334,12 +2362,6 @@ document.addEventListener("click", function(ev){
   }
   if((el = ev.target.closest("[data-timer]"))){ startTimer(+el.dataset.timer, "Descanso", ""); return; }
   if((el = ev.target.closest(".tab"))){ tab = el.dataset.t; render(); return; }
-  if((el = ev.target.closest("[data-ord] button"))){
-    var rut = el.closest("[data-ord]").dataset.ord;
-    state.orden = state.orden || {};
-    state.orden[rut] = el.dataset.v.split("");
-    state.pos.e = 0; sesion = {}; saveSesion(); save(); render(); return;
-  }
   if((el = ev.target.closest("[data-seg] button"))){
     var seg = el.closest("[data-seg]").dataset.seg;
     state.porSemana[seg] = +el.dataset.v; state.pos.e = 0; save(); render(); return;
@@ -2515,6 +2537,87 @@ document.addEventListener("change", function(ev){
   }
   if(ev.target.id === "selF"){ state.pos.f = +ev.target.value; state.pos.s = 0; state.pos.e = 0; save(); render(); }
   if(ev.target.id === "selS"){ state.pos.s = +ev.target.value; state.pos.e = 0; save(); render(); }
+});
+
+/* ---------- arrastrar los cuadrados del orden ---------- */
+function guardaOrden(fila){
+  var rut = fila.dataset.ord;
+  var letras = Array.prototype.map.call(fila.querySelectorAll(".ordcuadro"), function(c){
+    return c.dataset.l;
+  });
+  state.orden = state.orden || {};
+  state.orden[rut] = letras;
+  state.pos.e = 0; sesion = {}; saveSesion(); save();
+  pintaOrden(fila);
+}
+/* repinta posiciones y la frase sin volcar toda la vista, para no cortar el arrastre */
+function pintaOrden(fila){
+  var cuadros = fila.querySelectorAll(".ordcuadro"), n = cuadros.length, letras = [];
+  Array.prototype.forEach.call(cuadros, function(c, k){
+    c.querySelector(".ordpos").textContent = (k + 1) + "º";
+    c.setAttribute("aria-label", "Entreno " + c.dataset.l + ", posición " + (k + 1) + " de " + n);
+    letras.push(c.dataset.l);
+  });
+  var txt = fila.parentElement.querySelector(".ordtxt");
+  if(txt) txt.textContent = "Empiezas por el " + letras[0] +
+    ", luego el " + letras.slice(1).join(", luego el ") + ", y vuelta a empezar.";
+}
+
+document.addEventListener("pointerdown", function(ev){
+  var cuadro = ev.target.closest(".ordcuadro");
+  if(!cuadro) return;
+  var fila = cuadro.closest("[data-ord]");
+  if(!fila) return;
+
+  var cuadros = Array.prototype.slice.call(fila.querySelectorAll(".ordcuadro"));
+  var ancho = cuadro.offsetWidth + 7, x0 = ev.clientX, movido = false;
+  cuadro.setPointerCapture(ev.pointerId);
+  cuadro.classList.add("arrastrando");
+
+  function mueve(e){
+    var dx = e.clientX - x0;
+    if(!movido && Math.abs(dx) < 4) return;
+    movido = true;
+    cuadro.style.transform = "translateX(" + dx + "px)";
+    var actual = cuadros.indexOf(cuadro);
+    var destino = Math.max(0, Math.min(cuadros.length - 1, actual + Math.round(dx / ancho)));
+    if(destino !== actual){
+      cuadros.splice(actual, 1);
+      cuadros.splice(destino, 0, cuadro);
+      cuadros.forEach(function(c){ fila.appendChild(c); });
+      x0 = e.clientX;
+      cuadro.style.transform = "";
+      pintaOrden(fila);
+    }
+  }
+  function suelta(){
+    cuadro.releasePointerCapture(ev.pointerId);
+    cuadro.classList.remove("arrastrando");
+    cuadro.style.transform = "";
+    cuadro.removeEventListener("pointermove", mueve);
+    cuadro.removeEventListener("pointerup", suelta);
+    cuadro.removeEventListener("pointercancel", suelta);
+    if(movido) guardaOrden(fila);
+  }
+  cuadro.addEventListener("pointermove", mueve);
+  cuadro.addEventListener("pointerup", suelta);
+  cuadro.addEventListener("pointercancel", suelta);
+});
+
+/* y con el teclado, para quien no quiera arrastrar */
+document.addEventListener("keydown", function(ev){
+  if(ev.key !== "ArrowLeft" && ev.key !== "ArrowRight") return;
+  var cuadro = document.activeElement;
+  if(!cuadro || !cuadro.classList || !cuadro.classList.contains("ordcuadro")) return;
+  var fila = cuadro.closest("[data-ord]");
+  var cuadros = Array.prototype.slice.call(fila.querySelectorAll(".ordcuadro"));
+  var i = cuadros.indexOf(cuadro), j = i + (ev.key === "ArrowRight" ? 1 : -1);
+  if(j < 0 || j >= cuadros.length) return;
+  ev.preventDefault();
+  cuadros.splice(i, 1); cuadros.splice(j, 0, cuadro);
+  cuadros.forEach(function(c){ fila.appendChild(c); });
+  guardaOrden(fila);
+  cuadro.focus();
 });
 
 /* pestañas */
