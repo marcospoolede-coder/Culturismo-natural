@@ -173,14 +173,15 @@
   .ordcuadro{flex:1 1 0; min-width:0; touch-action:none; cursor:grab;
              display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
              border:1.5px solid var(--line-2); border-radius:13px; padding:12px 6px;
-             background:var(--surface-2); transition:box-shadow .15s ease, background .15s ease}
+             background:var(--surface-2);
+             transition:box-shadow .15s ease, background .15s ease, transform .14s ease}
   .ordcuadro .ordpos{font-family:"Saira Condensed",sans-serif; font-size:11px; letter-spacing:.08em;
                      color:var(--ink-3); font-weight:600; line-height:1}
   .ordcuadro .ordletra{font-family:"Saira Condensed",sans-serif; font-weight:700; font-size:26px;
                        line-height:1; color:var(--ink)}
-  .ordcuadro:first-child{background:var(--accent); border-color:transparent}
-  .ordcuadro:first-child .ordletra{color:var(--accent-ink)}
-  .ordcuadro:first-child .ordpos{color:var(--accent-ink); opacity:.75}
+  .ordcuadro.primero{background:var(--accent); border-color:transparent}
+  .ordcuadro.primero .ordletra{color:var(--accent-ink)}
+  .ordcuadro.primero .ordpos{color:var(--accent-ink); opacity:.75}
   .ordcuadro.arrastrando{cursor:grabbing; box-shadow:var(--shadow); z-index:2;
                          position:relative; transition:none}
 
@@ -2067,7 +2068,7 @@ function vAjustes(){
     h += '<div><b>' + esc(r[1]) + '</b>' +
       '<div class="ordfila" data-ord="' + r[0] + '">' +
       act.map(function(x, k){
-        return '<button class="ordcuadro" data-l="' + x + '" tabindex="0" ' +
+        return '<button class="ordcuadro' + (k === 0 ? " primero" : "") + '" data-l="' + x + '" tabindex="0" ' +
           'aria-label="Entreno ' + x + ', posición ' + (k + 1) + ' de ' + act.length + '">' +
           '<span class="ordpos">' + (k + 1) + 'º</span>' +
           '<span class="ordletra">' + x + '</span></button>';
@@ -2539,28 +2540,27 @@ document.addEventListener("change", function(ev){
   if(ev.target.id === "selS"){ state.pos.s = +ev.target.value; state.pos.e = 0; save(); render(); }
 });
 
-/* ---------- arrastrar los cuadrados del orden ---------- */
-function guardaOrden(fila){
-  var rut = fila.dataset.ord;
-  var letras = Array.prototype.map.call(fila.querySelectorAll(".ordcuadro"), function(c){
-    return c.dataset.l;
-  });
-  state.orden = state.orden || {};
-  state.orden[rut] = letras;
-  state.pos.e = 0; sesion = {}; saveSesion(); save();
-  pintaOrden(fila);
-}
-/* repinta posiciones y la frase sin volcar toda la vista, para no cortar el arrastre */
-function pintaOrden(fila){
-  var cuadros = fila.querySelectorAll(".ordcuadro"), n = cuadros.length, letras = [];
-  Array.prototype.forEach.call(cuadros, function(c, k){
+/* ---------- arrastrar los cuadrados del orden ----------
+   Mientras se arrastra no se toca el DOM: mover el nodo arrastrado cancelaría
+   la captura del puntero y el arrastre se cortaría al primer salto. Lo que se
+   mueve son las transformaciones, y el orden se guarda al soltar. */
+function etiquetasOrden(fila, lista){
+  var n = lista.length, letras = [];
+  lista.forEach(function(c, k){
     c.querySelector(".ordpos").textContent = (k + 1) + "º";
     c.setAttribute("aria-label", "Entreno " + c.dataset.l + ", posición " + (k + 1) + " de " + n);
+    c.classList.toggle("primero", k === 0);
     letras.push(c.dataset.l);
   });
   var txt = fila.parentElement.querySelector(".ordtxt");
   if(txt) txt.textContent = "Empiezas por el " + letras[0] +
     ", luego el " + letras.slice(1).join(", luego el ") + ", y vuelta a empezar.";
+  return letras;
+}
+function guardaOrden(rut, letras){
+  state.orden = state.orden || {};
+  state.orden[rut] = letras;
+  state.pos.e = 0; sesion = {}; saveSesion(); save();
 }
 
 document.addEventListener("pointerdown", function(ev){
@@ -2569,40 +2569,48 @@ document.addEventListener("pointerdown", function(ev){
   var fila = cuadro.closest("[data-ord]");
   if(!fila) return;
 
-  var cuadros = Array.prototype.slice.call(fila.querySelectorAll(".ordcuadro"));
+  var tiles = Array.prototype.slice.call(fila.querySelectorAll(".ordcuadro"));
+  var origen = tiles.indexOf(cuadro), destino = origen;
   var ancho = cuadro.offsetWidth + 7, x0 = ev.clientX, movido = false;
-  cuadro.setPointerCapture(ev.pointerId);
+
+  try{ cuadro.setPointerCapture(ev.pointerId); }catch(e){}
   cuadro.classList.add("arrastrando");
 
-  /* el destino se mide siempre contra la posición de partida, no contra la
-     última, para que el cuadrado siga al dedo y pueda saltar varios huecos */
-  var origen = cuadros.indexOf(cuadro);
+  function ordenActual(){
+    var o = tiles.slice();
+    o.splice(origen, 1);
+    o.splice(destino, 0, cuadro);
+    return o;
+  }
   function mueve(e){
     var dx = e.clientX - x0;
     if(!movido && Math.abs(dx) < 4) return;
     movido = true;
-    var destino = Math.max(0, Math.min(cuadros.length - 1, origen + Math.round(dx / ancho)));
-    var actual = cuadros.indexOf(cuadro);
-    if(destino !== actual){
-      cuadros.splice(actual, 1);
-      cuadros.splice(destino, 0, cuadro);
-      cuadros.forEach(function(c){ fila.appendChild(c); });
-      pintaOrden(fila);
-    }
-    cuadro.style.transform = "translateX(" + (dx - (destino - origen) * ancho) + "px)";
+    destino = Math.max(0, Math.min(tiles.length - 1, origen + Math.round(dx / ancho)));
+    cuadro.style.transform = "translateX(" + dx + "px)";
+    tiles.forEach(function(t, k){
+      if(t === cuadro) return;
+      var d = 0;
+      if(destino > origen && k > origen && k <= destino) d = -ancho;
+      if(destino < origen && k >= destino && k < origen) d = ancho;
+      t.style.transform = d ? "translateX(" + d + "px)" : "";
+    });
+    etiquetasOrden(fila, ordenActual());
   }
   function suelta(){
-    cuadro.releasePointerCapture(ev.pointerId);
+    document.removeEventListener("pointermove", mueve);
+    document.removeEventListener("pointerup", suelta);
+    document.removeEventListener("pointercancel", suelta);
     cuadro.classList.remove("arrastrando");
-    cuadro.style.transform = "";
-    cuadro.removeEventListener("pointermove", mueve);
-    cuadro.removeEventListener("pointerup", suelta);
-    cuadro.removeEventListener("pointercancel", suelta);
-    if(movido) guardaOrden(fila);
+    tiles.forEach(function(t){ t.style.transform = ""; });
+    if(!movido) return;
+    var letras = ordenActual().map(function(t){ return t.dataset.l; });
+    guardaOrden(fila.dataset.ord, letras);
+    render();
   }
-  cuadro.addEventListener("pointermove", mueve);
-  cuadro.addEventListener("pointerup", suelta);
-  cuadro.addEventListener("pointercancel", suelta);
+  document.addEventListener("pointermove", mueve);
+  document.addEventListener("pointerup", suelta);
+  document.addEventListener("pointercancel", suelta);
 });
 
 /* y con el teclado, para quien no quiera arrastrar */
@@ -2611,14 +2619,16 @@ document.addEventListener("keydown", function(ev){
   var cuadro = document.activeElement;
   if(!cuadro || !cuadro.classList || !cuadro.classList.contains("ordcuadro")) return;
   var fila = cuadro.closest("[data-ord]");
-  var cuadros = Array.prototype.slice.call(fila.querySelectorAll(".ordcuadro"));
-  var i = cuadros.indexOf(cuadro), j = i + (ev.key === "ArrowRight" ? 1 : -1);
-  if(j < 0 || j >= cuadros.length) return;
+  var tiles = Array.prototype.slice.call(fila.querySelectorAll(".ordcuadro"));
+  var i = tiles.indexOf(cuadro), j = i + (ev.key === "ArrowRight" ? 1 : -1);
+  if(j < 0 || j >= tiles.length) return;
   ev.preventDefault();
-  cuadros.splice(i, 1); cuadros.splice(j, 0, cuadro);
-  cuadros.forEach(function(c){ fila.appendChild(c); });
-  guardaOrden(fila);
-  cuadro.focus();
+  tiles.splice(i, 1); tiles.splice(j, 0, cuadro);
+  var letra = cuadro.dataset.l;
+  guardaOrden(fila.dataset.ord, tiles.map(function(t){ return t.dataset.l; }));
+  render();
+  var vuelve = document.querySelector('[data-ord="' + fila.dataset.ord + '"] .ordcuadro[data-l="' + letra + '"]');
+  if(vuelve) vuelve.focus();
 });
 
 /* pestañas */
