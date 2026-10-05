@@ -168,6 +168,29 @@
   .wfield input{width:74px; padding:6px 8px; border-radius:9px; border:1px solid var(--line-2);
                 background:var(--surface-2); font-family:"IBM Plex Mono",monospace; font-size:14px}
 
+  /* alternativas sin máquina */
+  .altzona{margin-top:11px}
+  .altbtn{width:100%; gap:7px; font-size:13px; color:var(--ink-2)}
+  .altbtn svg{width:15px; height:15px; stroke:currentColor; fill:none; stroke-width:2;
+              stroke-linecap:round; stroke-linejoin:round; flex:0 0 auto}
+  .altbtn.vuelve{margin-top:6px; color:var(--accent); border-color:var(--accent)}
+  .altlista{margin-top:9px; padding:11px; border-radius:12px; background:var(--surface-2);
+            border:1px solid var(--line); display:flex; flex-direction:column; gap:6px}
+  .altop{display:flex; align-items:center; gap:9px; width:100%; text-align:left;
+         border:1.5px solid var(--line-2); border-radius:10px; padding:9px 11px;
+         background:var(--surface)}
+  .altop .alton{flex:1 1 auto; font-weight:600; font-size:14px; line-height:1.2}
+  .altop .altok{flex:0 0 auto; font-family:"Saira Condensed",sans-serif; font-size:11px;
+                letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3);
+                border:1px solid var(--line); border-radius:6px; padding:2px 6px}
+  .altop.on{border-color:var(--accent); background:var(--accent-soft)}
+  .altop.on .alton{color:var(--accent)}
+  .altmark{font-family:"Saira Condensed",sans-serif; font-style:normal; font-size:10.5px;
+           letter-spacing:.1em; text-transform:uppercase; color:var(--accent);
+           background:var(--accent-soft); border-radius:5px; padding:1px 5px; vertical-align:2px}
+  .jej{border-top:1px solid var(--line); padding-top:10px; margin-top:10px}
+  .jej:first-of-type{border-top:0}
+
   /* jump set por vueltas */
   .js-bloque .ex-load b{font-size:19px}
   .vuelta{border:1.5px solid var(--line-2); border-radius:13px; padding:9px 10px 10px; margin-top:9px;
@@ -502,7 +525,7 @@
 /* Coeficientes, repeticiones y descansos salen del cuaderno manuscrito
    del 31 de mayo de 2025 y de las tablas de rutina por microciclo.     */
 
-var VERSION = "1 de octubre de 2026";
+var VERSION = "5 de octubre de 2026";
 var BARRA = 20;
 var PESO_CORP_DEF = 75;   /* peso corporal por defecto, se cambia en Ajustes */
 function pesoCorp(){ return state.peso > 0 ? state.peso : PESO_CORP_DEF; }
@@ -582,7 +605,77 @@ var FOTOS = {
   "Leg extensión":"07_leg_extension",
   "Crunch invertido":"19_crunch_invertido",
   "Crunch inverso":"19_crunch_invertido",
-  "Fondos tríceps":"22_fondos_triceps"
+  "Fondos tríceps":"22_fondos_triceps",
+  "Lunges":"21_lunges",
+  "GHR":"17_ghr",
+  "Fondo estrecho":"33_fondo_estrecho",
+  "Press francés":"30_press_frances",
+  "Elevación lateral":"08_elevacion_lateral",
+  "Curl 45 grados":"05_curl_45",
+  "Plancha abdominal":"23_plancha_abdominal",
+  "Crunch":"15_crunch"
+};
+
+/* Alternativas sin máquina para los complementarios. Todas se hacen con
+   mancuernas, con la barra olímpica o con el peso del cuerpo. */
+var PIERNA_PANTORRILLA = [
+  ["Elevación de talón con la barra en la espalda", "barra"],
+  ["Elevación de talón con mancuerna, a una pierna", "mancuerna"],
+  ["Elevación de talón en un escalón", "peso corporal"]
+];
+var LUMBAR = [
+  ["Peso muerto rumano con barra", "barra"],
+  ["Buenos días con barra", "barra"],
+  ["Superman en el suelo", "peso corporal"]
+];
+var ABDOMEN = [
+  ["Elevación de piernas colgado de la barra", "barra fija"],
+  ["Plancha abdominal", "peso corporal"],
+  ["Crunch", "peso corporal"]
+];
+
+var ALT = {
+  "Prensa 45 grados": [
+    ["Sentadilla goblet con mancuerna", "mancuerna"],
+    ["Lunges", "mancuernas"],
+    ["Sentadilla búlgara con mancuernas", "mancuernas"]
+  ],
+  "Leg extensión": [
+    ["Sentadilla sissy", "peso corporal"],
+    ["Step up a un banco con mancuernas", "mancuernas"],
+    ["Lunges", "mancuernas"]
+  ],
+  "Leg curl": [
+    ["Peso muerto rumano con mancuernas", "mancuernas"],
+    ["GHR", "peso corporal"],
+    ["Puente de glúteo a una pierna", "peso corporal"]
+  ],
+  "Calf machine": PIERNA_PANTORRILLA,
+  "Calf prensa": PIERNA_PANTORRILLA,
+  "Hiperextensión": LUMBAR,
+  "Hiperextensión 45 grados": LUMBAR,
+  "Crunch invertido": ABDOMEN,
+  "Crunch inverso": ABDOMEN,
+  "Fondos tríceps": [
+    ["Fondo estrecho", "peso corporal"],
+    ["Press francés", "barra"],
+    ["Extensión de tríceps sobre la cabeza", "mancuerna"]
+  ],
+  "Press inclinado": [
+    ["Press inclinado con mancuernas", "mancuernas"],
+    ["Flexiones con los pies elevados", "peso corporal"],
+    ["Press de banca con mancuernas", "mancuernas"]
+  ],
+  "Press mancuernas": [
+    ["Press militar con barra, sentado", "barra"],
+    ["Press Arnold con mancuernas", "mancuernas"],
+    ["Elevación lateral", "mancuernas"]
+  ],
+  "Curl con barra": [
+    ["Curl con mancuernas, alterno", "mancuernas"],
+    ["Curl martillo con mancuernas", "mancuernas"],
+    ["Curl 45 grados", "mancuernas"]
+  ]
 };
 
 /* series por microciclo: [micro1, micro2, micro3 de descarga] */
@@ -625,6 +718,7 @@ var state = {
   porSemana:{AB:4, ABC:3},
   inicio:{AB:0, ABC:0},        /* por qué letra empieza cada rutina */
   peso:PESO_CORP_DEF,          /* peso corporal, para el lastre de las dominadas */
+  alt:{},                      /* complementarios cambiados por una alternativa */
   rms:{}, rmsFecha:{}, ejemplo:true,
   tests:{}, pesos:{}, hechas:[], marcas:[], registros:[]
 };
@@ -744,6 +838,7 @@ function merge(base, o){
   out.rmsFecha = Object.assign({}, base.rmsFecha, o.rmsFecha || {});
   out.porSemana = Object.assign({}, base.porSemana, o.porSemana || {});
   out.inicio = Object.assign({}, base.inicio, o.inicio || {});
+  out.alt = Object.assign({}, base.alt, o.alt || {});
   return out;
 }
 function save(){
@@ -829,6 +924,15 @@ function activo(p, lista){
   }
   return -1;
 }
+/* Nombre que toca mostrar: si has cambiado el complementario por una
+   alternativa sin máquina, manda la alternativa. Los básicos no se cambian. */
+function nombreEj(e){
+  if(esBasico(e)) return e.n;
+  return (state.alt && state.alt[e.n]) || e.n;
+}
+function esAlt(e){ return nombreEj(e) !== e.n; }
+function fotoDe(e){ return FOTOS[nombreEj(e)] || null; }
+
 /* lo que se apunta en un básico con lastre es el lastre, no el total */
 function teoDe(e, kg){ return e.bw ? Math.max(0, (kg || 0) - pesoCorp()) : kg; }
 
@@ -1099,6 +1203,32 @@ function hechosSesion(p, lista){
 
 /* Un jump set es una serie de cada ejercicio, seguidas, y vuelta a empezar.
    Por eso se pinta por vueltas y no por ejercicio. */
+/* Panel para cambiar un complementario por algo que no necesite máquina. */
+function panelAlt(e, i){
+  var opciones = ALT[e.n];
+  if(!opciones) return "";
+  var abierto = altAbierto === i, cambiado = esAlt(e);
+  var h = '<div class="altzona">';
+  h += '<button class="btn sm altbtn" data-alt="' + i + '">' +
+    '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h12l-3-3M20 16H8l3 3"/></svg>' +
+    (cambiado ? "Cambiar otra vez" : "No tengo la máquina, cambiar ejercicio") + '</button>';
+  if(cambiado){
+    h += '<button class="btn sm altbtn vuelve" data-altq="' + i + '">Volver a ' + esc(e.n) + '</button>';
+  }
+  if(abierto){
+    h += '<div class="altlista"><p class="note" style="margin:0 0 7px">Todas se hacen con mancuernas, ' +
+      'con la barra olímpica o con tu propio peso.</p>';
+    opciones.forEach(function(o){
+      var sel = nombreEj(e) === o[0];
+      h += '<button class="altop' + (sel ? " on" : "") + '" data-altp="' + i + '" data-v="' + esc(o[0]) + '">' +
+        '<span class="alton">' + esc(o[0]) + '</span>' +
+        '<span class="altok">' + esc(o[1]) + '</span></button>';
+    });
+    h += '</div>';
+  }
+  return h + '</div>';
+}
+
 function bloqueJS(p, f, lista, ini, fin, act){
   var ejs = [], i;
   for(i = ini; i <= fin; i++) ejs.push({e:lista[i], i:i, c:cargas(p, lista[i])});
@@ -1111,7 +1241,7 @@ function bloqueJS(p, f, lista, ini, fin, act){
   var abierto = false;
   ejs.forEach(function(q){ if(q.i === act) abierto = true; });
 
-  var nombres = ejs.map(function(q){ return q.e.n; });
+  var nombres = ejs.map(function(q){ return nombreEj(q.e); });
   var titulo = nombres.length > 1
     ? nombres.slice(0, -1).join(", ") + " y " + nombres[nombres.length - 1]
     : nombres[0];
@@ -1145,10 +1275,10 @@ function bloqueJS(p, f, lista, ini, fin, act){
       var x = q.c[v];
       if(!x){ return; }
       var marcada = ((sesion.sets || {})[q.i] || [])[v];
-      var manual = state.pesos[q.e.n];
+      var manual = state.pesos[nombreEj(q.e)];
       h += '<button class="jchip' + (marcada ? " on" : "") + '" data-set="' + q.i + ',' + v + '">' +
         '<span class="jn">' + (orden + 1) + '</span>' +
-        '<span class="jt">' + esc(q.e.n) + '</span>' +
+        '<span class="jt">' + esc(nombreEj(q.e)) + (esAlt(q.e) ? ' <i class="altmark">alt</i>' : '') + '</span>' +
         '<span class="jr"><b>' + x.reps + '</b> reps' +
         (x.kg ? ", " + nf(x.kg) + " kg" : (manual ? ", " + nf(manual) + " kg" : "")) + '</span>' +
         '</button>';
@@ -1157,18 +1287,22 @@ function bloqueJS(p, f, lista, ini, fin, act){
   }
 
   ejs.forEach(function(q){
-    if(q.e.rm) return;
-    var manual = state.pesos[q.e.n];
-    h += '<div class="wfield"><label for="wj' + q.i + '">' + esc(q.e.n) + '</label>' +
-      '<input id="wj' + q.i + '" class="mono" inputmode="decimal" data-peso="' + esc(q.e.n) + '" value="' +
-      (manual ? nf(manual) : "") + '" placeholder="kg"><span>kg</span></div>';
+    var n = nombreEj(q.e), manual = state.pesos[n];
+    h += '<div class="jej">';
+    if(!q.e.rm){
+      h += '<div class="wfield" style="margin-top:0"><label for="wj' + q.i + '">' + esc(n) + '</label>' +
+        '<input id="wj' + q.i + '" class="mono" inputmode="decimal" data-peso="' + esc(n) + '" value="' +
+        (manual ? nf(manual) : "") + '" placeholder="kg"><span>kg</span></div>';
+    }
+    h += panelAlt(q.e, q.i) + '</div>';
   });
 
   ejs.forEach(function(q){
-    if(!FOTOS[q.e.n]) return;
-    h += '<figure class="demo"><img src="img/' + FOTOS[q.e.n] + '.webp" width="1000" height="334" ' +
-      'loading="lazy" decoding="async" alt="Ejecución de ' + esc(q.e.n) + '">' +
-      '<figcaption>' + esc(q.e.n) + '</figcaption></figure>';
+    var ft = fotoDe(q.e);
+    if(!ft) return;
+    h += '<figure class="demo"><img src="img/' + ft + '.webp" width="1000" height="334" ' +
+      'loading="lazy" decoding="async" alt="Ejecución de ' + esc(nombreEj(q.e)) + '">' +
+      '<figcaption>' + esc(nombreEj(q.e)) + '</figcaption></figure>';
   });
 
   h += '</div>';
@@ -1230,22 +1364,23 @@ function vHoy(){
     var done = exHecho(p, e, i), lock = bloqueado(p, lista, i);
     var tag = e.t === "b" ? '<span class="tag b">básico</span>' :
              (e.js ? '<span class="tag js">jump set</span>' : '<span class="tag">compl</span>');
-    var kg = c[0].kg, manual = state.pesos[e.n];
+    var kg = c[0].kg, manual = state.pesos[nombreEj(e)];
     var carga = kg ? nf(kg) + (c[c.length - 1].kg !== kg ? " a " + nf(c[c.length - 1].kg) : "") + " kg"
                    : (manual ? nf(manual) + " kg" : "a tu peso");
     if(e.bw && kg) carga = "+" + nf(Math.max(0, kg - pesoCorp())) + " kg";
     h += '<div class="ex' + (done ? " done" : "") + (lock ? " lock" : "") + '" data-ex="' + i + '">' +
       '<button class="ex-head"' + (lock ? " disabled" : ' data-open="' + i + '"') + '>' + tag +
-      '<span class="ex-name">' + esc(e.n) + '</span>' +
+      '<span class="ex-name">' + esc(nombreEj(e)) +
+      (esAlt(e) ? ' <i class="altmark">alt</i>' : '') + '</span>' +
       '<span class="ex-load"><b>' + esc(carga) + '</b><small>' + c.length + ' x ' +
       c.map(function(x){ return x.reps; }).join("-") + '</small></span></button>';
 
     if(lock){
       /* la foto se ve igual, para saber de antemano qué máquina hace falta */
-      if(FOTOS[e.n]){
+      if(fotoDe(e)){
         h += '<div class="ex-body" style="padding-top:0"><figure class="demo previa">' +
-          '<img src="img/' + FOTOS[e.n] + '.webp" width="1000" height="334" loading="lazy" ' +
-          'decoding="async" alt="Ejecución de ' + esc(e.n) + '"></figure></div>';
+          '<img src="img/' + fotoDe(e) + '.webp" width="1000" height="334" loading="lazy" ' +
+          'decoding="async" alt="Ejecución de ' + esc(nombreEj(e)) + '"></figure></div>';
       }
       h += '<div class="lockmsg"><svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="10" rx="2"/>' +
         '<path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>' +
@@ -1256,11 +1391,14 @@ function vHoy(){
 
     h += '<div class="ex-body"' + (done || i !== act ? " hidden" : "") + '>';
 
-    if(FOTOS[e.n]){
+    if(fotoDe(e)){
       /* carga diferida: no se descarga hasta que abres el ejercicio */
-      h += '<figure class="demo"><img src="img/' + FOTOS[e.n] + '.webp" width="1000" height="334" ' +
-        'loading="lazy" decoding="async" alt="Ejecución de ' + esc(e.n) + '">' +
+      h += '<figure class="demo"><img src="img/' + fotoDe(e) + '.webp" width="1000" height="334" ' +
+        'loading="lazy" decoding="async" alt="Ejecución de ' + esc(nombreEj(e)) + '">' +
         '<figcaption>Inicio y final del movimiento</figcaption></figure>';
+    }else if(esAlt(e)){
+      h += '<p class="note">Sin foto para esta alternativa. Si dudas de la técnica, ' +
+        'búscala en vídeo antes de cargar peso.</p>';
     }
 
     if(esBasico(e)){
@@ -1328,9 +1466,10 @@ function vHoy(){
       }
       if(!e.rm){
         h += '<div class="wfield"><label for="w' + i + '">Peso</label>' +
-          '<input id="w' + i + '" class="mono" inputmode="decimal" data-peso="' + esc(e.n) + '" value="' +
-          (manual ? nf(manual) : "") + '" placeholder="kg"><span>kg</span></div>';
+          '<input id="w' + i + '" class="mono" inputmode="decimal" data-peso="' + esc(nombreEj(e)) +
+          '" value="' + (manual ? nf(manual) : "") + '" placeholder="kg"><span>kg</span></div>';
       }
+      h += panelAlt(e, i);
     }
 
     h += '<p class="note">' + (e.js ? "Jump set, alterna cada 30 segundos."
@@ -1624,6 +1763,7 @@ function vRM(){
 
 /* ============================ CALENDARIO ============================ */
 var calRef = null;
+var altAbierto = -1;   /* qué ejercicio tiene abierto el panel de alternativas */
 
 function porDia(){
   var m = {};
@@ -2080,6 +2220,25 @@ document.addEventListener("click", function(ev){
         q > 0 ? "Quedan " + q + " serie" + (q > 1 ? "s" : "") : "Ejercicio terminado");
     }
     render(); return;
+  }
+  if((el = ev.target.closest("[data-alt]"))){
+    var ai = +el.dataset.alt;
+    altAbierto = (altAbierto === ai) ? -1 : ai;
+    render(); return;
+  }
+  if((el = ev.target.closest("[data-altp]"))){
+    var pi = +el.dataset.altp, p6 = state.pos, f6 = fase(p6.f);
+    var e6 = RUT[f6.rut][letra(f6, p6.e)][pi];
+    state.alt = state.alt || {};
+    if(state.alt[e6.n] === el.dataset.v) delete state.alt[e6.n];
+    else state.alt[e6.n] = el.dataset.v;
+    altAbierto = -1; save(); render(); return;
+  }
+  if((el = ev.target.closest("[data-altq]"))){
+    var qi = +el.dataset.altq, p7 = state.pos, f7 = fase(p7.f);
+    var e7 = RUT[f7.rut][letra(f7, p7.e)][qi];
+    if(state.alt) delete state.alt[e7.n];
+    altAbierto = -1; save(); render(); return;
   }
   if((el = ev.target.closest("[data-tec]"))){
     var t = el.dataset.tec.split(","), ti = +t[0], tj = +t[1];
