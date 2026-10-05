@@ -168,6 +168,18 @@
   .wfield input{width:74px; padding:6px 8px; border-radius:9px; border:1px solid var(--line-2);
                 background:var(--surface-2); font-family:"IBM Plex Mono",monospace; font-size:14px}
 
+  /* orden de los entrenos */
+  .ordgrid{display:grid; grid-template-columns:repeat(auto-fit, minmax(96px, 1fr)); gap:7px}
+  .ordop{display:flex; align-items:center; justify-content:center; gap:3px;
+         border:1.5px solid var(--line-2); border-radius:11px; padding:11px 8px;
+         background:var(--surface-2)}
+  .ordop .ordl{font-family:"Saira Condensed",sans-serif; font-weight:700; font-size:17px;
+               line-height:1; color:var(--ink)}
+  .ordop .ordf{color:var(--ink-3); font-size:13px; line-height:1}
+  .ordop.on{background:var(--accent); border-color:transparent}
+  .ordop.on .ordl{color:var(--accent-ink)}
+  .ordop.on .ordf{color:var(--accent-ink); opacity:.7}
+
   /* alternativas sin máquina */
   .altzona{margin-top:11px}
   .altbtn{width:100%; gap:7px; font-size:13px; color:var(--ink-2)}
@@ -716,7 +728,7 @@ var state = {
   v:1, ts:0,
   pos:{f:0, s:0, e:0},            /* fase, semana, sesión dentro de la semana */
   porSemana:{AB:4, ABC:3},
-  inicio:{AB:0, ABC:0},        /* por qué letra empieza cada rutina */
+  orden:{AB:null, ABC:null},   /* el orden de las letras, null es el del plan */
   peso:PESO_CORP_DEF,          /* peso corporal, para el lastre de las dominadas */
   alt:{},                      /* complementarios cambiados por una alternativa */
   rms:{}, rmsFecha:{}, ejemplo:true,
@@ -837,7 +849,15 @@ function merge(base, o){
   out.rms = Object.assign({}, base.rms, o.rms || {});
   out.rmsFecha = Object.assign({}, base.rmsFecha, o.rmsFecha || {});
   out.porSemana = Object.assign({}, base.porSemana, o.porSemana || {});
-  out.inicio = Object.assign({}, base.inicio, o.inicio || {});
+  out.orden = Object.assign({}, base.orden, o.orden || {});
+  /* estados viejos guardaban solo la letra de arranque */
+  if(o.inicio){
+    ["AB","ABC"].forEach(function(r){
+      if(out.orden[r] || !o.inicio[r]) return;
+      var L = RUT[r].letras, d = o.inicio[r];
+      out.orden[r] = L.map(function(_, k){ return L[(k + d) % L.length]; });
+    });
+  }
   out.alt = Object.assign({}, base.alt, o.alt || {});
   return out;
 }
@@ -1000,9 +1020,24 @@ function fotoDelCiclo(f, motivo){
 
 function fase(i){ return FASES[Math.min(i, FASES.length - 1)]; }
 function porSemana(f){ return state.porSemana[f.rut] || (f.rut === "AB" ? 4 : 3); }
+function ordenDe(rut){
+  var o = state.orden && state.orden[rut];
+  if(o && o.length === RUT[rut].letras.length) return o;
+  return RUT[rut].letras;
+}
 function letra(f, e){
-  var L = RUT[f.rut].letras, d = (state.inicio && state.inicio[f.rut]) || 0;
-  return L[(e + d) % L.length];
+  var o = ordenDe(f.rut);
+  return o[e % o.length];
+}
+/* todas las combinaciones posibles de las letras de una rutina */
+function combinaciones(L){
+  if(L.length <= 1) return [L.slice()];
+  var out = [];
+  L.forEach(function(x, i){
+    var resto = L.slice(0, i).concat(L.slice(i + 1));
+    combinaciones(resto).forEach(function(c){ out.push([x].concat(c)); });
+  });
+  return out;
 }
 function esDescarga(p){ var f = fase(p.f); return f.tipo !== "fuerza" && p.s === f.sem - 1; }
 function micro(p){ return Math.min(p.s, 2); }
@@ -1992,18 +2027,26 @@ function vAjustes(){
       return '<button data-v="' + n + '" aria-pressed="' + (state.porSemana.ABC === n) + '">' + n + '</button>';
     }).join("") + '</div></div></div></div>';
 
-  h += '<div class="sect"><div class="eyebrow">Por cuál empiezas</div><div class="card stack">' +
-    '<p class="note" style="margin:0">Cambia el orden de las letras dentro de la semana. ' +
-    'Útil si el gimnasio está lleno el día que te toca sentadilla, o si prefieres abrir por el entreno ' +
+  h += '<div class="sect"><div class="eyebrow">Orden de los entrenos</div><div class="card stack">' +
+    '<p class="note" style="margin:0">Elige en qué orden van las letras dentro de la semana. ' +
+    'Útil si el gimnasio está lleno el día que toca sentadilla, o si prefieres abrir por el entreno ' +
     'que peor llevas.</p>';
   [["AB", "Entrenos A y B"], ["ABC", "Entrenos A, B y C"]].forEach(function(r){
-    var L = RUT[r[0]].letras, d = (state.inicio && state.inicio[r[0]]) || 0;
+    var act = ordenDe(r[0]), combis = combinaciones(RUT[r[0]].letras);
     h += '<div><b>' + esc(r[1]) + '</b>' +
-      '<p class="note" style="margin:2px 0 8px">Orden actual: ' +
-      L.map(function(_, k){ return L[(k + d) % L.length]; }).join(", ") + '</p>' +
-      '<div class="seg" data-ini="' + r[0] + '">' + L.map(function(x, k){
-        return '<button data-v="' + k + '" aria-pressed="' + (d === k) + '">' + x + '</button>';
-      }).join("") + '</div></div>';
+      '<p class="note" style="margin:2px 0 9px">Ahora mismo empiezas la semana por el ' +
+      act[0] + ', luego el ' + act.slice(1).join(", luego el ") + ', y vuelta a empezar.</p>' +
+      '<div class="ordgrid" data-ord="' + r[0] + '">';
+    combis.forEach(function(c){
+      var sel = c.join("") === act.join("");
+      h += '<button class="ordop' + (sel ? " on" : "") + '" data-v="' + c.join("") + '" ' +
+        'aria-pressed="' + sel + '">' +
+        c.map(function(x, k){
+          return '<span class="ordl">' + x + '</span>' +
+            (k < c.length - 1 ? '<span class="ordf">›</span>' : "");
+        }).join("") + '</button>';
+    });
+    h += '</div></div>';
   });
   h += '</div></div>';
 
@@ -2291,9 +2334,10 @@ document.addEventListener("click", function(ev){
   }
   if((el = ev.target.closest("[data-timer]"))){ startTimer(+el.dataset.timer, "Descanso", ""); return; }
   if((el = ev.target.closest(".tab"))){ tab = el.dataset.t; render(); return; }
-  if((el = ev.target.closest("[data-ini] button"))){
-    var rut = el.closest("[data-ini]").dataset.ini;
-    state.inicio[rut] = +el.dataset.v;
+  if((el = ev.target.closest("[data-ord] button"))){
+    var rut = el.closest("[data-ord]").dataset.ord;
+    state.orden = state.orden || {};
+    state.orden[rut] = el.dataset.v.split("");
     state.pos.e = 0; sesion = {}; saveSesion(); save(); render(); return;
   }
   if((el = ev.target.closest("[data-seg] button"))){
