@@ -1473,7 +1473,9 @@ function vHoy(){
     }
 
     h += '<p class="note">' + (e.js ? "Jump set, alterna cada 30 segundos."
-        : "Descanso " + mmss(descansoDe(p, e)) + (e.t === "b" ? " entre series" : "")) +
+        : e.t === "b" ? "Descanso " + mmss(descansoDe(p, e)) + " entre series"
+        : "Cada serie al fallo. Descanso " + mmss(descansoDe(p, e)) + " entre series, " +
+          "entre serie y serie, no entre repeticiones.") +
       (f.rp && e.t === "b" ? ", última serie en rest pause" : "") + '</p>';
     h += '</div>';
 
