@@ -1433,7 +1433,7 @@ function vHoy(){
   var clave = p.f + "-" + p.s + "-" + p.e;
   if(sesion.k !== clave || !sesion.sets){ sesion = {k:clave, sets:{}}; saveSesion(); }
 
-  var h = avisos(p);
+  var h = bannerInstalar() + avisos(p);
   h += '<div class="sect"><div class="today">' +
        '<div class="letter' + (f.tipo === "fuerza" ? " f" : "") + '">' + L + '</div><div>' +
        '<h2>Entreno ' + L + '</h2><div class="sub">' + esc(f.n) + ' semana ' + (p.s + 1) +
@@ -2036,6 +2036,41 @@ function vCal(){
   view.innerHTML = h;
 }
 
+/* ---------- instalar en el móvil ----------
+   En iPhone no existe el botón de instalar: solo se puede desde Safari, con
+   Compartir y Añadir a pantalla de inicio. Así que hay que explicarlo. */
+function esIOS(){
+  return /iphone|ipad|ipod/i.test(navigator.userAgent) ||
+         (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+}
+function yaInstalada(){
+  try{
+    return window.navigator.standalone === true ||
+           (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches);
+  }catch(e){ return false; }
+}
+function esSafari(){
+  var u = navigator.userAgent;
+  return /safari/i.test(u) && !/crios|fxios|edgios|chrome/i.test(u);
+}
+function bannerInstalar(){
+  if(yaInstalada() || state.sinBanner) return "";
+  if(!esIOS()) return "";
+  if(!esSafari()){
+    return '<div class="flag info" style="margin-bottom:10px"><div class="ic">!</div><div>' +
+      '<h3>Ábrela en Safari para instalarla</h3>' +
+      '<p>En iPhone solo se puede añadir a la pantalla de inicio desde Safari. ' +
+      'Copia la dirección y pégala allí.</p>' +
+      '<button class="act" data-nobanner="1"><span>Entendido</span></button></div></div>';
+  }
+  return '<div class="flag info" style="margin-bottom:10px"><div class="ic">+</div><div>' +
+    '<h3>Instálala en tu iPhone</h3>' +
+    '<p>Dale al botón de Compartir, el cuadrado con la flecha hacia arriba, baja y elige ' +
+    'Añadir a pantalla de inicio. Queda con su icono, a pantalla completa y funcionando ' +
+    'sin cobertura.</p>' +
+    '<button class="act" data-nobanner="1"><span>Ya está, no me lo enseñes más</span></button></div></div>';
+}
+
 /* anillo de progreso del objetivo semanal */
 function anilloHTML(hechas, m, tam){
   var r = (tam / 2) - 7, c = 2 * Math.PI * r;
@@ -2248,9 +2283,13 @@ function vAjustes(){
     '<li><b>En Android</b><span>Ábrela en Chrome, menú de los tres puntos, Instalar aplicación o ' +
     'Añadir a pantalla de inicio.</span></li>' +
     '</ol>' +
-    '<p class="note" style="margin-bottom:0"><b>Funciona sin cobertura.</b> Una vez instalada se guarda ' +
-    'entera en el móvil, fotos incluidas, así que en el sótano del gimnasio abre igual. Los cambios que ' +
-    'haga yo te llegan solos la próxima vez que la abras con datos.</p></div></div>';
+    '<p class="note"><b>Funciona sin cobertura.</b> Una vez instalada se guarda entera en el móvil, ' +
+    'fotos incluidas, así que en el sótano del gimnasio abre igual. Los cambios que haga yo te llegan ' +
+    'solos la próxima vez que la abras con datos.</p>' +
+    '<div class="banner" style="margin-top:11px"><b>Ojo</b><span>La app instalada guarda sus datos ' +
+    'aparte de los del navegador: al abrirla la verás vacía aunque en Safari tuvieras tu entrenamiento. ' +
+    'Antes de instalarla, copia tu código aquí arriba, y pégalo dentro de la app ya instalada. ' +
+    'Si entras con cuenta, no hace falta: se sincroniza solo.</span></div></div></div>';
 
   h += '<div class="sect"><div class="eyebrow">Objetivo semanal</div><div class="card">' +
     '<p class="note" style="margin:0 0 10px">Cuántas sesiones quieres hacer por semana. La racha ' +
@@ -2566,6 +2605,9 @@ document.addEventListener("click", function(ev){
   }
   if((el = ev.target.closest("[data-timer]"))){ startTimer(+el.dataset.timer, "Descanso", ""); return; }
   if((el = ev.target.closest(".tab"))){ tab = el.dataset.t; render(); return; }
+  if((el = ev.target.closest("[data-nobanner]"))){
+    state.sinBanner = 1; save(); render(); return;
+  }
   if((el = ev.target.closest("[data-meta] button"))){
     state.meta = +el.dataset.v; save(); render(); return;
   }
