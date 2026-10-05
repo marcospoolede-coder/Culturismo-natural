@@ -2900,6 +2900,13 @@ if("serviceWorker" in navigator && location.protocol === "https:"){
   window.addEventListener("load", function(){
     navigator.serviceWorker.register("sw.js")["catch"](function(){});
   });
+  /* si entra una versión nueva mientras la tienes abierta, recarga una vez */
+  var recargado = false;
+  navigator.serviceWorker.addEventListener("controllerchange", function(){
+    if(recargado) return;
+    recargado = true;
+    location.reload();
+  });
 }
 
 cap("downloads").then(function(d){ dl = d; })["catch"](function(){});

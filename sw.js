@@ -2,9 +2,12 @@
    Sirve para dos cosas: que la aplicación se instale en el móvil como una app
    y que funcione sin cobertura, que en un sótano de gimnasio es lo normal.
    Sube VERSION en cada despliegue para que el móvil recoja los cambios. */
-var VERSION = "cuaderno-v3";
+var VERSION = "cuaderno-v4";
 var BASE = new URL("./", self.location).pathname;
-var NUCLEO = [BASE, BASE + "index.html", BASE + "manifest.webmanifest",
+/* La página no se precachea a propósito: si se guarda en la instalación, la
+   primera visita tras un cambio sirve la copia vieja. Se guarda sola al
+   visitarla y solo se usa cuando no hay red. */
+var NUCLEO = [BASE + "manifest.webmanifest",
               BASE + "icon-180.png", BASE + "icon-192.png", BASE + "icon-512.png"];
 
 self.addEventListener("install", function(ev){
