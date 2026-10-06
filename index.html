@@ -893,6 +893,7 @@ var state = {
   peso:PESO_CORP_DEF,          /* peso corporal, para el lastre de las dominadas */
   alt:{},                      /* complementarios cambiados por una alternativa */
   dias:[1,3,5],                /* días que entrenas: 1 lunes a 7 domingo */
+  eligio:0,                    /* ya ha tocado sus días, aunque deje los de serie */
   escudos:0,                   /* semanas que puedes salvar si te quedas corto */
   salvadas:{},                 /* semanas rescatadas con un escudo */
   puntos:0,
@@ -1367,8 +1368,9 @@ function render(){
    desaparecen para siempre. */
 function primerosPasos(){
   var tieneMarcas = !state.ejemplo;
-  var tieneDias = !!(state.dias && state.dias.length);
+  var tieneDias = !!state.eligio;
   var haEntrenado = (state.hechas || []).length > 0;
+  if(haEntrenado && !tieneDias){ state.eligio = 1; tieneDias = true; }
   if(tieneMarcas && tieneDias && haEntrenado) return "";
 
   function paso(n, hecho, ahora, titulo, texto, boton, id){
@@ -2847,6 +2849,7 @@ document.addEventListener("click", function(ev){
   }
   if((el = ev.target.closest("[data-dias] button"))){
     var dn = +el.dataset.v, dl = diasPlan(), k = dl.indexOf(dn);
+    state.eligio = 1;
     if(k > -1){ if(dl.length > 1) dl.splice(k, 1); }
     else dl.push(dn);
     state.dias = dl.sort(function(a,b){ return a-b; });
