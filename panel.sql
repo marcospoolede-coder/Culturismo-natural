@@ -51,8 +51,11 @@ alter table public.admins enable row level security;
 
 insert into public.admins (user_id, nota)
 select id, 'Marcos' from auth.users
-where lower(email) = lower('marcos@relevofamiliar.com')
+where lower(email) in ('marcos@relevofamiliar.com', 'marcospoolede@gmail.com')
 on conflict (user_id) do nothing;
+
+-- Si ninguno de esos correos tiene cuenta todavia, registrate primero en la
+-- app y vuelve a correr solo este insert.
 
 -- ------------------------------------------------------------------
 -- 3. El panel

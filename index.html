@@ -173,12 +173,40 @@
   .wfield input{width:74px; padding:6px 8px; border-radius:9px; border:1px solid var(--line-2);
                 background:var(--surface-2); font-family:"IBM Plex Mono",monospace; font-size:15.5px}
 
+  /* días de entreno */
+  .dias{display:grid; grid-template-columns:repeat(7,1fr); gap:5px}
+  .dia{aspect-ratio:1/1; border-radius:5px; border:1.5px solid var(--line-2);
+       background:var(--surface-2); font-family:"Cinzel",Georgia,serif; font-weight:700;
+       font-size:16px; color:var(--ink-2); cursor:pointer}
+  .dia.on{background:var(--accent); border-color:transparent; color:var(--accent-ink)}
+
+  /* primeros pasos */
+  .pasos{display:flex; flex-direction:column; gap:0}
+  .paso{display:flex; gap:12px; padding:13px 0; align-items:flex-start}
+  .paso + .paso{border-top:1px solid var(--line)}
+  .paso-n{flex:0 0 auto; width:28px; height:28px; border-radius:50%; display:grid; place-items:center;
+          font-family:"Cinzel",Georgia,serif; font-weight:700; font-size:14px;
+          background:var(--surface-2); color:var(--ink-3); border:1.5px solid var(--line-2)}
+  .paso.hecho .paso-n{background:var(--ok); color:#fff; border-color:transparent}
+  .paso.ahora .paso-n{background:var(--accent); color:var(--accent-ink); border-color:transparent}
+  .paso-t{flex:1 1 auto; min-width:0}
+  .paso-t b{display:block; font-size:16.5px; line-height:1.25}
+  .paso.hecho .paso-t b{color:var(--ink-3); text-decoration:line-through}
+  .paso-t p{margin:3px 0 0; font-size:14.5px; color:var(--ink-2); line-height:1.4}
+  .paso-t .btn{margin-top:9px; max-width:220px}
+
+  /* hoy toca o no */
+  .toca{display:flex; align-items:center; gap:7px; font-size:14.5px; margin-top:7px; color:var(--ink-2)}
+  .toca b{color:var(--ink)}
+  .toca i{width:9px; height:9px; border-radius:50%; background:var(--ok); display:block; flex:0 0 auto}
+  .toca.no i{background:var(--line-2)}
+
   /* la i que explica la jerga */
-  .info{display:inline-grid; place-items:center; width:19px; height:19px; flex:0 0 auto;
-        border-radius:50%; border:1.5px solid var(--ink-3); color:var(--ink-3);
-        font-family:"Cinzel",Georgia,serif; font-size:12px; font-weight:700; line-height:1;
-        margin-left:5px; vertical-align:1px; cursor:pointer}
-  .info:hover{border-color:var(--accent); color:var(--accent)}
+  .gi{display:inline-grid; place-items:center; width:19px; height:19px; flex:0 0 auto;
+      border-radius:50%; border:1.5px solid var(--ink-3); color:var(--ink-3);
+      font-family:"Cinzel",Georgia,serif; font-size:12px; font-weight:700; line-height:1;
+      margin-left:5px; vertical-align:1px; cursor:pointer}
+  .gi:hover{border-color:var(--accent); color:var(--accent)}
   .info-c{text-align:left}
   .info-c h2{font-size:23px; margin-bottom:8px}
   .info-c .frase{margin-bottom:18px}
@@ -864,7 +892,7 @@ var state = {
   orden:{AB:null, ABC:null},   /* el orden de las letras, null es el del plan */
   peso:PESO_CORP_DEF,          /* peso corporal, para el lastre de las dominadas */
   alt:{},                      /* complementarios cambiados por una alternativa */
-  meta:3,                      /* sesiones por semana que te pones como objetivo */
+  dias:[1,3,5],                /* días que entrenas: 1 lunes a 7 domingo */
   escudos:0,                   /* semanas que puedes salvar si te quedas corto */
   salvadas:{},                 /* semanas rescatadas con un escudo */
   puntos:0,
@@ -1009,6 +1037,7 @@ function merge(base, o){
   out.alt = Object.assign({}, base.alt, o.alt || {});
   out.salvadas = Object.assign({}, base.salvadas, o.salvadas || {});
   out.logros = Object.assign({}, base.logros, o.logros || {});
+  if(!o.dias && o.meta > 0) out.dias = [1,3,5].slice(0, o.meta);   /* estados viejos */
   return out;
 }
 function save(){
@@ -1334,6 +1363,40 @@ function render(){
   });
 }
 
+/* Los tres primeros pasos. Se quedan hasta que estén los tres y luego
+   desaparecen para siempre. */
+function primerosPasos(){
+  var tieneMarcas = !state.ejemplo;
+  var tieneDias = !!(state.dias && state.dias.length);
+  var haEntrenado = (state.hechas || []).length > 0;
+  if(tieneMarcas && tieneDias && haEntrenado) return "";
+
+  function paso(n, hecho, ahora, titulo, texto, boton, id){
+    return '<div class="paso' + (hecho ? " hecho" : (ahora ? " ahora" : "")) + '">' +
+      '<div class="paso-n">' + (hecho ? "✓" : n) + '</div>' +
+      '<div class="paso-t"><b>' + titulo + '</b><p>' + texto + '</p>' +
+      ((!hecho && ahora && boton) ? '<button class="btn primary" data-go="' + id + '">' + boton + '</button>' : "") +
+      '</div></div>';
+  }
+
+  return '<div class="sect"><div class="eyebrow">Para empezar</div><div class="card">' +
+    '<div class="pasos">' +
+    paso(1, tieneMarcas, true,
+         "Mide la fuerza que tienes hoy",
+         "Haz un test de cada básico y apunta el peso máximo que mueves una vez. " +
+         "Todo el plan sale de esos seis números. Dentro tienes el paso a paso.",
+         "Ir a mis maximales", "rm") +
+    paso(2, tieneDias, tieneMarcas,
+         "Elige tus tres días",
+         "Marca los días de la semana que vas a ir al gimnasio.",
+         "Elegir mis días", "aj") +
+    paso(3, haEntrenado, tieneMarcas && tieneDias,
+         "Déjate llevar",
+         "Ya está. Abre la app el día que toque y haz lo que te diga, ejercicio por ejercicio.",
+         "", "") +
+    '</div></div></div>';
+}
+
 function avisos(p){
   var f = fase(p.f), h = "";
   if(tocaTest(p)){
@@ -1504,7 +1567,7 @@ function vHoy(){
   var clave = p.f + "-" + p.s + "-" + p.e;
   if(sesion.k !== clave || !sesion.sets){ sesion = {k:clave, sets:{}}; saveSesion(); }
 
-  var h = bannerInstalar() + avisos(p);
+  var h = bannerInstalar() + primerosPasos() + avisos(p);
   h += '<div class="sect"><div class="today">' +
        '<div class="letter' + (f.tipo === "fuerza" ? " f" : "") + '">' + L + '</div><div>' +
        '<h2>Entreno ' + L + '</h2><div class="sub">' + esc(f.n) + ' semana ' + (p.s + 1) +
@@ -1515,6 +1578,9 @@ function vHoy(){
        '<div class="dura"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="8"/>' +
        '<path d="M12 9v4l2.5 2.5M9 2h6"/></svg>~' + enHoras(duracion(p, lista)) +
        '</div>' +
+       '<div class="toca' + (hoyTocaEntrenar() ? "" : " no") + '"><i></i>' +
+       (hoyTocaEntrenar() ? '<span><b>Hoy toca.</b> Es uno de tus días.</span>'
+        : '<span>Hoy descansas. Te toca el <b>' + NOMBREDIA[proximoDia()] + '</b>.</span>') + '</div>' +
        '</div></div>';
 
   if(f.tipo === "fuerza"){
@@ -1943,7 +2009,21 @@ function deIso(k){ var p = String(k).split("-"); return new Date(+p[0], +p[1] - 
 /* ---------- objetivo semanal ----------
    Entrenar fuerza no es diario: hace falta descansar. Por eso el objetivo es
    de sesiones por semana y la racha cuenta semanas cumplidas, no días. */
-function meta(){ return state.meta > 0 ? state.meta : 3; }
+var NOMBREDIA = ["", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"];
+var LETRADIA  = ["", "L", "M", "X", "J", "V", "S", "D"];
+function diasPlan(){
+  var d = state.dias;
+  return (d && d.length) ? d.slice().sort(function(a,b){ return a-b; }) : [1,3,5];
+}
+function meta(){ return diasPlan().length; }
+/* 1 es lunes y 7 domingo, como se cuenta aquí la semana */
+function diaDe(d){ var n = (d || new Date()).getDay(); return n === 0 ? 7 : n; }
+function hoyTocaEntrenar(){ return diasPlan().indexOf(diaDe()) > -1; }
+function proximoDia(){
+  var hoy = diaDe(), d = diasPlan();
+  for(var i = 0; i < d.length; i++) if(d[i] > hoy) return d[i];
+  return d[0];
+}
 function lunesIso(d){ return iso(lunes(d || new Date())); }
 
 function porSemanaHechas(){
@@ -2111,7 +2191,7 @@ var GLOSARIO = {
               d:"El número por el que se multiplica tu marca para sacar el peso de hoy. Si tu marca es 100 y el coeficiente 0,80, te tocan 80 kg."}
 };
 function info(clave){
-  return '<button class="info" data-info="' + clave + '" aria-label="Qué es esto">i</button>';
+  return '<button class="gi" data-info="' + clave + '" aria-label="Qué es esto">i</button>';
 }
 function abreInfo(clave){
   var g = GLOSARIO[clave];
@@ -2138,7 +2218,11 @@ function abreInfo(clave){
 var PASOS = [
   {t:"Fuerte y sano con 3 horas a la semana",
    p:"Tres entrenos. Nada más.",
-   c:"No hace falta vivir en el gimnasio. Hace falta ir siempre.",
+   c:"Con tres días a la semana ya estás en forma. Lo que cuenta es ser constante, no machacarse.",
+   i:"pesa"},
+  {t:"Todo gira en torno a 6 ejercicios",
+   p:"Sentadilla, banca, peso muerto, militar, remo y dominadas.",
+   c:"Seis movimientos que trabajan el cuerpo entero. Cuanto más sencillo, más fácil es cumplirlo.",
    i:"pesa"},
   {t:"Yo te digo qué hacer",
    p:"Qué ejercicio, cuántas veces y cuánto peso.",
@@ -2152,6 +2236,10 @@ var PASOS = [
    p:"Un gimnasio normal.",
    c:"Barra, discos, mancuernas y un banco. Si falta una máquina, te doy otro ejercicio.",
    i:"pesa"},
+  {t:"Primero, tu fuerza de hoy",
+   p:"Mides, eliges días y a entrenar.",
+   c:"Empiezas midiendo cuánto levantas en los seis básicos. Luego marcas tus tres días. A partir de ahí, déjate llevar.",
+   i:"lista"},
   {t:"Sin magia",
    p:"Esto va de constancia.",
    c:"Está hecho con lo que dicen los expertos en culturismo natural. Si buscas resultados rápidos y sin esfuerzo, esta no es tu app.",
@@ -2190,7 +2278,9 @@ function modoBienvenida(si){
    En iPhone no existe el botón de instalar: solo se puede desde Safari, con
    Compartir y Añadir a pantalla de inicio. Así que hay que explicarlo. */
 function esIOS(){
-  return /iphone|ipad|ipod/i.test(navigator.userAgent) ||
+  var u = navigator.userAgent;
+  if(/android/i.test(u)) return false;
+  return /iphone|ipad|ipod/i.test(u) ||
          (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 }
 function yaInstalada(){
@@ -2434,12 +2524,17 @@ function vAjustes(){
     '<div class="banner" style="margin-top:11px"><b>Ojo</b><span>La app instalada empieza vacía. ' +
     'Copia tu código antes de instalar y pégalo dentro. Con cuenta, no hace falta.</span></div></div></div>';
 
-  h += '<div class="sect"><div class="eyebrow">Objetivo semanal</div><div class="card">' +
-    '<p class="note" style="margin:0 0 10px">Sesiones por semana. La racha cuenta semanas, no días: ' +
-    'entrenar fuerza necesita descanso.</p>' +
-    '<div class="seg" data-meta="1">' + [2,3,4,5].map(function(n){
-      return '<button data-v="' + n + '" aria-pressed="' + (meta() === n) + '">' + n + '</button>';
+  var dp = diasPlan();
+  h += '<div class="sect"><div class="eyebrow">Tus días de entreno</div><div class="card">' +
+    '<p class="note" style="margin:0 0 11px">Toca los días que vas al gimnasio. ' +
+    'Con tres a la semana es suficiente.</p>' +
+    '<div class="dias" data-dias="1">' + [1,2,3,4,5,6,7].map(function(n){
+      var on = dp.indexOf(n) > -1;
+      return '<button class="dia' + (on ? " on" : "") + '" data-v="' + n + '" ' +
+        'aria-pressed="' + on + '" aria-label="' + NOMBREDIA[n] + '">' + LETRADIA[n] + '</button>';
     }).join("") + '</div>' +
+    '<p class="note">Entrenas <b>' + dp.length + (dp.length === 1 ? ' día' : ' días') + '</b> por semana: ' +
+    dp.map(function(n){ return NOMBREDIA[n]; }).join(", ") + '.</p>' +
     '<p class="note">Cada 4 semanas ganas un <b>escudo</b>. Si una semana fallas, se gasta solo y la ' +
     'racha sigue. Un viaje no te borra tres meses.</p></div></div>';
 
@@ -2750,8 +2845,12 @@ document.addEventListener("click", function(ev){
   if((el = ev.target.closest("[data-nobanner]"))){
     state.sinBanner = 1; save(); render(); return;
   }
-  if((el = ev.target.closest("[data-meta] button"))){
-    state.meta = +el.dataset.v; save(); render(); return;
+  if((el = ev.target.closest("[data-dias] button"))){
+    var dn = +el.dataset.v, dl = diasPlan(), k = dl.indexOf(dn);
+    if(k > -1){ if(dl.length > 1) dl.splice(k, 1); }
+    else dl.push(dn);
+    state.dias = dl.sort(function(a,b){ return a-b; });
+    save(); render(); return;
   }
   if((el = ev.target.closest("[data-seg] button"))){
     var seg = el.closest("[data-seg]").dataset.seg;
