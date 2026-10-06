@@ -173,6 +173,16 @@
   .wfield input{width:74px; padding:6px 8px; border-radius:9px; border:1px solid var(--line-2);
                 background:var(--surface-2); font-family:"IBM Plex Mono",monospace; font-size:15.5px}
 
+  /* la i que explica la jerga */
+  .info{display:inline-grid; place-items:center; width:19px; height:19px; flex:0 0 auto;
+        border-radius:50%; border:1.5px solid var(--ink-3); color:var(--ink-3);
+        font-family:"Cinzel",Georgia,serif; font-size:12px; font-weight:700; line-height:1;
+        margin-left:5px; vertical-align:1px; cursor:pointer}
+  .info:hover{border-color:var(--accent); color:var(--accent)}
+  .info-c{text-align:left}
+  .info-c h2{font-size:23px; margin-bottom:8px}
+  .info-c .frase{margin-bottom:18px}
+
   /* bienvenida: la pantalla se queda sola */
   body.solo-bienv .tabs,
   body.solo-bienv #foot,
@@ -891,6 +901,7 @@ function aplicaSesion(ses){
     cuenta.sync = "nube";
     cuenta.nombre = sesionNube.user.email || "";
     cargaAcceso().then(function(){
+      apuntaVisita();
       if(aprobado()) cargaNube(); else render();
     });
   }else{
@@ -913,6 +924,13 @@ function cargaAcceso(){
       return acceso;
     })["catch"](function(){ acceso = "sin-control"; return acceso; });
 }
+/* Apunta que hoy has abierto la app. Una fila por persona y dia, con un
+   contador. Solo cuenta para el panel de control, no se enseña a nadie. */
+function apuntaVisita(){
+  if(!nube || !sesionNube) return;
+  nube.rpc("visita")["catch"](function(){});
+}
+
 function cargaNube(){
   if(!nube || !sesionNube) return;
   nube.from("entrenamientos").select("estado").eq("user_id", sesionNube.user.id).maybeSingle()
@@ -1320,7 +1338,7 @@ function avisos(p){
   var f = fase(p.f), h = "";
   if(tocaTest(p)){
     h += '<div class="flag test"><div class="ic">1RM</div><div><h3>Toca test de maximales</h3>' +
-      '<p>Los pesos del plan salen de aquí. Hazlo antes de empezar.</p>' +
+      '<p>Los pesos del plan salen de aquí. Hazlo antes de empezar.' + info("maximal") + '</p>' +
       '<button class="act" data-go="rm"><span>Ir al test</span></button></div></div>';
   }
   if(semanaPico(p)){
@@ -1330,7 +1348,7 @@ function avisos(p){
   }
   if(esDescarga(p) && f.tipo !== "fuerza"){
     h += '<div class="flag deload"><div class="ic">↓</div><div><h3>Semana de descarga</h3>' +
-      '<p>Menos series, mismo peso. Toca recuperar.</p></div></div>';
+      '<p>Menos series, mismo peso. Toca recuperar.' + info("descarga") + '</p></div></div>';
   }
   var r = sesionesRestantesFase(p);
   if(!tocaTest(p) && r <= 3){
@@ -1416,7 +1434,7 @@ function bloqueJS(p, f, lista, ini, fin, act){
 
   var h = '<div class="ex js-bloque' + (done ? " done" : "") + (lock ? " lock" : "") + '">' +
     '<button class="ex-head"' + (lock ? " disabled" : ' data-open="js' + ini + '"') + '>' +
-    '<span class="tag js">seguidos</span>' +
+    '<span class="tag js">jump set</span>' +
     '<span class="ex-name">' + esc(titulo) + '</span>' +
     '<span class="ex-load"><b>' + vueltas + '</b><small>vueltas</small></span></button>';
 
@@ -1428,7 +1446,8 @@ function bloqueJS(p, f, lista, ini, fin, act){
   }
 
   h += '<div class="ex-body"' + (done || !abierto ? " hidden" : "") + '>';
-  h += '<p class="note">Una serie de cada uno, seguidas. Cambias cada 30 segundos.</p>';
+  h += '<p class="note">Una serie de cada uno, seguidas. Cambias cada 30 segundos.' +
+    info("jumpset") + '</p>';
 
   for(var v = 0; v < vueltas; v++){
     var completa = ejs.every(function(q){
@@ -1528,7 +1547,7 @@ function vHoy(){
     var c = cargas(p, e), sets = sesion.sets[i] || [];
     var done = exHecho(p, e, i), lock = bloqueado(p, lista, i);
     var tag = e.t === "b" ? '<span class="tag b">básico</span>' :
-             (e.js ? '<span class="tag js">seguidos</span>' : '<span class="tag">extra</span>');
+             (e.js ? '<span class="tag js">jump set</span>' : '<span class="tag">complem</span>');
     var kg = c[0].kg, manual = state.pesos[nombreEj(e)];
     var carga = kg ? nf(kg) + (c[c.length - 1].kg !== kg ? " a " + nf(c[c.length - 1].kg) : "") + " kg"
                    : (manual ? nf(manual) + " kg" : "a tu peso");
@@ -1565,7 +1584,8 @@ function vHoy(){
     }
 
     if(esBasico(e)){
-      h += '<p class="note">Apunta cada serie. Hasta que no lo hagas no se abre el siguiente.</p>';
+      h += '<p class="note">Apunta cada serie. Hasta que no lo hagas no se abre el siguiente.' +
+        info("basico") + '</p>';
       c.forEach(function(x, j){
         var teo = teoDe(e, x.kg);
         var r = apunte(i, j) || {}, ok = setHecho(e, i, j, teo, x.reps);
@@ -1574,7 +1594,7 @@ function vHoy(){
           '<div class="srow-h"><b>Serie ' + (j + 1) + '</b>' +
           '<span class="objetivo"><b>' + x.reps + '</b> reps' +
           (f.rp && j === c.length - 1 ? " más rest pause" : "") + '</span>' +
-          '<span class="teo">toca <b>' + (teo ? (e.bw ? "+" : "") + nf(teo) : "libre") + '</b> kg</span></div>';
+          '<span class="teo">teórico <b>' + (teo ? (e.bw ? "+" : "") + nf(teo) : "libre") + '</b> kg</span></div>';
         var pl = discos(x.kg, e.bw);
         if(pl){
           h += '<div class="plates"><span>Barra ' + nf(BARRA) + ' kg y por lado</span>';
@@ -1595,15 +1615,15 @@ function vHoy(){
           '<input inputmode="numeric" data-reps="' + i + ',' + j + '" value="' +
           (vrep ? vrep : "") + '" aria-label="Repeticiones reales de la serie ' + (j + 1) + '">' +
           '<span class="u">reps</span></div></label>' +
-          '<label class="campo-s ancho"><span>Reps que te sobraron</span>' +
+          '<label class="campo-s ancho"><span>Recámara' + info("recamara") + '</span>' +
           '<select data-rir="' + i + ',' + j + '"' + (r.rir === undefined || r.rir === "" ? ' class="falta"' : '') +
           ' aria-label="Repeticiones en recámara de la serie ' + (j + 1) + '">' +
           '<option value="">Elige</option>' +
-          [["0","Ninguna, al fallo"],["1","1 más"],["2","2 más"],["3","3 más"],["4","4 más"],["5","5 o más"]].map(function(o){
+          [["0","0, al fallo"],["1","1"],["2","2"],["3","3"],["4","4"],["5","5 o más"]].map(function(o){
             return '<option value="' + o[0] + '"' + (String(r.rir) === o[0] ? " selected" : "") + '>' + o[1] + '</option>';
           }).join("") + '</select></label>' +
           '<div class="tecs" role="group" aria-label="Técnica de la serie ' + (j + 1) + '">' +
-          [["A","Bien"],["B","Regular"],["C","Mal"]].map(function(t){
+          [["A","limpia"],["B","alguna rota"],["C","rota"]].map(function(t){
             return '<button data-tec="' + i + ',' + j + '" data-v="' + t[0] + '" aria-pressed="' +
               (r.tec === t[0]) + '">' + t[0] + '<small>' + t[1] + '</small></button>';
           }).join("") + '</div>' +
@@ -1637,7 +1657,7 @@ function vHoy(){
     h += '<p class="note">' + (e.js ? "Alterna cada 30 segundos."
         : e.t === "b" ? "Descanso " + mmss(descansoDe(p, e)) + " entre series"
         : "Al fallo. " + mmss(descansoDe(p, e)) + " de descanso entre series") +
-      (f.rp && e.t === "b" ? ", última serie en rest pause" : "") + '</p>';
+      (f.rp && e.t === "b" ? ", última serie en rest pause" + info("restpause") : "") + '</p>';
     h += '</div>';
 
     if(done && esBasico(e)){
@@ -1692,8 +1712,8 @@ function vPlan(){
   h += '<div>' + (t < 0
     ? '<b>No te queda ningún test.</b>'
     : sem === 0
-      ? '<b>Toca test de marcas</b>, ahora, antes de seguir.'
-      : '<b>Próximo test de marcas:</b> dentro de ' + sem +
+      ? '<b>Toca test de maximales</b>, ahora, antes de seguir.'
+      : '<b>Próximo test de maximales:</b> dentro de ' + sem +
         (sem === 1 ? ' semana.' : ' semanas.')) + '</div>';
   var fi = FASES.length - 1;
   h += '<div><b>Acabas el sistema</b> en ' +
@@ -1702,10 +1722,11 @@ function vPlan(){
   h += '</div></div>';
 
   h += '<div class="sect"><div class="eyebrow">Cómo funciona</div><div class="card stack">' +
-    '<div><b>El peso sale de tus marcas</b><p class="note" style="margin:2px 0 0">' +
-    'Cada ciclo sube un poco el peso y baja las repeticiones.</p></div>' +
-    '<div><b>La última semana de cada ciclo descansas</b><p class="note" style="margin:2px 0 0">' +
-    'Menos series, mismo peso. Sirve para recuperar.</p></div>' +
+    '<div><b>El peso sale de tu maximal' + info("maximal") + '</b>' +
+    '<p class="note" style="margin:2px 0 0">Se multiplica por el coeficiente' + info("coef") +
+    ' del ciclo. Cada ciclo sube el peso y baja las repeticiones.</p></div>' +
+    '<div><b>La última semana de cada ciclo hay descarga' + info("descarga") + '</b>' +
+    '<p class="note" style="margin:2px 0 0">Menos series, mismo peso. Sirve para recuperar.</p></div>' +
     '<div><b>En fuerza aprietas, en volumen no</b><p class="note" style="margin:2px 0 0">' +
     'En los primeros ciclos paras antes de fallar. En el bloque de fuerza vas al límite.</p></div>' +
     '</div></div>';
@@ -1801,11 +1822,11 @@ function vRM(){
       .replace(/<div class="flag info">[\s\S]*?<\/div><\/div>/g, "");
   }
 
-  h += '<div class="sect"><div class="eyebrow">Tus marcas</div><div class="card">' +
+  h += '<div class="sect"><div class="eyebrow">Maximales</div><div class="card">' +
     '<div class="rmgrid">' +
     '<span class="th">Ejercicio</span>' +
-    '<span class="th n">Calculado</span>' +
-    '<span class="th n">La tuya</span>';
+    '<span class="th n">Teórico</span>' +
+    '<span class="th n">Tu marca</span>';
   var hayTeo = false;
   LIFTS.forEach(function(l, i){
     var t = rmTeorico(l.k), act = state.rms[l.k] || 0, sp = i ? " sep" : "";
@@ -1837,9 +1858,9 @@ function vRM(){
 
   h += evoHTML();
 
-  h += '<div class="sect"><div class="eyebrow">Cómo buscar tu marca</div><div class="card">' +
-    '<p class="note" style="margin:0 0 12px">Tu marca es el peso máximo que levantas una sola vez, ' +
-    'bien hecho. De ahí sale todo lo demás.</p>' +
+  h += '<div class="sect"><div class="eyebrow">Cómo buscar tu maximal</div><div class="card">' +
+    '<p class="note" style="margin:0 0 12px">Tu maximal' + info("maximal") + ' es el peso máximo que ' +
+    'levantas una sola vez, bien hecho. De ahí sale todo lo demás.</p>' +
     guia([
       ["Ve descansado", "Un solo ejercicio por día. Nunca sentadilla y peso muerto el mismo día."],
       ["Calienta con la tabla de abajo", "Te dice qué peso poner en cada serie."],
@@ -2058,6 +2079,57 @@ function vCal(){
   });
   h += '</div></div>';
   view.innerHTML = h;
+}
+
+/* ============================ GLOSARIO ============================
+   La jerga se queda, que es la del gimnasio y la que usa tu entrenador,
+   pero cada palabra lleva una i al lado que la explica en dos frases. */
+var GLOSARIO = {
+  maximal:   {t:"Maximal, o 1RM",
+              d:"El peso máximo que levantas una sola vez, bien hecho. De ese número salen todos los pesos del plan."},
+  recamara:  {t:"Recámara, o RIR",
+              d:"Las repeticiones que te habrían sobrado al acabar la serie. Si paras en 10 y podías hacer 12, tu recámara es 2. Si no podías ni una más, es 0."},
+  jumpset:   {t:"Jump set",
+              d:"Dos o tres ejercicios seguidos sin descanso entre ellos. Cambias cada 30 segundos y, al acabar la vuelta, empiezas otra. Ahorra tiempo sin perder trabajo."},
+  basico:    {t:"Básico",
+              d:"Los ejercicios grandes con barra: sentadilla, banca, peso muerto, militar, remo y dominadas. Mueven mucho músculo y el peso sale de tus marcas."},
+  complem:   {t:"Complementario",
+              d:"Los ejercicios de apoyo, normalmente en máquina o con mancuernas. Van después de los básicos y el peso lo eliges tú."},
+  teorico:   {t:"Peso teórico",
+              d:"El peso que te toca según tu marca y el ciclo en el que estás. Es una propuesta: si hoy no sale, apunta el que hayas movido de verdad."},
+  tecnica:   {t:"Técnica A, B o C",
+              d:"Cómo ha salido la serie. A, limpia de principio a fin. B, se te ha roto alguna repetición. C, has tenido que hacer trampas para subirla."},
+  descarga:  {t:"Semana de descarga",
+              d:"La última semana de cada ciclo. Haces menos series con el mismo peso. No es perder el tiempo: es lo que te deja llegar entero al ciclo siguiente."},
+  restpause: {t:"Rest pause",
+              d:"Llegas al fallo, descansas 15 segundos sin soltar el peso y sigues hasta que no puedas más. Todo cuenta como una sola serie."},
+  drop:      {t:"Drop",
+              d:"Al acabar la última serie, bajas el peso un 20% o 30% y haces más repeticiones sin descansar."},
+  ciclo:     {t:"Ciclo",
+              d:"Tres semanas con el mismo esquema. Cada ciclo sube un poco el peso y baja las repeticiones. Ocho ciclos son un sistema completo, casi un año."},
+  coef:      {t:"Coeficiente",
+              d:"El número por el que se multiplica tu marca para sacar el peso de hoy. Si tu marca es 100 y el coeficiente 0,80, te tocan 80 kg."}
+};
+function info(clave){
+  return '<button class="info" data-info="' + clave + '" aria-label="Qué es esto">i</button>';
+}
+function abreInfo(clave){
+  var g = GLOSARIO[clave];
+  if(!g) return;
+  var el = document.createElement("div");
+  el.className = "fel";
+  el.innerHTML = '<div class="fel-c info-c" role="dialog" aria-modal="true">' +
+    '<h2>' + esc(g.t) + '</h2>' +
+    '<p class="frase">' + esc(g.d) + '</p>' +
+    '<button class="btn primary" id="info-ok">Entendido</button></div>';
+  document.body.appendChild(el);
+  var ok = el.querySelector("#info-ok");
+  ok.focus();
+  function cierra(){ el.remove(); document.removeEventListener("keydown", tecla); }
+  function tecla(ev){ if(ev.key === "Escape") cierra(); }
+  ok.addEventListener("click", cierra);
+  el.addEventListener("click", function(ev){ if(ev.target === el) cierra(); });
+  document.addEventListener("keydown", tecla);
 }
 
 /* ============================ BIENVENIDA ============================
@@ -2665,6 +2737,7 @@ document.addEventListener("click", function(ev){
   }
   if((el = ev.target.closest("[data-timer]"))){ startTimer(+el.dataset.timer, "Descanso", ""); return; }
   if((el = ev.target.closest(".tab"))){ tab = el.dataset.t; render(); return; }
+  if((el = ev.target.closest("[data-info]"))){ abreInfo(el.dataset.info); return; }
   if(ev.target.id === "b-sig"){
     if(pasoAct < PASOS.length - 1){ pasoAct++; render(); }
     else { state.visto = 1; pasoAct = 0; save(); render(); }
@@ -2966,7 +3039,7 @@ var ICON = {
   aj:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/>'
 };
 document.getElementById("tabs").innerHTML =
-  [["hoy","Hoy","hoy"],["cal","Racha","cal"],["plan","Plan","plan"],["rm","Marcas","rm"],["aj","Ajustes","aj"]]
+  [["hoy","Hoy","hoy"],["cal","Racha","cal"],["plan","Plan","plan"],["rm","1RM","rm"],["aj","Ajustes","aj"]]
   .map(function(t){
     return '<button class="tab" role="tab" data-t="' + t[0] + '" aria-selected="false">' +
       '<svg viewBox="0 0 24 24">' + ICON[t[2]] + '</svg>' + t[1] + '</button>';
