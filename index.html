@@ -173,6 +173,16 @@
   .wfield input{width:74px; padding:6px 8px; border-radius:9px; border:1px solid var(--line-2);
                 background:var(--surface-2); font-family:"IBM Plex Mono",monospace; font-size:15.5px}
 
+  /* alimentación */
+  .comdib{width:86px; height:86px; border-radius:50%; background:var(--accent-soft);
+          display:grid; place-items:center; margin:2px auto 14px}
+  .comdib svg{width:46px; height:46px; stroke:var(--accent); fill:none; stroke-width:1.6;
+              stroke-linecap:round; stroke-linejoin:round}
+  .btn.compra{margin-top:12px; gap:8px; text-decoration:none; background:var(--deload-soft);
+              color:var(--deload); border-color:transparent; font-weight:600}
+  .btn.compra svg{width:17px; height:17px; stroke:currentColor; fill:none; stroke-width:1.8;
+                  stroke-linecap:round; stroke-linejoin:round}
+
   /* días de entreno */
   .dias{display:grid; grid-template-columns:repeat(7,1fr); gap:5px}
   .dia{aspect-ratio:1/1; border-radius:5px; border:1.5px solid var(--line-2);
@@ -381,7 +391,7 @@
   /* tabs */
   .tabs{position:fixed; left:0; right:0; bottom:0; z-index:50; background:var(--surface);
         border-top:1px solid var(--line); padding-bottom:env(safe-area-inset-bottom, 0px)}
-  .tabs-in{max-width:520px; margin:0 auto; display:grid; grid-template-columns:repeat(5,1fr)}
+  .tabs-in{max-width:520px; margin:0 auto; display:grid; grid-template-columns:repeat(6,1fr)}
   .tab{height:var(--tabh); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px;
        font-family:"Cinzel","Palatino Linotype",Georgia,serif; font-size:13px; letter-spacing:.06em; text-transform:uppercase;
        font-weight:600; color:var(--ink-3)}
@@ -1356,6 +1366,7 @@ function render(){
   if(tab === "hoy") vHoy();
   else if(tab === "cal") vCal();
   else if(tab === "plan") vPlan();
+  else if(tab === "com") vCom();
   else if(tab === "rm") vRM();
   else vAjustes();
 
@@ -2414,6 +2425,105 @@ function felicita(f, L, nApuntes, cerroFase, extra){
   document.addEventListener("keydown", tecla);
 }
 
+/* Tu etiqueta de Amazon Afiliados. Mientras esté vacía, los botones llevan
+   a la búsqueda normal, sin comisión. En cuanto tengas la cuenta aprobada en
+   afiliados.amazon.es, pon aquí tu etiqueta, por ejemplo "marcospoole-21",
+   y todos los enlaces pasan a dar comisión. */
+var AFILIADO = "";
+
+function enlaceCompra(busqueda){
+  return "https://www.amazon.es/s?k=" + encodeURIComponent(busqueda) +
+         (AFILIADO ? "&tag=" + encodeURIComponent(AFILIADO) : "");
+}
+function botonCompra(busqueda, texto){
+  return '<a class="btn compra" href="' + enlaceCompra(busqueda) + '" target="_blank" rel="noopener sponsored">' +
+    '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 7h12l1 13H5zM9 7a3 3 0 0 1 6 0"/></svg>' +
+    esc(texto) + '</a>' +
+    (AFILIADO ? '<p class="note" style="margin:6px 0 0; font-size:13px">Enlace de afiliado: ' +
+    'si compras desde aquí, me llevo una pequeña comisión y a ti te cuesta lo mismo.</p>' : "");
+}
+
+/* las ilustraciones, dibujadas aquí para no depender de fotos de nadie */
+function dibujoCom(cual){
+  var d = {
+    prote: '<path d="M9 3h6M10 3v3M14 3v3M8 6h8l-1 4h-6zM9 10l-1 11h8l-1-11"/><path d="M9.5 14h5"/>',
+    crea:  '<rect x="6" y="8" width="12" height="13" rx="1.5"/><path d="M7 8V6.5A1.5 1.5 0 0 1 8.5 5h7A1.5 1.5 0 0 1 17 6.5V8M9 12h6M12 15v3"/>',
+    magne: '<ellipse cx="9" cy="14" rx="3.2" ry="5" transform="rotate(-30 9 14)"/><ellipse cx="15.5" cy="10.5" rx="3.2" ry="5" transform="rotate(-30 15.5 10.5)"/><path d="M13 13.8l5 2.9"/>'
+  }[cual];
+  return '<div class="comdib"><svg viewBox="0 0 24 24">' + d + '</svg></div>';
+}
+
+/* ============================ ALIMENTACIÓN ============================
+   Tres cosas y en este orden, que es el de la evidencia: la proteína es la
+   base, la creatina es el único suplemento que compensa, y el magnesio solo
+   si falta. Frases cortas y números con tu peso. */
+function vCom(){
+  var kg = pesoCorp();
+  var pMin = Math.round(kg * 1.6), pMax = Math.round(kg * 2);
+
+  var h = '<div class="sect"><div class="card semana">' +
+    '<div class="semana-t"><b>La comida es la otra mitad</b>' +
+    '<p>Entrenar rompe el músculo. Comer lo construye. ' +
+    'Sin esto, el plan se queda a medias.</p></div></div></div>';
+
+  h += '<div class="sect"><div class="eyebrow">1. Proteína, la base</div><div class="card">' +
+    dibujoCom("prote") +
+    '<div class="conv-rm"><span>Tu objetivo diario</span><b class="mono">' +
+    pMin + ' a ' + pMax + ' g</b></div>' +
+    '<p class="note" style="margin:0">Entre 1,6 y 2 gramos por kilo de peso. ' +
+    'Con tus ' + nf(kg) + ' kg, eso son ' + pMin + ' a ' + pMax + ' g al día. ' +
+    'Es lo único de esta página que es obligatorio.</p>' +
+    '<p class="note"><b>De dónde sacarla.</b> Huevos, pollo, pescado, carne, ' +
+    'lácteos y legumbres. Para que te hagas una idea: una pechuga son ~30 g, ' +
+    'tres huevos ~20 g, un yogur griego ~10 g.</p>' +
+    '<p class="note"><b>Cuándo.</b> Da igual la hora. Reparte en 3 o 4 comidas ' +
+    'y cubre el total del día. La ventana de media hora tras entrenar es un mito.</p>' +
+    '<p class="note"><b>El batido.</b> Vale si no llegas con comida. ' +
+    'Es comida en polvo, no magia. Uno al día como mucho.</p>' +
+    botonCompra("proteina whey aislada", "Ver proteínas en Amazon") +
+    '</div></div>';
+
+  h += '<div class="sect"><div class="eyebrow">2. Creatina, la única que compensa</div><div class="card">' +
+    dibujoCom("crea") +
+    '<div class="conv-rm"><span>Dosis</span><b class="mono">5 g al día</b></div>' +
+    '<p class="note" style="margin:0"><b>Monohidrato</b>, el de toda la vida y el más barato. ' +
+    'Es el suplemento con más estudios del mundo en fuerza: unas repeticiones más ' +
+    'con el mismo peso, y algo más de músculo con los meses.</p>' +
+    '<p class="note"><b>Todos los días</b>, entrenes o no, a la hora que te acuerdes. ' +
+    'Funciona por acumulación, no por tomarla antes de entrenar.</p>' +
+    '<p class="note"><b>Subirás ~1 kg las primeras semanas.</b> Es agua dentro del músculo. ' +
+    'Buena señal, no grasa.</p>' +
+    '<p class="note"><b>No hace falta</b> fase de carga, ni marcas caras, ' +
+    'ni descansar de ella. Busca que ponga Creapure, que es la materia prima buena.</p>' +
+    botonCompra("creatina monohidrato creapure", "Ver creatinas en Amazon") +
+    '</div></div>';
+
+  h += '<div class="sect"><div class="eyebrow">3. Magnesio, solo si falta</div><div class="card">' +
+    dibujoCom("magne") +
+    '<p class="note" style="margin:0">Te lo digo claro: <b>no mejora el rendimiento por sí solo</b>. ' +
+    'Sirve cuando hay déficit, que suele venir de comer poco de donde lo hay.</p>' +
+    '<p class="note"><b>Dónde está.</b> Frutos secos, legumbres, verdura de hoja, ' +
+    'cereales integrales y chocolate negro. Si comes de eso a diario, probablemente no te falta.</p>' +
+    '<p class="note"><b>Si lo tomas.</b> Citrato o bisglicinato, de 200 a 300 mg al día, ' +
+    'mejor con la cena. El óxido de magnesio se absorbe mal: no lo compres. ' +
+    'Pasarse suelta la tripa.</p>' +
+    '<p class="note"><b>Para qué puede ayudar.</b> Dormir algo mejor ' +
+    'y menos calambres, sobre todo si venías con déficit.</p>' +
+    botonCompra("magnesio bisglicinato", "Ver magnesio en Amazon") +
+    '</div></div>';
+
+  h += '<div class="sect"><div class="card">' +
+    '<p class="note" style="margin:0"><b>Lo que no está aquí, no lo necesitas.</b> ' +
+    'Quemagrasas, aminoácidos sueltos, boosters: dinero tirado para un natural. ' +
+    'Primero la proteína, luego dormir, y la creatina si quieres el extra.</p></div></div>';
+
+  h += '<div class="sect"><div class="banner"><b>Ojo</b><span>Esto no es consejo médico. ' +
+    'Si tienes el riñón delicado, tomas medicación o estás embarazada, ' +
+    'pregunta a tu médico antes de suplementarte.</span></div></div>';
+
+  view.innerHTML = h;
+}
+
 function cuentaHTML(){
   var h = '<div class="sect"><div class="eyebrow">Tu cuenta</div><div class="card">';
 
@@ -3136,12 +3246,13 @@ var ICON = {
   hoy:'<path d="M6 4v16M18 4v16M3 8h3M18 8h3M6 12h12M3 16h3M18 16h3"/>',
   plan:'<path d="M4 6h16M4 12h16M4 18h9"/><circle cx="19" cy="18" r="2"/>',
   rm:'<path d="M4 17V9M9 20V4M15 20V7M20 17v-6"/>',
+  com:'<path d="M7 3v7a2 2 0 0 0 2 2h0V3M9 3v18M17 3c-1.5 3-1.5 7 0 9v9"/>',
   cal:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/>' +
       '<circle cx="8.5" cy="14.5" r="1.2"/><circle cx="12" cy="14.5" r="1.2"/><circle cx="15.5" cy="18" r="1.2"/>',
   aj:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/>'
 };
 document.getElementById("tabs").innerHTML =
-  [["hoy","Hoy","hoy"],["cal","Racha","cal"],["plan","Plan","plan"],["rm","1RM","rm"],["aj","Ajustes","aj"]]
+  [["hoy","Hoy","hoy"],["cal","Racha","cal"],["plan","Plan","plan"],["rm","1RM","rm"],["com","Comida","com"],["aj","Ajustes","aj"]]
   .map(function(t){
     return '<button class="tab" role="tab" data-t="' + t[0] + '" aria-selected="false">' +
       '<svg viewBox="0 0 24 24">' + ICON[t[2]] + '</svg>' + t[1] + '</button>';
