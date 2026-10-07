@@ -731,7 +731,9 @@ var RUT = {
     C:[ ex("Peso muerto",{t:"b", rm:"muerto"}),
         ex("Dominadas",{t:"b", rm:"dominadas", bw:1}),
         ex("Curl con barra",{}),
-        ex("Remo o seal row",{t:"b", rm:"remo"}),
+        /* en la tabla original el remo del dia C va en la zona amarilla:
+           jump set ligero, no un tercer tiron pesado con porcentaje */
+        ex("Remo o seal row",{js:1}),
         ex("Leg extensión",{js:1, sin:1}),
         ex("Crunch invertido",{js:1, sin:1}) ]
   }
