@@ -680,7 +680,7 @@
 /* Coeficientes, repeticiones y descansos salen del cuaderno manuscrito
    del 31 de mayo de 2025 y de las tablas de rutina por microciclo.     */
 
-var VERSION = "5 de octubre de 2026";
+var VERSION = "10 de octubre de 2026";
 var BARRA = 20;
 var PESO_CORP_DEF = 75;   /* peso corporal por defecto, se cambia en Ajustes */
 function pesoCorp(){ return state.peso > 0 ? state.peso : PESO_CORP_DEF; }
@@ -1737,7 +1737,7 @@ function vHoy(){
 
     h += '<p class="note">' + (e.js ? "Alterna cada 30 segundos."
         : e.t === "b" ? "Descanso " + mmss(descansoDe(p, e)) + " entre series"
-        : "Al fallo. " + mmss(descansoDe(p, e)) + " de descanso entre series") +
+        : "Al fallo" + info("fallo") + ". " + mmss(descansoDe(p, e)) + " de descanso entre series") +
       (f.rp && e.t === "b" ? ", última serie en rest pause" + info("restpause") : "") + '</p>';
     h += '</div>';
 
@@ -2202,6 +2202,8 @@ var GLOSARIO = {
               d:"Al acabar la última serie, bajas el peso un 20% o 30% y haces más repeticiones sin descansar."},
   ciclo:     {t:"Ciclo",
               d:"Tres semanas con el mismo esquema. Cada ciclo sube un poco el peso y baja las repeticiones. Ocho ciclos son un sistema completo, casi un año."},
+  fallo:     {t:"Al fallo",
+              d:"Sigues hasta que no sale ni una repetición más con buena postura. Las reps que marca la app son orientativas: si salen más, haz más y apúntalas."},
   coef:      {t:"Coeficiente",
               d:"El número por el que se multiplica tu marca para sacar el peso de hoy. Si tu marca es 100 y el coeficiente 0,80, te tocan 80 kg."}
 };
@@ -2863,7 +2865,11 @@ function tick(){
   document.getElementById("tnum").textContent = mmss(q);
   document.getElementById("ttrack").style.width =
     Math.max(0, Math.min(100, q / T.total * 100)) + "%";
-  if(q <= 0 && !T.son){ T.son = true; beep(); document.getElementById("timer").classList.add("late"); }
+  if(q <= 0){
+    document.getElementById("timer").classList.add("late");
+    /* pita una y otra vez hasta que pares el cronometro o sumes 30 segundos */
+    if(Date.now() >= (+T.son || 0)){ T.son = Date.now() + 1800; beep(); }
+  }
   if(q < -600) stopTimer();
 }
 
