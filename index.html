@@ -696,7 +696,7 @@
    del 31 de mayo de 2025 y de las tablas de rutina por microciclo.     */
 
 /* súbela en cada despliegue: la app instalada la compara para avisar de que hay otra */
-var VERSION = "10 de octubre de 2026";
+var VERSION = "10 de octubre de 2026, 14:20";
 var BARRA = 20;
 var PESO_CORP_DEF = 75;   /* peso corporal por defecto, se cambia en Ajustes */
 function pesoCorp(){ return state.peso > 0 ? state.peso : PESO_CORP_DEF; }
@@ -2847,8 +2847,68 @@ function descarga(nombre, texto, vacio){
 }
 
 /* ============================ CRONÓMETRO ============================ */
-var T = {fin:0, total:0, lab:"", sub:"", int:null, wake:null, son:false};
-var actx = null;
+var T = {fin:0, total:0, lab:"", sub:"", int:null, wake:null, son:false, prox:0, audioOk:false};
+var actx = null, alarma = null;
+
+/* La alarma es un <audio> con un wav generado aquí mismo, no Web Audio: en
+   iPhone, Web Audio se calla con el interruptor de silencio y el audio de
+   tipo multimedia no. El wav empieza con 0,15 s de silencio para poder
+   "desbloquearlo" al arrancar el cronómetro sin que se oiga nada. */
+function wavAlarma(){
+  var sr = 8000, dur = 1.6, n = Math.round(sr * dur), datos = new Uint8Array(44 + n);
+  function u32(i, v){ datos[i] = v & 255; datos[i+1] = (v >> 8) & 255; datos[i+2] = (v >> 16) & 255; datos[i+3] = (v >> 24) & 255; }
+  function u16(i, v){ datos[i] = v & 255; datos[i+1] = (v >> 8) & 255; }
+  function txt(i, t){ for(var k = 0; k < t.length; k++) datos[i+k] = t.charCodeAt(k); }
+  txt(0, "RIFF"); u32(4, 36 + n); txt(8, "WAVE"); txt(12, "fmt "); u32(16, 16); u16(20, 1); u16(22, 1);
+  u32(24, sr); u32(28, sr); u16(32, 1); u16(34, 8); txt(36, "data"); u32(40, n);
+  var tonos = [[0.15, 880], [0.33, 880], [0.51, 1320]];
+  for(var i = 0; i < n; i++){
+    var t = i / sr, v = 0;
+    tonos.forEach(function(tn){
+      var d = t - tn[0];
+      if(d >= 0 && d < 0.14){
+        var env = Math.min(1, d / 0.01) * Math.min(1, (0.14 - d) / 0.03);
+        v += (Math.sin(2 * Math.PI * tn[1] * t) > 0 ? 1 : -1) * 0.45 * env;
+      }
+    });
+    datos[44 + i] = 128 + Math.round(v * 127);
+  }
+  var b = "";
+  for(var j = 0; j < datos.length; j += 8192) b += String.fromCharCode.apply(null, datos.subarray(j, j + 8192));
+  return "data:audio/wav;base64," + btoa(b);
+}
+function preparaAlarma(){
+  if(alarma) return;
+  try{
+    alarma = new Audio(wavAlarma());
+    alarma.loop = true; alarma.preload = "auto";
+    alarma.setAttribute("playsinline", "");
+  }catch(e){ alarma = null; }
+}
+/* se llama dentro del toque que arranca el cronómetro: iPhone solo deja sonar
+   después a un audio que ya ha sonado con un gesto del usuario */
+function desbloqueaAlarma(){
+  preparaAlarma();
+  if(!alarma) return;
+  try{
+    var pr = alarma.play();
+    if(pr && pr.then) pr.then(function(){ alarma.pause(); alarma.currentTime = 0; })["catch"](function(){});
+  }catch(e){}
+}
+function empiezaAlarma(){
+  if(!alarma) return false;
+  try{
+    alarma.currentTime = 0;
+    var pr = alarma.play();
+    if(pr && pr["catch"]) pr["catch"](function(){ T.audioOk = false; });
+    return true;
+  }catch(e){ return false; }
+}
+function paraAlarma(){
+  T.son = false; T.prox = 0; T.audioOk = false;
+  if(alarma){ try{ alarma.pause(); alarma.currentTime = 0; }catch(e){} }
+}
+function vibra(){ try{ if(navigator.vibrate) navigator.vibrate([120, 70, 120]); }catch(e){} }
 
 function beep(){
   try{
@@ -2863,10 +2923,11 @@ function beep(){
       o.start(actx.currentTime + t); o.stop(actx.currentTime + t + 0.16);
     });
   }catch(e){}
-  try{ if(navigator.vibrate) navigator.vibrate([120, 70, 120]); }catch(e){}
 }
 function startTimer(seg, lab, sub){
-  T.fin = Date.now() + seg * 1000; T.total = seg; T.lab = lab || "Descanso"; T.sub = sub || ""; T.son = false;
+  paraAlarma();
+  T.fin = Date.now() + seg * 1000; T.total = seg; T.lab = lab || "Descanso"; T.sub = sub || "";
+  desbloqueaAlarma();
   document.getElementById("timer").hidden = false;
   document.getElementById("tlab").textContent = T.lab;
   document.getElementById("tsub").textContent = T.sub;
@@ -2879,6 +2940,7 @@ function startTimer(seg, lab, sub){
   clearInterval(T.int); T.int = setInterval(tick, 200); tick();
 }
 function stopTimer(){
+  paraAlarma();
   clearInterval(T.int); T.int = null;
   document.getElementById("timer").hidden = true;
   document.getElementById("timer").classList.remove("late");
@@ -2891,8 +2953,10 @@ function tick(){
     Math.max(0, Math.min(100, q / T.total * 100)) + "%";
   if(q <= 0){
     document.getElementById("timer").classList.add("late");
-    /* pita una y otra vez hasta que pares el cronometro o sumes 30 segundos */
-    if(Date.now() >= (+T.son || 0)){ T.son = Date.now() + 1800; beep(); }
+    /* suena en bucle hasta que pares el cronómetro, sumes 30 segundos o
+       marques la siguiente serie; si el audio falla, pita con Web Audio */
+    if(!T.son){ T.son = true; T.audioOk = empiezaAlarma(); }
+    if(Date.now() >= T.prox){ T.prox = Date.now() + 1800; if(!T.audioOk) beep(); vibra(); }
   }
   if(q < -600) stopTimer();
 }
@@ -2901,7 +2965,7 @@ function tick(){
 document.getElementById("tstop").addEventListener("click", stopTimer);
 document.getElementById("tplus").addEventListener("click", function(){
   T.fin += 30000; T.total += 30;
-  document.getElementById("timer").classList.remove("late"); T.son = false; tick();
+  document.getElementById("timer").classList.remove("late"); paraAlarma(); tick();
 });
 
 document.addEventListener("click", function(ev){
