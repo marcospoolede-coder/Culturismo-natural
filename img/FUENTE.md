@@ -40,6 +40,7 @@ Cada archivo WebP combina la posición inicial y final del movimiento para que l
 | `32_calf_prensa.webp` | Calf en prensa | Calf Press On The Leg Press Machine |
 | `33_fondo_estrecho.webp` | Fondo estrecho | Bench Dips |
 | `34_curl_barra.webp` | Curl con barra | Barbell Curl |
+| `alt_22_flexiones_diamante.webp` | Flexiones de diamante | Push-Ups - Close Triceps Position |
 
 ## Fuente
 

@@ -377,6 +377,17 @@
             border:1px solid var(--line); border-radius:16px; box-shadow:var(--shadow);
             padding:11px 13px; display:flex; align-items:center; gap:12px}
   .timer.late .timer-in{border-color:var(--ok); background:var(--ok-soft)}
+
+  /* aviso de versión nueva, encima de las pestañas */
+  .nueva{position:fixed; left:0; right:0; z-index:41;
+         bottom:calc(var(--tabh) + env(safe-area-inset-bottom, 0px));
+         display:flex; justify-content:center; padding:0 12px 10px; pointer-events:none}
+  .nueva-in{pointer-events:auto; width:100%; max-width:496px; background:var(--accent);
+            color:var(--accent-ink); border-radius:16px; box-shadow:var(--shadow);
+            padding:11px 13px 11px 16px; display:flex; align-items:center; gap:12px; font-size:16px}
+  .nueva-in span{flex:1}
+  .nueva-in button{font:inherit; font-weight:600; background:var(--accent-ink); color:var(--accent);
+            border:0; border-radius:10px; padding:8px 14px; cursor:pointer}
   .t-num{font-family:"IBM Plex Mono",monospace; font-size:31px; font-weight:600; letter-spacing:-.02em;
          font-variant-numeric:tabular-nums; line-height:1; min-width:86px}
   .t-lab{flex:1 1 auto; font-size:13.5px; color:var(--ink-2); line-height:1.3}
@@ -659,6 +670,10 @@
   <p class="foot" id="foot"></p>
 </div>
 
+<div class="nueva" id="nueva" hidden>
+  <div class="nueva-in"><span>Hay una versión nueva de la app.</span>
+    <button id="nueva-btn">Actualizar</button></div>
+</div>
 <div class="timer" id="timer" hidden>
   <div class="timer-in">
     <div class="t-num mono" id="tnum">0:00</div>
@@ -680,6 +695,7 @@
 /* Coeficientes, repeticiones y descansos salen del cuaderno manuscrito
    del 31 de mayo de 2025 y de las tablas de rutina por microciclo.     */
 
+/* súbela en cada despliegue: la app instalada la compara para avisar de que hay otra */
 var VERSION = "10 de octubre de 2026";
 var BARRA = 20;
 var PESO_CORP_DEF = 75;   /* peso corporal por defecto, se cambia en Ajustes */
@@ -791,7 +807,8 @@ var FOTOS = {
   "Press militar con barra, sentado":"alt_18_press_militar_barra_sentado",
   "Press Arnold con mancuernas":"alt_19_press_arnold_mancuernas",
   "Curl con mancuernas, alterno":"alt_20_curl_mancuernas_alterno",
-  "Curl martillo con mancuernas":"alt_21_curl_martillo_mancuernas"
+  "Curl martillo con mancuernas":"alt_21_curl_martillo_mancuernas",
+  "Flexiones de diamante":"alt_22_flexiones_diamante"
 };
 
 /* alto real de las fotos que no son 334, para que no se deformen */
@@ -842,6 +859,7 @@ var ALT = {
   "Crunch invertido": ABDOMEN,
   "Crunch inverso": ABDOMEN,
   "Fondos tríceps": [
+    ["Flexiones de diamante", "peso corporal"],
     ["Fondo estrecho", "peso corporal"],
     ["Press francés", "barra"],
     ["Extensión de tríceps sobre la cabeza", "mancuerna"]
@@ -2715,6 +2733,12 @@ function vAjustes(){
     }).join("") + '</div>' +
     '<p class="note">También arranca solo al marcar una serie.</p></div></div>';
 
+  h += '<div class="sect"><div class="eyebrow">Versión</div><div class="card">' +
+    '<p class="note" style="margin:0 0 10px">Tienes la versión del ' + VERSION + '. ' +
+    'La app se actualiza sola al abrirla con cobertura; si la tienes abierta desde hace días, pulsa aquí.</p>' +
+    '<button class="btn" style="width:100%" data-actualiza="1">Buscar actualización</button>' +
+    '<p class="note" id="ver-estado" style="margin:8px 0 0"></p></div></div>';
+
   h += '<div class="sect"><button class="btn" id="ver-bienv">Ver otra vez la bienvenida</button></div>';
   view.innerHTML = h;
 }
@@ -2975,6 +2999,11 @@ document.addEventListener("click", function(ev){
   }
   if((el = ev.target.closest("[data-nobanner]"))){
     state.sinBanner = 1; save(); render(); return;
+  }
+  if((el = ev.target.closest("[data-actualiza]"))){
+    var ve = document.getElementById("ver-estado");
+    if(ve) ve.textContent = "Comprobando.";
+    compruebaVersion(true); return;
   }
   if((el = ev.target.closest("[data-dias] button"))){
     var dn = +el.dataset.v, dl = diasPlan(), k = dl.indexOf(dn);
@@ -3312,9 +3341,10 @@ function arranca(){
 }
 
 /* la app se instala y funciona sin cobertura gracias a esto */
+var swReg = null;
 if("serviceWorker" in navigator && location.protocol === "https:"){
   window.addEventListener("load", function(){
-    navigator.serviceWorker.register("sw.js")["catch"](function(){});
+    navigator.serviceWorker.register("sw.js").then(function(r){ swReg = r; })["catch"](function(){});
   });
   /* si entra una versión nueva mientras la tienes abierta, recarga una vez */
   var recargado = false;
@@ -3324,6 +3354,39 @@ if("serviceWorker" in navigator && location.protocol === "https:"){
     location.reload();
   });
 }
+
+/* Una app instalada puede quedarse abierta días: la página no se vuelve a pedir
+   y los cambios no llegan. Al volver a ella se compara la versión publicada con
+   la que corre y, si hay otra, se ofrece actualizar. */
+var ultimaComprobacion = 0;
+function compruebaVersion(aMano){
+  if(location.protocol !== "https:"){
+    var e0 = document.getElementById("ver-estado");
+    if(aMano && e0) e0.textContent = "Solo funciona en la versión publicada.";
+    return Promise.resolve(false);
+  }
+  ultimaComprobacion = Date.now();
+  if(swReg){ try{ swReg.update()["catch"](function(){}); }catch(e){} }
+  return fetch("index.html", {cache:"no-store"}).then(function(r){ return r.text(); })
+    .then(function(txt){
+      var m = /var VERSION = "([^"]+)"/.exec(txt);
+      var nueva = !!(m && m[1] !== VERSION);
+      document.getElementById("nueva").hidden = !nueva;
+      if(aMano){
+        var e = document.getElementById("ver-estado");
+        if(e) e.textContent = nueva ? "Hay una versión nueva, actualizando." : "Ya tienes la última versión.";
+        if(nueva) setTimeout(actualizaApp, 600);
+      }
+      return nueva;
+    })["catch"](function(){ return false; });
+}
+function actualizaApp(){ location.reload(); }
+document.getElementById("nueva-btn").addEventListener("click", actualizaApp);
+document.addEventListener("visibilitychange", function(){
+  if(document.hidden || Date.now() - ultimaComprobacion < 10 * 60 * 1000) return;
+  compruebaVersion(false);
+});
+setTimeout(function(){ compruebaVersion(false); }, 4000);
 
 cap("downloads").then(function(d){ dl = d; })["catch"](function(){});
 nubeInit();
