@@ -54,7 +54,7 @@ año, y se repite.
 | Ciclo 3 | A y B | 70% (0,73) | 10, 8, 6 | 2:00 | |
 | Ciclo 4 | A, B y C | 70 a 75% (0,73 a 0,79) | 10, 8, 6 | 2:00 | Test antes de abrir la fase |
 | Ciclo 5 | A, B y C | 77,5 a 80% (0,79 a 0,82) | 8, 6, 4 | 2:00 | |
-| Ciclo 6 | A, B y C | 80% (0,82) | 8, 6, 4 | 2:00 | Rest pause en la última serie del básico |
+| Ciclo 6 | A, B y C | 80% (0,82) | 8, 6, 4 | 2:00 | Rest pause en el básico y drop en la última serie de los complementarios |
 | Fuerza | A, B y C | 80 a 95%, 7 semanas | 7, 6, 5, 4, 3, 2, 1 | 3:00 | 4 series; coef 0,85 a 0,98 |
 | Cierre | A, B y C | 80% (0,82) | 8 (complementarios 12) | 3:00 | 4 series; test con el pico de fuerza |
 

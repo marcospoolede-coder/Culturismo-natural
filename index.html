@@ -696,7 +696,7 @@
    del 31 de mayo de 2025 y de las tablas de rutina por microciclo.     */
 
 /* súbela en cada despliegue: la app instalada la compara para avisar de que hay otra */
-var VERSION = "10 de octubre de 2026, 14:20";
+var VERSION = "12 de octubre de 2026, 14:28";
 var BARRA = 20;
 var PESO_CORP_DEF = 75;   /* peso corporal por defecto, se cambia en Ajustes */
 function pesoCorp(){ return state.peso > 0 ? state.peso : PESO_CORP_DEF; }
@@ -905,8 +905,8 @@ var FASES = [
    int:"70 a 75%", coef:[0.73,0.79], reps:[10,8,6], desc:120, test:"Antes de abrir la fase A, B y C"},
   {id:"c5", tipo:"hip", n:"Ciclo 5", nota:"subir peso, bajar reps", rut:"ABC", sem:3,
    int:"77,5 a 80%", coef:[0.79,0.82], reps:[8,6,4], desc:120},
-  {id:"c6", tipo:"hip", n:"Ciclo 6", nota:"rest pause en el básico", rut:"ABC", sem:3,
-   int:"80%", coef:[0.82], reps:[8,6,4], desc:120, rp:1},
+  {id:"c6", tipo:"hip", n:"Ciclo 6", nota:"rest pause y drop", rut:"ABC", sem:3,
+   int:"80%", coef:[0.82], reps:[8,6,4], desc:120, rp:1, dr:1},
   {id:"f",  tipo:"fuerza", n:"Bloque de fuerza", nota:"siete semanas hasta el 95%", rut:"ABC", sem:7,
    int:"80 a 95%", desc:180},
   {id:"fin", tipo:"final", n:"Cierre", nota:"A, B y C al 80%", rut:"ABC", sem:3,
@@ -1733,7 +1733,8 @@ function vHoy(){
       c.forEach(function(x, j){
         h += '<button class="set' + (sets[j] ? " on" : "") + '" data-set="' + i + ',' + j + '">' +
           '<b>' + (x.kg ? nf(x.kg) : (manual ? nf(manual) : "libre")) + '</b>' +
-          '<small>' + x.reps + ' reps</small></button>';
+          '<small>' + x.reps + ' reps' +
+          (f.dr && !e.js && e.t !== "b" && j === c.length - 1 ? " y drop" : "") + '</small></button>';
       });
       h += '</div>';
       var pl2 = discos(c[0].kg, e.bw);
@@ -1756,7 +1757,8 @@ function vHoy(){
     h += '<p class="note">' + (e.js ? "Alterna cada 30 segundos."
         : e.t === "b" ? "Descanso " + mmss(descansoDe(p, e)) + " entre series"
         : "Al fallo" + info("fallo") + ". " + mmss(descansoDe(p, e)) + " de descanso entre series") +
-      (f.rp && e.t === "b" ? ", última serie en rest pause" + info("restpause") : "") + '</p>';
+      (f.rp && e.t === "b" ? ", última serie en rest pause" + info("restpause") : "") +
+      (f.dr && !e.js && e.t !== "b" ? ", la última en drop" + info("drop") : "") + '</p>';
     h += '</div>';
 
     if(done && esBasico(e)){
