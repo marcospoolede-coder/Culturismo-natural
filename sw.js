@@ -2,7 +2,7 @@
    Sirve para dos cosas: que la aplicación se instale en el móvil como una app
    y que funcione sin cobertura, que en un sótano de gimnasio es lo normal.
    Sube VERSION en cada despliegue para que el móvil recoja los cambios. */
-var VERSION = "cuaderno-v4";
+var VERSION = "cuaderno-v5";
 var BASE = new URL("./", self.location).pathname;
 /* La página no se precachea a propósito: si se guarda en la instalación, la
    primera visita tras un cambio sirve la copia vieja. Se guarda sola al
@@ -65,4 +65,24 @@ self.addEventListener("fetch", function(ev){
       })
     );
   }
+});
+
+/* Notificaciones de "aviso fuera de la app": el servidor (AVISOS.md) manda el
+   push cuando vence un descanso y aquí se enseña y se atiende el toque. */
+self.addEventListener("push", function(ev){
+  var d = {};
+  try{ d = ev.data.json(); }catch(e){}
+  ev.waitUntil(self.registration.showNotification(d.titulo || "Descanso terminado", {
+    body: d.cuerpo || "Vuelve a la barra.",
+    icon: "icon-192.png",
+    badge: "icon-192.png",
+    tag: "descanso"
+  }));
+});
+self.addEventListener("notificationclick", function(ev){
+  ev.notification.close();
+  ev.waitUntil(clients.matchAll({type:"window", includeUncontrolled:true}).then(function(ws){
+    if(ws.length) return ws[0].focus();
+    return clients.openWindow("./");
+  }));
 });

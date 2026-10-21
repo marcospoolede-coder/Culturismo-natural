@@ -25,6 +25,9 @@ publica en un minuto.
     aprobacion.sql        control de acceso: tabla acceso, trigger y políticas
     panel.sql             visitas, administradores y las funciones del panel
     panel.html            panel web de administración (altas, visitas, aprobar y denegar)
+    push.sql              avisos fuera de la app: tabla, permisos y reloj de pg_cron
+    supabase/empuja.ts    Edge Function que manda las notificaciones (ver AVISOS.md)
+    AVISOS.md             cómo montar y depurar el aviso fuera de la app
     img/                  55 fotos de ejercicios en webp, dos fotogramas por foto; img/FUENTE.md
     icon-*.png, qr.png    iconos (David de Miguel Ángel) y QR para compartir
     CREDITOS.md           licencias de las imágenes; la del David exige acreditar
@@ -141,6 +144,13 @@ el mismo botón.
 
 **En cada despliegue hay que cambiar `var VERSION` en `index.html`** (fecha y hora), y si tocas
 `sw.js` o los iconos, también `VERSION` en `sw.js`.
+
+**Aviso fuera de la app**: iOS congela las webs en segundo plano, así que el pitido solo
+suena con la app a la vista. Para avisar con el móvil bloqueado o en otra app hay
+notificaciones push: la app apunta el aviso en la tabla `avisos` y un reloj de pg_cron
+dispara la Edge Function `empuja`, que lo manda. Montaje y depuración en `AVISOS.md`; la
+clave VAPID privada vive en los secretos de Supabase, nunca en el repo. Dentro de la app,
+cada básico muestra antes de la primera serie sus series de aproximación.
 
 Instalación: en iPhone solo desde Safari (Compartir, Añadir a pantalla de inicio); en Android y
 ordenador, con el botón de instalar de Chrome o Edge. El QR de `qr.png` apunta a la app.

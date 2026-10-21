@@ -369,6 +369,13 @@
   .btn[disabled]{opacity:.45; cursor:default}
   .row{display:flex; gap:9px}
 
+  /* aproximación antes del básico */
+  .aprox{background:var(--accent-soft); border-radius:10px; padding:10px 13px; margin:0 0 11px;
+         display:flex; flex-direction:column; gap:3px}
+  .aprox .ap-t{font-weight:700; color:var(--accent); font-size:13px; letter-spacing:.05em;
+         text-transform:uppercase}
+  .aprox .ap-s{font-size:16px; line-height:1.45}
+
   /* cronómetro */
   .timer{position:fixed; left:0; right:0; z-index:40;
          bottom:calc(var(--tabh) + env(safe-area-inset-bottom, 0px));
@@ -696,7 +703,7 @@
    del 31 de mayo de 2025 y de las tablas de rutina por microciclo.     */
 
 /* súbela en cada despliegue: la app instalada la compara para avisar de que hay otra */
-var VERSION = "12 de octubre de 2026, 17:10";
+var VERSION = "21 de octubre de 2026, 15:27";
 var BARRA = 20;
 var PESO_CORP_DEF = 75;   /* peso corporal por defecto, se cambia en Ajustes */
 function pesoCorp(){ return state.peso > 0 ? state.peso : PESO_CORP_DEF; }
@@ -1192,6 +1199,28 @@ function guardaApuntes(p, f, L, lista){
    las que te sobraron son las que podrías haber hecho, y de ahí Maurice y Rydin.
    Solo cuentan las series del último ciclo con técnica A o B y recámara de 4 o menos:
    una serie con la técnica rota o muy lejos del fallo no estima nada fiable. */
+/* Series de aproximación: de la barra al peso de trabajo subiendo en dos o
+   tres saltos y bajando reps. No se apuntan; son para no empezar en frío. */
+function aproxHTML(e, c){
+  if(e.t !== "b") return "";
+  if(e.bw){
+    return '<div class="aprox"><span class="ap-t">Aproximación' + info("aprox") + '</span>' +
+      '<span class="ap-s">2 tandas de 3 a 5 dominadas sin lastre, con 45 segundos entre ellas.</span></div>';
+  }
+  var w = c[0] ? c[0].kg : 0;
+  if(!w) return "";
+  var esca = [[BARRA, 8], [redondea(w * 0.5), 5], [redondea(w * 0.75), 3]], v = [], usados = {};
+  esca.forEach(function(a){
+    var kg = Math.max(BARRA, a[0]);
+    if(kg >= w || usados[kg]) return;
+    usados[kg] = 1;
+    v.push("<b>" + nf(kg) + "</b> kg por " + a[1]);
+  });
+  if(!v.length) return "";
+  return '<div class="aprox"><span class="ap-t">Aproximación' + info("aprox") + '</span>' +
+    '<span class="ap-s">' + v.join(", luego ") + ", y a la primera serie.</span></div>";
+}
+
 function rmTeorico(k){
   var rs = (state.registros || []).filter(function(x){
     return x.rm === k && x.tec && x.tec !== "C" &&
@@ -1685,6 +1714,7 @@ function vHoy(){
     if(esBasico(e)){
       h += '<p class="note">Apunta cada serie. Hasta que no lo hagas no se abre el siguiente.' +
         info("basico") + '</p>';
+      h += aproxHTML(e, c);
       c.forEach(function(x, j){
         var teo = teoDe(e, x.kg);
         var r = apunte(i, j) || {}, ok = setHecho(e, i, j, teo, x.reps);
@@ -2224,6 +2254,8 @@ var GLOSARIO = {
               d:"Tres semanas con el mismo esquema. Cada ciclo sube un poco el peso y baja las repeticiones. Ocho ciclos son un sistema completo, casi un año."},
   fallo:     {t:"Al fallo",
               d:"Sigues hasta que no sale ni una repetición más con buena postura. Las reps que marca la app son orientativas: si salen más, haz más y apúntalas."},
+  aprox:     {t:"Aproximación",
+              d:"Series de calentamiento para llegar al peso de trabajo sin sustos: poco peso y pocas repeticiones, subiendo en dos o tres saltos. Descansa entre 30 y 60 segundos. No se apuntan ni cuentan como series. Si es el segundo básico del día y ya vienes caliente, con una llega."},
   coef:      {t:"Coeficiente",
               d:"El número por el que se multiplica tu marca para sacar el peso de hoy. Si tu marca es 100 y el coeficiente 0,80, te tocan 80 kg."}
 };
@@ -2729,6 +2761,25 @@ function vAjustes(){
     'Si pone 80 kg son la barra más 30 por lado.</p>' +
     '<p class="note">Si tu barra pesa otra cosa, resta la diferencia.</p></div></div>';
 
+  h += '<div class="sect"><div class="eyebrow">Aviso fuera de la app</div><div class="card">';
+  var pOK = ("Notification" in window) && ("PushManager" in window) && ("serviceWorker" in navigator);
+  if(!pOK){
+    h += '<p class="note" style="margin:0">Este navegador no admite avisos. En iPhone hacen ' +
+      'falta iOS 16.4 o más y la app instalada en la pantalla de inicio, abierta desde su icono.</p>';
+  }else if(pushGuardado()){
+    h += '<p class="note" style="margin:0 0 10px">Activado en este dispositivo: el final del ' +
+      'descanso llega como notificación aunque estés en otra app o con el móvil bloqueado. ' +
+      'Tarda hasta 15 segundos. En modo silencio, vibra.</p>' +
+      '<div class="row"><button class="btn primary" style="flex:1" data-push="test">Probar aviso</button>' +
+      '<button class="btn" style="flex:1" data-push="off">Quitarlo</button></div>';
+  }else{
+    h += '<p class="note" style="margin:0 0 10px">El pitido solo suena con la app a la vista: ' +
+      'iPhone congela las webs en segundo plano. Activa esto y el final del descanso te llega ' +
+      'como notificación, estés donde estés.</p>' +
+      '<button class="btn primary" style="width:100%" data-push="on">Activar avisos</button>';
+  }
+  h += '<p class="note" id="push-estado" style="margin:8px 0 0"></p></div></div>';
+
   h += '<div class="sect"><div class="eyebrow">Cronómetro</div><div class="card">' +
     '<div class="row">' + [90,105,120,180].map(function(s){
       return '<button class="btn sm" style="flex:1" data-timer="' + s + '">' + mmss(s) + '</button>';
@@ -2852,8 +2903,57 @@ function descarga(nombre, texto, vacio){
   alPortapapeles(texto);
 }
 
+/* ================== AVISO FUERA DE LA APP (PUSH) ==================
+   El pitido solo puede sonar con la app a la vista: iOS congela las webs
+   en segundo plano. Para avisar fuera, la app apunta el aviso en la tabla
+   "avisos" de Supabase y el servidor manda la notificación (ver AVISOS.md).
+   La suscripción es de cada dispositivo: vive en localStorage, no en state. */
+var EMPUJE_CLAVE = "BElOu9zVNlmvhO9LKvFab3tBDLC3FWAFQMAVolY-TBeHFnig7WHBNlForwnEPOhntLUSod7E441cvVisC6FGlGY";
+
+function pushGuardado(){
+  try{ return JSON.parse(localStorage.getItem("cuaderno-push") || "null"); }catch(e){ return null; }
+}
+function b64aBytes(b){
+  var s = atob((b + "===".slice((b.length + 3) % 4)).replace(/-/g, "+").replace(/_/g, "/"));
+  var a = new Uint8Array(s.length);
+  for(var i = 0; i < s.length; i++) a[i] = s.charCodeAt(i);
+  return a;
+}
+function uuidAviso(){
+  try{ return crypto.randomUUID(); }
+  catch(e){
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function(c){
+      var r = Math.random() * 16 | 0; return (c === "x" ? r : (r & 3 | 8)).toString(16);
+    });
+  }
+}
+function cabecerasNube(){
+  var c = window.CUADERNO_SUPABASE;
+  return {apikey:c.anonKey, Authorization:"Bearer " + c.anonKey,
+          "Content-Type":"application/json", Prefer:"return=minimal"};
+}
+function programaAviso(seg, titulo, cuerpo){
+  var sub = pushGuardado(), c = window.CUADERNO_SUPABASE;
+  if(!sub || !c || !c.url) return null;
+  var id = uuidAviso();
+  try{
+    fetch(c.url + "/rest/v1/avisos", {method:"POST", keepalive:true, headers:cabecerasNube(),
+      body:JSON.stringify({id:id, vence:new Date(Date.now() + seg * 1000).toISOString(),
+                           sub:sub, titulo:titulo, cuerpo:cuerpo})})["catch"](function(){});
+  }catch(e){ return null; }
+  return id;
+}
+function anulaAviso(id){
+  var c = window.CUADERNO_SUPABASE;
+  if(!id || !c || !c.url) return;
+  try{
+    fetch(c.url + "/rest/v1/avisos?id=eq." + id,
+      {method:"DELETE", keepalive:true, headers:cabecerasNube()})["catch"](function(){});
+  }catch(e){}
+}
+
 /* ============================ CRONÓMETRO ============================ */
-var T = {fin:0, total:0, lab:"", sub:"", int:null, wake:null, son:false, prox:0};
+var T = {fin:0, total:0, lab:"", sub:"", int:null, wake:null, son:false, prox:0, aviso:null};
 var actx = null;
 
 /* El aviso suena con Web Audio y por eso se mezcla con tu música sin pararla.
@@ -2880,6 +2980,9 @@ function beep(){
 }
 function startTimer(seg, lab, sub){
   paraAlarma();
+  anulaAviso(T.aviso);
+  T.aviso = programaAviso(seg + 3, "Descanso terminado",
+    (lab || "Vuelve a la barra") + (sub ? ". " + sub : ""));
   T.fin = Date.now() + seg * 1000; T.total = seg; T.lab = lab || "Descanso"; T.sub = sub || "";
   document.getElementById("timer").hidden = false;
   document.getElementById("tlab").textContent = T.lab;
@@ -2894,6 +2997,7 @@ function startTimer(seg, lab, sub){
 }
 function stopTimer(){
   paraAlarma();
+  anulaAviso(T.aviso); T.aviso = null;
   clearInterval(T.int); T.int = null;
   document.getElementById("timer").hidden = true;
   document.getElementById("timer").classList.remove("late");
@@ -2905,6 +3009,7 @@ function tick(){
   document.getElementById("ttrack").style.width =
     Math.max(0, Math.min(100, q / T.total * 100)) + "%";
   if(q <= 0){
+    if(T.aviso){ anulaAviso(T.aviso); T.aviso = null; }  /* estás dentro: pita la app */
     document.getElementById("timer").classList.add("late");
     /* pita una y otra vez hasta que pares el cronómetro, sumes 30 segundos
        o marques la siguiente serie */
@@ -2917,6 +3022,9 @@ function tick(){
 document.getElementById("tstop").addEventListener("click", stopTimer);
 document.getElementById("tplus").addEventListener("click", function(){
   T.fin += 30000; T.total += 30;
+  anulaAviso(T.aviso);
+  T.aviso = programaAviso(Math.max(3, Math.round((T.fin - Date.now()) / 1000) + 3),
+    "Descanso terminado", T.lab || "Vuelve a la barra");
   document.getElementById("timer").classList.remove("late"); paraAlarma(); tick();
 });
 
@@ -3015,6 +3123,43 @@ document.addEventListener("click", function(ev){
   }
   if((el = ev.target.closest("[data-nobanner]"))){
     state.sinBanner = 1; save(); render(); return;
+  }
+  if((el = ev.target.closest("[data-push]"))){
+    var accP = el.dataset.push;
+    var peP = function(t){ var x = document.getElementById("push-estado"); if(x) x.textContent = t; };
+    if(accP === "on"){
+      peP("Pidiendo permiso.");
+      Notification.requestPermission().then(function(perm){
+        if(perm !== "granted"){
+          peP("Sin permiso no hay aviso. Se cambia en Ajustes del iPhone, Notificaciones, Cuaderno.");
+          return;
+        }
+        navigator.serviceWorker.ready.then(function(reg){
+          return reg.pushManager.subscribe({userVisibleOnly:true,
+            applicationServerKey:b64aBytes(EMPUJE_CLAVE)});
+        }).then(function(sq){
+          try{ localStorage.setItem("cuaderno-push", JSON.stringify(sq)); }catch(e2){}
+          render();
+          programaAviso(2, "Avisos activados", "Así llegará el final de cada descanso.");
+        })["catch"](function(){
+          peP("No se ha podido activar. Puede que falte montar el servidor: AVISOS.md del repositorio.");
+        });
+      });
+      return;
+    }
+    if(accP === "test"){
+      programaAviso(2, "Esto es el aviso", "Llega aunque estés en otra app.");
+      peP("Enviado. Bloquea el móvil o vete a otra app: debe llegar en unos 15 segundos. Si no llega, mira AVISOS.md.");
+      return;
+    }
+    if(accP === "off"){
+      try{ localStorage.removeItem("cuaderno-push"); }catch(e3){}
+      try{
+        navigator.serviceWorker.ready.then(function(reg){ return reg.pushManager.getSubscription(); })
+          .then(function(sq){ if(sq) sq.unsubscribe(); })["catch"](function(){});
+      }catch(e4){}
+      render(); return;
+    }
   }
   if((el = ev.target.closest("[data-actualiza]"))){
     var ve = document.getElementById("ver-estado");
