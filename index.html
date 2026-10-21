@@ -374,7 +374,9 @@
          display:flex; flex-direction:column; gap:3px}
   .aprox .ap-t{font-weight:700; color:var(--accent); font-size:13px; letter-spacing:.05em;
          text-transform:uppercase}
-  .aprox .ap-s{font-size:16px; line-height:1.45}
+  .aprox .ap-l{margin:2px 0 4px; padding-left:20px; font-size:16px; line-height:1.6}
+  .aprox .ap-l small{color:var(--ink-3)}
+  .aprox .ap-f{font-size:14.5px; color:var(--ink-3); line-height:1.4}
 
   /* cronómetro */
   .timer{position:fixed; left:0; right:0; z-index:40;
@@ -409,10 +411,12 @@
   /* tabs */
   .tabs{position:fixed; left:0; right:0; bottom:0; z-index:50; background:var(--surface);
         border-top:1px solid var(--line); padding-bottom:env(safe-area-inset-bottom, 0px)}
-  .tabs-in{max-width:520px; margin:0 auto; display:grid; grid-template-columns:repeat(6,1fr)}
+  .tabs-in{max-width:520px; margin:0 auto; display:grid; grid-template-columns:repeat(7,1fr)}
   .tab{height:var(--tabh); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px;
        font-family:"Cinzel","Palatino Linotype",Georgia,serif; font-size:13px; letter-spacing:.06em; text-transform:uppercase;
-       font-weight:600; color:var(--ink-3)}
+       font-weight:600; color:var(--ink-3); min-width:0; overflow:hidden}
+  /* siete pestañas en un móvil: letra un punto menor y sin aire extra */
+  @media (max-width:430px){ .tab{font-size:10.5px; letter-spacing:.02em} }
   .tab svg{width:21px; height:21px; stroke:currentColor; fill:none; stroke-width:1.9;
            stroke-linecap:round; stroke-linejoin:round}
   .tab[aria-selected="true"]{color:var(--accent)}
@@ -703,7 +707,7 @@
    del 31 de mayo de 2025 y de las tablas de rutina por microciclo.     */
 
 /* súbela en cada despliegue: la app instalada la compara para avisar de que hay otra */
-var VERSION = "21 de octubre de 2026, 15:27";
+var VERSION = "21 de octubre de 2026, 15:46";
 var BARRA = 20;
 var PESO_CORP_DEF = 75;   /* peso corporal por defecto, se cambia en Ajustes */
 function pesoCorp(){ return state.peso > 0 ? state.peso : PESO_CORP_DEF; }
@@ -1199,26 +1203,31 @@ function guardaApuntes(p, f, L, lista){
    las que te sobraron son las que podrías haber hecho, y de ahí Maurice y Rydin.
    Solo cuentan las series del último ciclo con técnica A o B y recámara de 4 o menos:
    una serie con la técnica rota o muy lejos del fallo no estima nada fiable. */
-/* Series de aproximación: de la barra al peso de trabajo subiendo en dos o
-   tres saltos y bajando reps. No se apuntan; son para no empezar en frío. */
+/* Calentamiento con barra antes de cada básico: escalones de menos a más
+   peso y de más a menos repeticiones. No se apuntan; activan sin cansar. */
 function aproxHTML(e, c){
   if(e.t !== "b") return "";
   if(e.bw){
-    return '<div class="aprox"><span class="ap-t">Aproximación' + info("aprox") + '</span>' +
-      '<span class="ap-s">2 tandas de 3 a 5 dominadas sin lastre, con 45 segundos entre ellas.</span></div>';
+    return '<div class="aprox"><span class="ap-t">Calentamiento' + info("aprox") + '</span>' +
+      '<ul class="ap-l"><li><b>3 a 5 dominadas</b> sin lastre</li>' +
+      '<li>45 segundos de pausa y <b>otras 3 a 5</b></li></ul>' +
+      '<span class="ap-f">Y a la primera serie de verdad.</span></div>';
   }
   var w = c[0] ? c[0].kg : 0;
   if(!w) return "";
-  var esca = [[BARRA, 8], [redondea(w * 0.5), 5], [redondea(w * 0.75), 3]], v = [], usados = {};
+  var esca = [[BARRA, 8, "la barra sola"], [redondea(w * 0.5), 5, "la mitad del peso"],
+              [redondea(w * 0.75), 3, "tres cuartos"]], li = "", usados = {};
   esca.forEach(function(a){
     var kg = Math.max(BARRA, a[0]);
     if(kg >= w || usados[kg]) return;
     usados[kg] = 1;
-    v.push("<b>" + nf(kg) + "</b> kg por " + a[1]);
+    li += '<li><b>' + nf(kg) + ' kg</b> por ' + a[1] + ' <small>' + a[2] + '</small></li>';
   });
-  if(!v.length) return "";
-  return '<div class="aprox"><span class="ap-t">Aproximación' + info("aprox") + '</span>' +
-    '<span class="ap-s">' + v.join(", luego ") + ", y a la primera serie.</span></div>";
+  if(!li) return "";
+  return '<div class="aprox"><span class="ap-t">Calentamiento' + info("aprox") + '</span>' +
+    '<ul class="ap-l">' + li + '</ul>' +
+    '<span class="ap-f">Cada escalón: más peso, menos repeticiones. Medio minuto entre ellos ' +
+    'y a la primera serie con ' + nf(w) + ' kg.</span></div>';
 }
 
 function rmTeorico(k){
@@ -1413,6 +1422,7 @@ function render(){
   modoBienvenida(!state.visto);
   if(!state.visto){ vBienvenida(); return; }
   if(tab === "hoy") vHoy();
+  else if(tab === "previo") vPrevio();
   else if(tab === "cal") vCal();
   else if(tab === "plan") vPlan();
   else if(tab === "com") vCom();
@@ -1490,12 +1500,12 @@ function avisos(p){
    que marca el plan, las series de aproximación de cada básico y diez minutos
    de calentamiento general. Es una estimación, por eso se muestra con ~. */
 function duracion(p, lista){
-  var seg = 600;
+  var seg = 300;                     /* el previo de movilidad, unos 5 minutos */
   lista.forEach(function(e){
     var c = cargas(p, e), desc = descansoDe(p, e);
     c.forEach(function(x){ seg += (+x.reps || 10) * 4 + 15; });
     seg += desc * c.length;
-    if(e.t === "b") seg += 120;
+    if(e.t === "b") seg += 300;      /* calentamiento con barra y montaje de discos */
   });
   /* los jump set se alternan, así que su descanso ya lo ocupa el otro ejercicio */
   return Math.round(seg / 60);
@@ -2144,6 +2154,43 @@ function delMes(ref){
   return n;
 }
 
+/* El previo: movilidad y activación, siempre igual, antes de cada entreno.
+   Los cuatro ejercicios son los que marca el entrenador de Marcos. */
+var PREVIO = [
+  {n:"Rodillo en glúteos y espalda alta",
+   c:"Siéntate sobre el rodillo y pásalo despacio por cada glúteo; luego túmbate y recorre la espalda alta, de media espalda a los hombros.",
+   d:"8 a 10 pasadas lentas por zona",
+   q:"Despierta el tejido y quita los puntos duros antes de cargar."},
+  {n:"Cruce de pierna tumbado",
+   c:"Boca arriba, brazos en cruz. Sube una pierna estirada y llévala al lado contrario hasta acercarla a la mano, sin que el tronco se despegue. Vuelve y cambia.",
+   d:"8 cruces por pierna",
+   q:"Suelta la cadera y la zona lumbar manteniendo el tronco firme, justo lo que piden la sentadilla y el peso muerto."},
+  {n:"Libro abierto con piernas ancladas",
+   c:"Túmbate de lado con las rodillas dobladas y sujetas (vale bloquearlas bajo una barra). Abre el pecho hacia el otro lado buscando apoyar toda la espalda en el suelo, y respira hondo ahí.",
+   d:"6 respiraciones por lado",
+   q:"Da la rotación de espalda alta que luego piden la banca y el remo, sin que la cadera se mueva."},
+  {n:"Molinillo tumbado de lado",
+   c:"De lado, rodillas dobladas y cadera quieta. El brazo de arriba dibuja un círculo grande y pegado al suelo, pasando junto a la oreja, como si barrieras a tu alrededor.",
+   d:"6 círculos por lado",
+   q:"Abre hombro y pecho con control: prepara la postura de todos los presses."}
+];
+function vPrevio(){
+  var h = '<div class="sect"><div class="eyebrow">Antes de cada entreno</div><div class="card">' +
+    '<p class="note" style="margin:0"><b>Siempre lo mismo, unos 5 minutos.</b> No es estirar por ' +
+    'estirar: prepara la postura para los ejercicios. Hazlo en este orden y sin prisa, y después ' +
+    've a Hoy, que cada básico trae su calentamiento con barra.</p></div></div>';
+  h += '<div class="sect"><div class="eyebrow">Los 4 pasos</div>';
+  PREVIO.forEach(function(e, i){
+    h += '<div class="card" style="margin-bottom:10px">' +
+      '<p style="margin:0 0 6px"><b>' + (i + 1) + '. ' + e.n + '</b> <small style="color:var(--ink-3)">' + e.d + '</small></p>' +
+      '<p class="note" style="margin:0 0 6px">' + e.c + '</p>' +
+      '<p class="note" style="margin:0; color:var(--ink-3)">' + e.q + '</p>' +
+      '</div>';
+  });
+  h += '</div>';
+  view.innerHTML = h;
+}
+
 function vCal(){
   var ref = calRef || new Date(), m = porDia();
   var y = ref.getFullYear(), mo = ref.getMonth(), hoyI = iso(new Date());
@@ -2254,8 +2301,8 @@ var GLOSARIO = {
               d:"Tres semanas con el mismo esquema. Cada ciclo sube un poco el peso y baja las repeticiones. Ocho ciclos son un sistema completo, casi un año."},
   fallo:     {t:"Al fallo",
               d:"Sigues hasta que no sale ni una repetición más con buena postura. Las reps que marca la app son orientativas: si salen más, haz más y apúntalas."},
-  aprox:     {t:"Aproximación",
-              d:"Series de calentamiento para llegar al peso de trabajo sin sustos: poco peso y pocas repeticiones, subiendo en dos o tres saltos. Descansa entre 30 y 60 segundos. No se apuntan ni cuentan como series. Si es el segundo básico del día y ya vienes caliente, con una llega."},
+  aprox:     {t:"Calentamiento del básico",
+              d:"Escalones para llegar al peso de trabajo sin sustos: empiezas con la barra sola y en cada escalón subes el peso y bajas las repeticiones. Así activas el gesto sin gastarte. Medio minuto entre escalones. No se apuntan ni cuentan como series. Si es el segundo básico del día y ya vienes caliente, con el último escalón llega."},
   coef:      {t:"Coeficiente",
               d:"El número por el que se multiplica tu marca para sacar el peso de hoy. Si tu marca es 100 y el coeficiente 0,80, te tocan 80 kg."}
 };
@@ -3458,10 +3505,11 @@ var ICON = {
   com:'<path d="M7 3v7a2 2 0 0 0 2 2h0V3M9 3v18M17 3c-1.5 3-1.5 7 0 9v9"/>',
   cal:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/>' +
       '<circle cx="8.5" cy="14.5" r="1.2"/><circle cx="12" cy="14.5" r="1.2"/><circle cx="15.5" cy="18" r="1.2"/>',
+  previo:'<circle cx="8" cy="5" r="2"/><path d="M6 21c.5-5 2-8 6-9.5 3-1 5-3 6-6.5M4 13l4-2"/>',
   aj:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/>'
 };
 document.getElementById("tabs").innerHTML =
-  [["hoy","Hoy","hoy"],["cal","Racha","cal"],["plan","Plan","plan"],["rm","1RM","rm"],["com","Comida","com"],["aj","Ajustes","aj"]]
+  [["hoy","Hoy","hoy"],["previo","Previo","previo"],["cal","Racha","cal"],["plan","Plan","plan"],["rm","1RM","rm"],["com","Comida","com"],["aj","Ajustes","aj"]]
   .map(function(t){
     return '<button class="tab" role="tab" data-t="' + t[0] + '" aria-selected="false">' +
       '<svg viewBox="0 0 24 24">' + ICON[t[2]] + '</svg>' + t[1] + '</button>';
