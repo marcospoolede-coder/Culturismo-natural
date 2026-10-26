@@ -4,6 +4,18 @@ Para que el final del descanso llegue como notificación aunque estés en WhatsA
 móvil bloqueado, hace falta montar una vez el lado del servidor en Supabase. Son tres pasos
 y diez minutos. La app ya trae todo lo demás.
 
+## La vía rápida: ntfy (sin montar nada)
+
+Mientras el servidor de abajo no esté montado, la app ofrece un plan B que funciona ya:
+la app gratuita **ntfy** (App Store). En Ajustes, "Aviso fuera de la app", botón "Activar
+con ntfy": la app crea un canal privado aleatorio, te suscribes a él en ntfy y listo. Al
+salir de la app con el cronómetro en marcha, se programa un mensaje que ntfy convierte en
+notificación. Matices: ntfy no permite anular un mensaje ya programado, así que si vuelves
+a la app y acabas el descanso dentro, la notificación llega igual (dice "Descanso
+terminado", no molesta); y el canal viaja por ntfy.sh, así que no lleva ningún dato
+personal, solo el texto del aviso. La vía de abajo, con notificaciones propias, sigue
+siendo la fina: avisa justo a tiempo y se anula sola si atiendes dentro.
+
 ## Cómo funciona
 
 1. Al arrancar un descanso, la app apunta en la tabla `avisos` de Supabase: "a tal hora,

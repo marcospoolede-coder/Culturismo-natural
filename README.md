@@ -148,7 +148,7 @@ el mismo botón.
 **Aviso fuera de la app**: iOS congela las webs en segundo plano, así que el pitido solo
 suena con la app a la vista. Para avisar con el móvil bloqueado o en otra app hay
 notificaciones push: la app apunta el aviso en la tabla `avisos` y un reloj de pg_cron
-dispara la Edge Function `empuja`, que lo manda. Montaje y depuración en `AVISOS.md`; la
+dispara la Edge Function `empuja`, que lo manda. Montaje y depuración en `AVISOS.md` (incluye el plan B con la app ntfy, que no necesita servidor); la
 clave VAPID privada vive en los secretos de Supabase, nunca en el repo. Dentro de la app,
 cada básico muestra antes de la primera serie sus series de aproximación.
 

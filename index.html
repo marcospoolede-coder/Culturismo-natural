@@ -378,6 +378,11 @@
   .aprox .ap-l small{color:var(--ink-3)}
   .aprox .ap-f{font-size:14.5px; color:var(--ink-3); line-height:1.4}
 
+  /* rest pause: cuenta atrás y reps extra en la última serie */
+  .rpz{display:flex; gap:10px; align-items:flex-end; margin:10px 0 2px; flex-wrap:wrap}
+  .rpz .btn{flex:1 1 150px}
+  .rpz .campo-s{flex:1 1 130px}
+
   /* cronómetro */
   .timer{position:fixed; left:0; right:0; z-index:40;
          bottom:calc(var(--tabh) + env(safe-area-inset-bottom, 0px));
@@ -707,7 +712,7 @@
    del 31 de mayo de 2025 y de las tablas de rutina por microciclo.     */
 
 /* súbela en cada despliegue: la app instalada la compara para avisar de que hay otra */
-var VERSION = "21 de octubre de 2026, 15:46";
+var VERSION = "26 de octubre de 2026, 15:34";
 var BARRA = 20;
 var PESO_CORP_DEF = 75;   /* peso corporal por defecto, se cambia en Ajustes */
 function pesoCorp(){ return state.peso > 0 ? state.peso : PESO_CORP_DEF; }
@@ -1189,7 +1194,7 @@ function guardaApuntes(p, f, L, lista){
       state.registros.push({
         d:d, f:f.id, fn:f.n, w:p.s + 1, r:L, ex:e.n, rm:e.rm || "", bw:e.bw ? 1 : 0, s:j + 1,
         obj:x.reps, reps:repsApuntadas(i, j, x.reps), teo:teo, kg:kgApuntado(i, j, teo),
-        rir:r.rir, tec:r.tec
+        rir:r.rir, tec:r.tec, rp2:r.rp2 || ""
       });
       n++;
     });
@@ -1766,7 +1771,16 @@ function vHoy(){
             return '<button data-tec="' + i + ',' + j + '" data-v="' + t[0] + '" aria-pressed="' +
               (r.tec === t[0]) + '">' + t[0] + '<small>' + t[1] + '</small></button>';
           }).join("") + '</div>' +
-          '</div></div>';
+          '</div>';
+        if(f.rp && j === c.length - 1){
+          h += '<div class="rpz">' +
+            '<button class="btn sm" type="button" data-rpt="1">Cuenta atrás de 15 segundos</button>' +
+            '<label class="campo-s"><span>Reps tras la pausa</span><div class="inw">' +
+            '<input inputmode="numeric" data-rp2="' + i + ',' + j + '" value="' + (r.rp2 || "") + '" ' +
+            'aria-label="Repeticiones tras la pausa de 15 segundos">' +
+            '<span class="u">reps</span></div></label></div>';
+        }
+        h += '</div>';
       });
     }else{
       h += '<div class="sets">';
@@ -1777,6 +1791,13 @@ function vHoy(){
           (f.dr && !e.js && e.t !== "b" && j === c.length - 1 ? " y drop" : "") + '</small></button>';
       });
       h += '</div>';
+      if(f.dr && !e.js && e.t !== "b"){
+        var pDrop = manual || c[0].kg;
+        h += '<p class="note">' + (pDrop
+          ? 'Drop en la última serie: al fallar, baja a <b>' + nf(redondea(pDrop * 0.75)) + ' kg</b> y sigue sin descanso hasta fallar otra vez.'
+          : 'Drop en la última serie: apunta arriba tu peso y te digo a cuánto bajar (un cuarto menos). Al fallar, sigue sin descanso.')
+          + info("drop") + '</p>';
+      }
       var pl2 = discos(c[0].kg, e.bw);
       if(pl2){
         h += '<div class="plates"><span>Barra ' + nf(BARRA) + ' kg y por lado</span>';
@@ -1807,7 +1828,8 @@ function vHoy(){
         var r = apunte(i, j) || {};
         var tj = teoDe(e, x.kg);
         h += '<span class="pill">' + nf(kgApuntado(i, j, tj)) + ' kg, ' +
-          repsApuntadas(i, j, x.reps) + ' reps, RIR ' + esc(String(r.rir)) +
+          repsApuntadas(i, j, x.reps) + ' reps' +
+          (r.rp2 ? " y " + esc(String(r.rp2)) + " tras la pausa" : "") + ', RIR ' + esc(String(r.rir)) +
           ', ' + esc(r.tec || "") + '</span>';
       });
       h += '</div>';
@@ -2810,20 +2832,29 @@ function vAjustes(){
 
   h += '<div class="sect"><div class="eyebrow">Aviso fuera de la app</div><div class="card">';
   var pOK = ("Notification" in window) && ("PushManager" in window) && ("serviceWorker" in navigator);
-  if(!pOK){
-    h += '<p class="note" style="margin:0">Este navegador no admite avisos. En iPhone hacen ' +
-      'falta iOS 16.4 o más y la app instalada en la pantalla de inicio, abierta desde su icono.</p>';
-  }else if(pushGuardado()){
+  if(pushGuardado()){
     h += '<p class="note" style="margin:0 0 10px">Activado en este dispositivo: el final del ' +
       'descanso llega como notificación aunque estés en otra app o con el móvil bloqueado. ' +
       'Tarda hasta 15 segundos. En modo silencio, vibra.</p>' +
       '<div class="row"><button class="btn primary" style="flex:1" data-push="test">Probar aviso</button>' +
       '<button class="btn" style="flex:1" data-push="off">Quitarlo</button></div>';
+  }else if(state.ntfy){
+    h += '<p class="note" style="margin:0 0 10px">Activado con la app <b>ntfy</b>. Tu canal: ' +
+      '<b>' + state.ntfy + '</b>. Si sales de la app o bloqueas el móvil con el cronómetro en ' +
+      'marcha, el final del descanso te llega por ahí. No compartas el canal: quien lo tenga ' +
+      'puede mandarte avisos.</p>' +
+      '<div class="row"><button class="btn primary" style="flex:1" data-ntfy="test">Probar aviso</button>' +
+      '<button class="btn" style="flex:1" data-ntfy="copia">Copiar canal</button>' +
+      '<button class="btn" style="flex:1" data-ntfy="off">Quitarlo</button></div>';
   }else{
     h += '<p class="note" style="margin:0 0 10px">El pitido solo suena con la app a la vista: ' +
-      'iPhone congela las webs en segundo plano. Activa esto y el final del descanso te llega ' +
-      'como notificación, estés donde estés.</p>' +
-      '<button class="btn primary" style="width:100%" data-push="on">Activar avisos</button>';
+      'iPhone congela las webs en segundo plano. Para que te avise fuera hay dos caminos.</p>' +
+      '<p class="note" style="margin:0 0 6px"><b>El rápido: la app gratuita ntfy.</b> ' +
+      'Instálala del App Store y pulsa aquí; te doy un canal y dos pasos.</p>' +
+      '<button class="btn primary" style="width:100%" data-ntfy="on">Activar con ntfy</button>' +
+      (pOK ? '<p class="note" style="margin:10px 0 6px"><b>El fino, sin app extra.</b> ' +
+      'Notificaciones propias. Antes hay que montar el servidor una vez: AVISOS.md del repositorio.</p>' +
+      '<button class="btn" style="width:100%" data-push="on">Activar avisos propios</button>' : "");
   }
   h += '<p class="note" id="push-estado" style="margin:8px 0 0"></p></div></div>';
 
@@ -2874,11 +2905,11 @@ function csvMarcas(){
   return l.join("\r\n");
 }
 function csvSeries(){
-  var l = ['"fecha";"ciclo";"semana";"entreno";"ejercicio";"serie";"reps_objetivo";"reps_reales";"teorico_kg";"real_kg";"recamara";"tecnica"'];
+  var l = ['"fecha";"ciclo";"semana";"entreno";"ejercicio";"serie";"reps_objetivo";"reps_reales";"reps_tras_pausa";"teorico_kg";"real_kg";"recamara";"tecnica"'];
   (state.registros || []).forEach(function(x){
     l.push(['"' + x.d + '"', '"' + (x.fn || "") + '"', '"' + x.w + '"', '"' + x.r + '"',
             '"' + x.ex + '"', '"' + x.s + '"', '"' + (x.obj != null ? x.obj : x.reps) + '"',
-            '"' + x.reps + '"',
+            '"' + x.reps + '"', '"' + (x.rp2 || "") + '"',
             '"' + nf(x.teo || 0) + '"', '"' + nf(x.kg || 0) + '"',
             '"' + x.rir + '"', '"' + x.tec + '"'].join(";"));
   });
@@ -2998,6 +3029,35 @@ function anulaAviso(id){
       {method:"DELETE", keepalive:true, headers:cabecerasNube()})["catch"](function(){});
   }catch(e){}
 }
+
+/* ---- plan B de los avisos: la app ntfy, sin servidor propio ----
+   Si el servidor de AVISOS.md no está montado, la app puede avisar por ntfy:
+   publica en un canal privado y la app ntfy del iPhone lo convierte en
+   notificación. ntfy no deja anular un mensaje ya programado, así que solo
+   se programa al salir de la app con el cronómetro corriendo. */
+function creaTemaNtfy(){
+  var abc = "abcdefghjkmnpqrstuvwxyz23456789", t = "cuaderno-";
+  for(var i = 0; i < 10; i++) t += abc[Math.floor(Math.random() * abc.length)];
+  state.ntfy = t; save();
+  return t;
+}
+function mandaNtfy(seg, titulo, cuerpo){
+  if(!state.ntfy) return;
+  var cab = {Title:titulo, Priority:"high", Tags:"stopwatch"};
+  if(seg >= 10) cab.Delay = Math.round(seg) + "s";
+  try{
+    fetch("https://ntfy.sh/" + state.ntfy,
+      {method:"POST", keepalive:true, headers:cab, body:cuerpo})["catch"](function(){});
+  }catch(e){}
+}
+document.addEventListener("visibilitychange", function(){
+  if(document.visibilityState !== "hidden") return;
+  if(!T.int || pushGuardado() || !state.ntfy) return;
+  var qN = Math.round((T.fin - Date.now()) / 1000);
+  if(qN < 5 || T.ntfyMarca === T.fin) return;
+  T.ntfyMarca = T.fin;
+  mandaNtfy(Math.max(10, qN + 2), "Descanso terminado", (T.lab || "Vuelve a la barra") + ". Abre la app y sigue.");
+});
 
 /* ============================ CRONÓMETRO ============================ */
 var T = {fin:0, total:0, lab:"", sub:"", int:null, wake:null, son:false, prox:0, aviso:null};
@@ -3171,6 +3231,33 @@ document.addEventListener("click", function(ev){
   if((el = ev.target.closest("[data-nobanner]"))){
     state.sinBanner = 1; save(); render(); return;
   }
+  if((el = ev.target.closest("[data-rpt]"))){
+    startTimer(15, "Rest pause", "Al cero, sigue hasta el fallo y apunta esas reps");
+    return;
+  }
+  if((el = ev.target.closest("[data-ntfy]"))){
+    var accN = el.dataset.ntfy;
+    var peN = function(t2){ var x2 = document.getElementById("push-estado"); if(x2) x2.textContent = t2; };
+    if(accN === "on"){
+      var tN = state.ntfy || creaTemaNtfy();
+      render();
+      setTimeout(function(){
+        var x3 = document.getElementById("push-estado");
+        if(x3) x3.textContent = "Canal creado: " + tN + ". Ahora: 1) instala ntfy del App Store. " +
+          "2) En ntfy, botón de más, suscríbete a ese canal (cópialo con el botón de arriba). " +
+          "3) Permite sus notificaciones y dale a Probar aviso.";
+      }, 60);
+      return;
+    }
+    if(accN === "test"){
+      mandaNtfy(0, "Esto es el aviso", "Llega aunque estes en otra app o con el movil bloqueado.");
+      peN("Enviado al canal " + state.ntfy + ". Debe sonar en ntfy en unos segundos. Si no llega, " +
+        "revisa que en ntfy estás suscrito a ese canal exacto y con notificaciones permitidas.");
+      return;
+    }
+    if(accN === "copia"){ alPortapapeles(state.ntfy); peN("Canal copiado: " + state.ntfy); return; }
+    if(accN === "off"){ delete state.ntfy; save(); render(); return; }
+  }
   if((el = ev.target.closest("[data-push]"))){
     var accP = el.dataset.push;
     var peP = function(t){ var x = document.getElementById("push-estado"); if(x) x.textContent = t; };
@@ -3335,6 +3422,14 @@ document.addEventListener("click", function(ev){
 
 document.addEventListener("input", function(ev){
   var t = ev.target;
+  if(t.dataset.rp2){
+    var pa2 = t.dataset.rp2.split(","), pi2 = +pa2[0], pj2 = +pa2[1];
+    var plg = logEx(pi2); plg[pj2] = plg[pj2] || {};
+    var pv2 = parseInt(String(t.value).replace(/[^0-9]/g, ""), 10);
+    plg[pj2].rp2 = (!isNaN(pv2) && pv2 > 0) ? pv2 : null;
+    saveSesion();
+    return;
+  }
   if(t.dataset.reps){
     var ra = t.dataset.reps.split(","), rri = +ra[0], rrj = +ra[1];
     var rlg = logEx(rri); rlg[rrj] = rlg[rrj] || {};
