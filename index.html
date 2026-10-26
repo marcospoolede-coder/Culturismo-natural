@@ -712,7 +712,7 @@
    del 31 de mayo de 2025 y de las tablas de rutina por microciclo.     */
 
 /* súbela en cada despliegue: la app instalada la compara para avisar de que hay otra */
-var VERSION = "26 de octubre de 2026, 15:34";
+var VERSION = "26 de octubre de 2026, 16:40";
 var BARRA = 20;
 var PESO_CORP_DEF = 75;   /* peso corporal por defecto, se cambia en Ajustes */
 function pesoCorp(){ return state.peso > 0 ? state.peso : PESO_CORP_DEF; }
@@ -2832,7 +2832,15 @@ function vAjustes(){
 
   h += '<div class="sect"><div class="eyebrow">Aviso fuera de la app</div><div class="card">';
   var pOK = ("Notification" in window) && ("PushManager" in window) && ("serviceWorker" in navigator);
-  if(pushGuardado()){
+  if(pushGuardado() && !pushActivo()){
+    h += '<p class="note" style="margin:0 0 10px"><b>Ojo: la vía fina está a medias.</b> ' +
+      'Este móvil tiene la suscripción hecha, pero el servidor de avisos no responde ' +
+      '(falta montarlo: AVISOS.md del repositorio). Así no llega nada. Quítala y usa la ' +
+      'vía de ntfy, o monta el servidor.</p>' +
+      '<div class="row"><button class="btn primary" style="flex:1" data-push="off">Quitar la suscripción</button>' +
+      (state.ntfy ? '' : '<button class="btn" style="flex:1" data-ntfy="on">Activar con ntfy</button>') +
+      '</div>';
+  }else if(pushGuardado()){
     h += '<p class="note" style="margin:0 0 10px">Activado en este dispositivo: el final del ' +
       'descanso llega como notificación aunque estés en otra app o con el móvil bloqueado. ' +
       'Tarda hasta 15 segundos. En modo silencio, vibra.</p>' +
@@ -3017,9 +3025,17 @@ function programaAviso(seg, titulo, cuerpo){
   try{
     fetch(c.url + "/rest/v1/avisos", {method:"POST", keepalive:true, headers:cabecerasNube(),
       body:JSON.stringify({id:id, vence:new Date(Date.now() + seg * 1000).toISOString(),
-                           sub:sub, titulo:titulo, cuerpo:cuerpo})})["catch"](function(){});
+                           sub:sub, titulo:titulo, cuerpo:cuerpo})})
+      .then(function(r){ try{ localStorage.setItem("cuaderno-push-ok", r.ok ? "1" : "0"); }catch(e2){} })
+      ["catch"](function(){ try{ localStorage.setItem("cuaderno-push-ok", "0"); }catch(e3){} });
   }catch(e){ return null; }
   return id;
+}
+/* la via fina solo cuenta si el servidor ha respondido alguna vez: una
+   suscripcion hecha sin servidor no debe taponar el plan B de ntfy */
+function pushActivo(){
+  if(!pushGuardado()) return false;
+  try{ return localStorage.getItem("cuaderno-push-ok") !== "0"; }catch(e){ return true; }
 }
 function anulaAviso(id){
   var c = window.CUADERNO_SUPABASE;
@@ -3052,7 +3068,7 @@ function mandaNtfy(seg, titulo, cuerpo){
 }
 document.addEventListener("visibilitychange", function(){
   if(document.visibilityState !== "hidden") return;
-  if(!T.int || pushGuardado() || !state.ntfy) return;
+  if(!T.int || pushActivo() || !state.ntfy) return;
   var qN = Math.round((T.fin - Date.now()) / 1000);
   if(qN < 5 || T.ntfyMarca === T.fin) return;
   T.ntfyMarca = T.fin;
@@ -3287,7 +3303,7 @@ document.addEventListener("click", function(ev){
       return;
     }
     if(accP === "off"){
-      try{ localStorage.removeItem("cuaderno-push"); }catch(e3){}
+      try{ localStorage.removeItem("cuaderno-push"); localStorage.removeItem("cuaderno-push-ok"); }catch(e3){}
       try{
         navigator.serviceWorker.ready.then(function(reg){ return reg.pushManager.getSubscription(); })
           .then(function(sq){ if(sq) sq.unsubscribe(); })["catch"](function(){});
