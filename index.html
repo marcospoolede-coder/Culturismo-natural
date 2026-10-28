@@ -712,7 +712,7 @@
    del 31 de mayo de 2025 y de las tablas de rutina por microciclo.     */
 
 /* súbela en cada despliegue: la app instalada la compara para avisar de que hay otra */
-var VERSION = "26 de octubre de 2026, 16:40";
+var VERSION = "28 de octubre de 2026, 16:30";
 var BARRA = 20;
 var PESO_CORP_DEF = 75;   /* peso corporal por defecto, se cambia en Ajustes */
 function pesoCorp(){ return state.peso > 0 ? state.peso : PESO_CORP_DEF; }
@@ -3059,21 +3059,30 @@ function creaTemaNtfy(){
 }
 function mandaNtfy(seg, titulo, cuerpo){
   if(!state.ntfy) return;
-  var cab = {Title:titulo, Priority:"high", Tags:"stopwatch"};
-  if(seg >= 10) cab.Delay = Math.round(seg) + "s";
-  try{
-    fetch("https://ntfy.sh/" + state.ntfy,
-      {method:"POST", keepalive:true, headers:cab, body:cuerpo})["catch"](function(){});
-  }catch(e){}
+  /* todo va en la URL y el texto en el cuerpo: así la petición es "simple"
+     y puede salir por sendBeacon, que el navegador garantiza aunque esté
+     congelando la página, que es justo el momento en que se manda */
+  var u = "https://ntfy.sh/" + state.ntfy +
+    "?title=" + encodeURIComponent(titulo) + "&priority=high&tags=stopwatch" +
+    (seg >= 10 ? "&delay=" + Math.round(seg) + "s" : "");
+  var fue = false;
+  try{ if(navigator.sendBeacon) fue = navigator.sendBeacon(u, cuerpo); }catch(e){}
+  if(!fue){
+    try{ fetch(u, {method:"POST", keepalive:true, body:cuerpo})["catch"](function(){}); }catch(e2){}
+  }
 }
-document.addEventListener("visibilitychange", function(){
-  if(document.visibilityState !== "hidden") return;
+function programaNtfy(){
   if(!T.int || pushActivo() || !state.ntfy) return;
   var qN = Math.round((T.fin - Date.now()) / 1000);
   if(qN < 5 || T.ntfyMarca === T.fin) return;
   T.ntfyMarca = T.fin;
   mandaNtfy(Math.max(10, qN + 2), "Descanso terminado", (T.lab || "Vuelve a la barra") + ". Abre la app y sigue.");
+}
+/* dos ganchos, porque según la versión de iOS salta uno u otro al salir */
+document.addEventListener("visibilitychange", function(){
+  if(document.visibilityState === "hidden") programaNtfy();
 });
+window.addEventListener("pagehide", programaNtfy);
 
 /* ============================ CRONÓMETRO ============================ */
 var T = {fin:0, total:0, lab:"", sub:"", int:null, wake:null, son:false, prox:0, aviso:null};
