@@ -1,7 +1,7 @@
 # Cambios de la versión 2
 
-La versión 2 vive en `v2.html`, al lado de la app de siempre (`index.html`), para probarla en el
-gimnasio sin perder nada. Las dos leen y guardan los mismos datos. Las fórmulas no se han tocado:
+Desde el 5 de noviembre de 2026 la versión 2 es la principal (`index.html`). La versión 1 queda en
+`v1.html` por si hay que volver, y `v2.html` redirige a la principal. Las dos leen y guardan los mismos datos. Las fórmulas no se han tocado:
 coeficientes, cargas, descansos, Maurice y Rydin, 1RM teórico, drop al 15%, racha y escudos.
 
 Propuesta validada: https://claude.ai/artifact/FYn93TPSg1SHaGVDoxPWEM
@@ -63,5 +63,4 @@ Propuesta validada: https://claude.ai/artifact/FYn93TPSg1SHaGVDoxPWEM
 
 ## Pendiente
 
-- Probarla en el iPhone durante un entreno y decidir si sustituye a `index.html`.
-- La app instalada abre `index.html`. Para probar la v2 instalada hay que abrir `v2.html` en Safari y añadirla a la pantalla de inicio.
+- Probarla en el iPhone durante un entreno y recoger los cambios numerados por pestaña.

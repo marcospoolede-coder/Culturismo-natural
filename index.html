@@ -7,7 +7,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<meta name="theme-color" content="#1D5B82">
+<meta name="theme-color" content="#101214">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -25,282 +25,299 @@
 <title>Cuaderno de Fuerza</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Figtree:wght@400;500;600;700;800&display=swap">
 <style>
+  /* ===== Cuaderno de Fuerza v2 =====
+     Mármol de día, obsidiana en el gimnasio. Cinzel solo en la marca y en el
+     nombre del entreno; Figtree para todo lo demás, con cifras alineadas. */
   :root{
-    --bg:#EAE7DF; --surface:#FBFAF6; --surface-2:#E3DFD5;
-    --ink:#1E1B16; --ink-2:#5C5547; --ink-3:#675F50;
-    --line:#D6D0C2; --line-2:#C2BAA8;
-    --accent:#1D5B82; --accent-ink:#FBFAF6; --accent-soft:#DCE7ED;
-    --warn:#9B3B2E; --warn-soft:#F2E2DD;
-    --deload:#A87B2E; --deload-soft:#F3EAD4; --deload-ink:#7E5B20;
-    --ok:#5A7638; --ok-soft:#E5EBDA;
+    --bg:#F3F1EC; --surface:#FFFFFF; --surface-2:#ECE9E2;
+    --ink:#16181B; --ink-2:#5D6168; --ink-3:#6B6F76;
+    --line:#E0DCD3; --line-2:#CFCAC0;
+    --accent:#1D5B82; --accent-ink:#FFFFFF; --accent-soft:#DDE8F0; --fill:#1D5B82;
+    --warn:#9B3B2E; --warn-soft:#F3E1DD;
+    --deload:#A87B2E; --deload-soft:#F2E8D5; --deload-ink:#7E5B20;
+    --ok:#5A7638; --ok-soft:#E6EDDC; --on-ok:#FFFFFF;
     --p25:#C8102E; --p20:#1B4DE4; --p15:#E0A800; --p10:#177A4C; --p5:#F3F1EC; --p2:#6E7481; --p1:#A9AEB8;
-    --radius:14px;
-    --shadow:0 1px 2px rgba(20,22,28,.06), 0 6px 18px -10px rgba(20,22,28,.22);
+    --radius:16px;
+    --shadow:0 1px 2px rgba(20,22,28,.06), 0 10px 26px -14px rgba(20,22,28,.28);
     --tabh:62px;
-  }
-  @media (prefers-color-scheme: dark){
-    :root:not([data-theme="light"]){
-      --bg:#14120E; --surface:#1E1A15; --surface-2:#272219;
-      --ink:#EFEADF; --ink-2:#A79E8C; --ink-3:#968D7B;
-      --line:#2E281F; --line-2:#3D3529;
-      --accent:#7FB3D1; --accent-ink:#14120E; --accent-soft:#1B2A33;
-      --warn:#D9705E; --warn-soft:#2E1A16;
-      --deload:#D9B45F; --deload-soft:#2B2416; --deload-ink:#D9B45F;
-      --ok:#9CBF6B; --ok-soft:#1C2416;
-      --p5:#D8D5CE;
-      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 22px -12px rgba(0,0,0,.7);
-    }
+    --f-marca:"Cinzel","Palatino Linotype",Georgia,serif;
+    --f-texto:"Figtree","Avenir Next","Segoe UI",system-ui,-apple-system,sans-serif;
+    color-scheme:light;
   }
   :root[data-theme="dark"]{
-    --bg:#14120E; --surface:#1E1A15; --surface-2:#272219;
-    --ink:#EFEADF; --ink-2:#A79E8C; --ink-3:#968D7B;
-    --line:#2E281F; --line-2:#3D3529;
-    --accent:#7FB3D1; --accent-ink:#14120E; --accent-soft:#1B2A33;
-    --warn:#D9705E; --warn-soft:#2E1A16;
-    --deload:#D9B45F; --deload-soft:#2B2416; --deload-ink:#D9B45F;
-    --ok:#9CBF6B; --ok-soft:#1C2416;
+    --bg:#101214; --surface:#1A1D21; --surface-2:#23272C;
+    --ink:#EDEBE6; --ink-2:#A3A9B1; --ink-3:#8E949C;
+    --line:#2C3036; --line-2:#3A3F46;
+    --accent:#62A6D8; --accent-ink:#0E1A24; --accent-soft:#1C2E3B; --fill:#2A6A97;
+    --warn:#DB7563; --warn-soft:#3A221E;
+    --deload:#D3A752; --deload-soft:#372D1A; --deload-ink:#D3A752;
+    --ok:#8DB061; --ok-soft:#232D1C; --on-ok:#101214;
     --p5:#D8D5CE;
-    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 22px -12px rgba(0,0,0,.7);
+    --shadow:0 1px 2px rgba(0,0,0,.45), 0 12px 28px -14px rgba(0,0,0,.8);
+    color-scheme:dark;
+  }
+  @media (prefers-color-scheme: dark){
+    :root[data-theme="system"]{
+      --bg:#101214; --surface:#1A1D21; --surface-2:#23272C;
+      --ink:#EDEBE6; --ink-2:#A3A9B1; --ink-3:#8E949C;
+      --line:#2C3036; --line-2:#3A3F46;
+      --accent:#62A6D8; --accent-ink:#0E1A24; --accent-soft:#1C2E3B; --fill:#2A6A97;
+      --warn:#DB7563; --warn-soft:#3A221E;
+      --deload:#D3A752; --deload-soft:#372D1A; --deload-ink:#D3A752;
+      --ok:#8DB061; --ok-soft:#232D1C; --on-ok:#101214;
+      --p5:#D8D5CE;
+      --shadow:0 1px 2px rgba(0,0,0,.45), 0 12px 28px -14px rgba(0,0,0,.8);
+      color-scheme:dark;
+    }
   }
 
   *,*::before,*::after{box-sizing:border-box}
   html,body{height:100%}
-  body{
-    margin:0; background:var(--bg); color:var(--ink);
-    font-family:"EB Garamond",Georgia,"Times New Roman",serif;
-    font-size:18px; line-height:1.52; -webkit-font-smoothing:antialiased;
-  }
+  body{margin:0; background:var(--bg); color:var(--ink); font-family:var(--f-texto);
+       font-size:16.5px; line-height:1.45; -webkit-font-smoothing:antialiased;
+       font-variant-numeric:tabular-nums}
   #app{max-width:520px; margin:0 auto; padding:0 16px;
-       padding-bottom:calc(var(--tabh) + env(safe-area-inset-bottom, 0px) + 96px)}
-  h1,h2,h3{font-family:"Cinzel","Palatino Linotype",Georgia,serif; font-weight:700; margin:0;
-           letter-spacing:.01em; text-wrap:balance}
-  .mono{font-family:"IBM Plex Mono",ui-monospace,monospace; font-variant-numeric:tabular-nums}
+       padding-bottom:calc(var(--tabh) + env(safe-area-inset-bottom, 0px) + 110px)}
+  h1,h2,h3{font-family:var(--f-texto); font-weight:800; margin:0; letter-spacing:-.01em; text-wrap:balance}
+  .mono{font-family:var(--f-texto); font-variant-numeric:tabular-nums}
   button{font:inherit; color:inherit; cursor:pointer; border:none; background:none;
          -webkit-tap-highlight-color:transparent; -webkit-user-select:none; user-select:none}
-  button:focus-visible,[tabindex]:focus-visible,input:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
-  input{font:inherit; color:inherit}
+  button:focus-visible,[tabindex]:focus-visible,input:focus-visible,summary:focus-visible,select:focus-visible{
+         outline:2px solid var(--accent); outline-offset:2px}
+  input,select{font:inherit; color:inherit}
+  a{color:var(--accent)}
 
   /* ---------- cabecera ---------- */
   .top{position:sticky; top:env(safe-area-inset-top, 0px); z-index:30;
-       background:color-mix(in srgb, var(--bg) 90%, transparent);
-       backdrop-filter:blur(12px); margin:0 -16px; padding:10px 16px 24px;
-       border-bottom:0; position:sticky}
-  /* greca, el meandro griego, como firma del estilo */
-  .top::after{content:""; position:absolute; left:0; right:0; bottom:2px; height:13px;
-              background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='13' viewBox='0 0 26 13'%3E%3Cpath d='M0 12h26M3 12V3h14v6.5H9V6.5h3.5' fill='none' stroke='%23C2BAA8' stroke-width='1.6'/%3E%3C/svg%3E"); background-repeat:repeat-x;
-              background-position:center bottom; opacity:.55}
+       background:color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter:blur(14px);
+       margin:0 -16px; padding:12px 16px 12px}
   .top-row{display:flex; align-items:baseline; justify-content:space-between; gap:10px}
-  .brand{font-family:"Cinzel","Palatino Linotype",Georgia,serif; font-weight:700; font-size:20px; letter-spacing:.02em;
-         text-transform:uppercase}
+  .brand{font-family:var(--f-marca); font-weight:700; font-size:19px; letter-spacing:.16em; text-transform:uppercase}
   .brand span{color:var(--accent)}
-  .where{font-size:13.5px; color:var(--ink-2); font-weight:500}
-  .bar{height:5px; border-radius:99px; background:var(--line); margin-top:8px; overflow:hidden; display:flex}
+  .where{font-size:13.5px; color:var(--ink-2); font-weight:600}
+  .bar{height:4px; border-radius:99px; background:var(--line); margin-top:9px; overflow:hidden; display:flex}
   .bar i{display:block; height:100%; background:var(--accent)}
   .bar i.deload{background:var(--deload)}
 
   /* ---------- bloques ---------- */
-  .sect{margin:20px 0 0}
-  .eyebrow{font-family:"Cinzel","Palatino Linotype",Georgia,serif; font-size:13.5px; letter-spacing:.14em;
-           text-transform:uppercase; color:var(--ink-3); font-weight:600; margin-bottom:7px}
+  .sect{margin:18px 0 0}
+  .eyebrow{font-size:12.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-3);
+           font-weight:700; margin-bottom:8px}
   .card{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:14px}
   .stack{display:flex; flex-direction:column; gap:10px}
+  .note{font-size:14.5px; color:var(--ink-2); margin:10px 0 0; line-height:1.4}
+  .expl{font-size:14.5px; color:var(--ink-2); margin:8px 0 0; line-height:1.4}
+  .chips{display:flex; flex-wrap:wrap; gap:6px}
+  .chip{display:inline-flex; align-items:center; gap:5px; font-size:13px; font-weight:700; padding:4px 10px;
+        border-radius:99px; background:var(--surface-2); color:var(--ink-2); line-height:1.3}
+  .chip.test{background:var(--warn-soft); color:var(--warn)}
+  .chip.now{background:var(--accent-soft); color:var(--accent)}
+  .chip.up,.chip.ok{background:var(--ok-soft); color:var(--ok)}
+  .chip.down{background:var(--warn-soft); color:var(--warn)}
+  .chip.gold{background:var(--deload-soft); color:var(--deload-ink)}
+  .chip svg{width:13px; height:13px; stroke:currentColor; fill:none; stroke-width:2.2; stroke-linecap:round}
+
+  /* desplegables: lo que se lee una vez, cerrado por defecto */
+  details.fold{border-radius:12px; background:var(--surface-2); margin-top:10px}
+  details.fold > summary{list-style:none; cursor:pointer; display:flex; align-items:center; gap:8px;
+        padding:11px 12px; font-size:14.5px; font-weight:700; min-height:44px}
+  details.fold > summary::-webkit-details-marker{display:none}
+  details.fold > summary::after{content:""; margin-left:auto; width:8px; height:8px; flex:0 0 auto;
+        border-right:2px solid var(--ink-3); border-bottom:2px solid var(--ink-3); transform:rotate(45deg);
+        transition:transform .2s ease}
+  details.fold[open] > summary::after{transform:rotate(-135deg)}
+  details.fold > .in{padding:0 12px 12px}
+  details.fold.cardf{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); margin:0}
+  details.fold.cardf > summary{padding:14px; font-size:15.5px}
+  details.fold.cardf > .in{padding:0 14px 14px}
+  details.fold.cardf .sect:first-child{margin-top:0}
+  details.fold ul{margin:0; padding-left:18px; display:grid; gap:5px; font-size:14.5px}
+  details.fold ul li::marker{color:var(--accent)}
+  details.fold .note:first-child{margin-top:0}
+
+  /* grupos de Ajustes */
+  details.grupo{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); margin-top:12px}
+  details.grupo > summary{list-style:none; cursor:pointer; display:flex; align-items:center; gap:12px;
+        padding:15px 16px; font-weight:800; font-size:17px}
+  details.grupo > summary::-webkit-details-marker{display:none}
+  details.grupo > summary small{display:block; font-weight:500; font-size:13.5px; color:var(--ink-2)}
+  details.grupo > summary::after{content:""; margin-left:auto; width:9px; height:9px; flex:0 0 auto;
+        border-right:2px solid var(--ink-3); border-bottom:2px solid var(--ink-3); transform:rotate(45deg)}
+  details.grupo[open] > summary::after{transform:rotate(-135deg)}
+  details.grupo > .in{padding:0 14px 14px; border-top:1px solid var(--line)}
+  details.grupo .sect{margin-top:14px}
+  details.grupo .card{border:0; padding:0; background:transparent}
+  .gico{width:34px; height:34px; border-radius:10px; background:var(--accent-soft); color:var(--accent);
+        display:grid; place-items:center; flex:0 0 auto}
+  .gico svg{width:19px; height:19px; stroke:currentColor; fill:none; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round}
 
   /* aviso destacado */
-  .flag{border-radius:var(--radius); padding:13px 14px; display:flex; gap:11px; align-items:flex-start}
-  .flag .ic{flex:0 0 auto; min-width:28px; height:28px; padding:0 6px; border-radius:8px;
-            display:grid; place-items:center; line-height:1;
-            font-family:"Cinzel","Palatino Linotype",Georgia,serif; font-size:13px; font-weight:700}
-  .flag h3{font-size:18.5px; line-height:1.15}
-  .flag p{margin:3px 0 0; font-size:15px; line-height:1.4}
+  .flag{border-radius:var(--radius); padding:13px 14px; display:flex; gap:11px; align-items:flex-start; margin-top:10px}
+  .flag .ic{flex:0 0 auto; min-width:30px; height:30px; padding:0 6px; border-radius:9px;
+            display:grid; place-items:center; line-height:1; font-size:13px; font-weight:800}
+  .flag h3{font-size:16.5px; line-height:1.2}
+  .flag p{margin:3px 0 0; font-size:14.5px; line-height:1.4}
   .flag.test{background:var(--warn-soft); color:var(--warn)}
   .flag.test .ic{background:var(--warn); color:var(--surface)}
   .flag.deload{background:var(--deload-soft); color:var(--deload-ink)}
   .flag.deload .ic{background:var(--deload-ink); color:var(--surface)}
   .flag.info{background:var(--accent-soft); color:var(--accent)}
   .flag.info .ic{background:var(--accent); color:var(--accent-ink)}
-  .flag .act{margin-top:9px; display:inline-block; background:currentColor; border-radius:8px;
-             padding:6px 11px; font-size:14px; font-weight:600; font-family:"EB Garamond",Georgia,serif}
+  .flag .act{margin-top:9px; display:inline-block; background:currentColor; border-radius:10px;
+             padding:7px 12px; font-size:14px; font-weight:700}
   .flag .act span{color:var(--surface)}
-  .flag.deload .act span,.flag.test .act span{color:var(--surface)}
 
-  /* cabecera de la sesión */
-  .today{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
-         padding:15px; display:flex; align-items:flex-start; gap:14px}
-  .today > div:last-child{flex:1 1 auto; min-width:0}
-  .letter{width:52px; height:52px; border-radius:13px; background:var(--accent); color:var(--accent-ink);
-          font-family:"Cinzel","Palatino Linotype",Georgia,serif; font-size:30px; font-weight:700; display:grid;
-          place-items:center; flex:0 0 auto}
-  .letter.f{background:var(--warn); color:var(--surface)}
-  .today h2{font-size:22px; line-height:1.1}
-  .today .sub{font-size:14px; color:var(--ink-2); margin-top:2px}
+  /* ---------- la tarjeta del entreno ---------- */
+  .today{background:var(--fill); color:#fff; border-radius:20px; padding:16px; display:flex; flex-direction:column; gap:10px;
+         box-shadow:var(--shadow)}
+  .today .sub{font-size:13.5px; opacity:.85; font-weight:600}
+  .today h2{font-family:var(--f-marca); font-size:28px; letter-spacing:.06em; font-weight:700; line-height:1.05}
+  .today .chips .chip{background:rgba(255,255,255,.16); color:#fff}
+  .today .chip.no{background:rgba(0,0,0,.18)}
+  .letter{display:none}
+  .prog{display:flex; align-items:center; gap:8px}
+  .prog-t{flex:1 1 auto; height:6px; border-radius:99px; background:rgba(255,255,255,.22); overflow:hidden}
+  .prog-t i{display:block; height:100%; background:#fff; border-radius:99px; transition:width .25s ease}
+  .prog span{font-size:13px; font-weight:700}
+  .today .banner{background:rgba(0,0,0,.18); color:#fff}
 
-  /* ejercicios */
+  /* movilidad previa */
+  .previo{display:flex; flex-direction:column}
+  .pv{display:grid; grid-template-columns:auto 1fr; gap:4px 12px; align-items:center; padding:9px 0}
+  .pv + .pv{border-top:1px solid var(--line)}
+  .pv-ck{width:30px; height:30px; border-radius:9px; border:2px solid var(--line-2); display:grid; place-items:center}
+  .pv-ck svg{width:16px; height:16px; stroke:var(--on-ok); fill:none; stroke-width:3; stroke-linecap:round; stroke-linejoin:round; opacity:0}
+  .pv.on .pv-ck{background:var(--ok); border-color:var(--ok)}
+  .pv.on .pv-ck svg{opacity:1}
+  .pv-t{font-weight:700; font-size:15.5px; line-height:1.25}
+  .pv-t small{display:block; font-weight:600; color:var(--ink-2); font-size:13px}
+  .pv.on .pv-t{color:var(--ink-2)}
+  .pv details{grid-column:2}
+  .pv details summary{font-size:13.5px; color:var(--accent); font-weight:700; cursor:pointer; list-style:none}
+  .pv details summary::-webkit-details-marker{display:none}
+  .pv details p{margin:4px 0 0; font-size:14px; color:var(--ink-2)}
+
+  /* ---------- ejercicios ---------- */
   .ex{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); overflow:hidden}
-  .ex + .ex{margin-top:9px}
-  .ex.done{border-color:var(--ok); background:var(--ok-soft)}
-  .ex-head{display:flex; align-items:center; gap:11px; padding:12px 13px; width:100%; text-align:left}
-  .tag{flex:0 0 auto; font-family:"Cinzel","Palatino Linotype",Georgia,serif; font-size:12.5px; letter-spacing:.1em;
-       text-transform:uppercase; font-weight:600; padding:3px 6px; border-radius:6px;
-       background:var(--surface-2); color:var(--ink-2); border:1px solid var(--line)}
-  .tag.b{background:var(--accent); color:var(--accent-ink); border-color:transparent}
-  .tag.js{background:var(--deload-soft); color:var(--deload-ink); border-color:transparent}
-  .ex-name{font-weight:600; font-size:16.5px; line-height:1.25; flex:1 1 auto}
+  .ex + .ex{margin-top:8px}
+  .ex.done{background:var(--ok-soft); border-color:transparent}
+  .ex.lock{opacity:.6}
+  .ex-head{display:flex; align-items:center; gap:11px; padding:13px 14px; width:100%; text-align:left; min-height:58px}
+  .ex.lock .ex-head{cursor:default}
+  .tag{flex:0 0 auto; font-size:11.5px; letter-spacing:.08em; text-transform:uppercase; font-weight:800;
+       padding:3px 7px; border-radius:7px; background:var(--surface-2); color:var(--ink-2)}
+  .tag.b{background:var(--accent-soft); color:var(--accent)}
+  .tag.js{background:var(--deload-soft); color:var(--deload-ink)}
+  .ex-name{font-weight:800; font-size:16.5px; line-height:1.25; flex:1 1 auto; min-width:0}
+  .ex.done .ex-name::before{content:""; display:inline-block; width:16px; height:16px; margin-right:6px; vertical-align:-2px;
+        border-radius:50%; background:var(--ok) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 8.5l2.5 2.5L12 5.5' fill='none' stroke='white' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E") center/100% no-repeat}
   .ex-load{text-align:right; flex:0 0 auto}
-  .ex-load b{font-family:"IBM Plex Mono",monospace; font-size:17.5px; font-weight:600; display:block;
-             font-variant-numeric:tabular-nums}
-  .ex-load small{font-size:12.5px; color:var(--ink-2); display:block; margin-top:-1px}
-  .ex-body{padding:0 13px 13px; border-top:1px solid var(--line)}
-  .ex.done .ex-body{border-color:color-mix(in srgb, var(--ok) 35%, transparent)}
+  .ex-load b{font-size:17px; font-weight:800; display:block}
+  .ex-load small{font-size:12.5px; color:var(--ink-2); display:block}
+  .ex-body{padding:2px 14px 14px; border-top:1px solid var(--line)}
+  .ex.done .ex-body{border-color:color-mix(in srgb, var(--ok) 30%, transparent)}
+  .lockmsg{display:none}
+  .exico{width:16px; height:16px; stroke:var(--ink-3); fill:none; stroke-width:2; flex:0 0 auto}
 
-  .sets{display:grid; grid-template-columns:repeat(auto-fit, minmax(84px, 1fr)); gap:8px; margin-top:13px}
-  .set{border:1.5px solid var(--line-2); border-radius:13px; padding:11px 8px; min-height:62px;
+  /* las dos fotos del ejercicio, en bucle como un vídeo corto */
+  .loopw{display:flex; gap:12px; align-items:center; margin-top:12px}
+  .loop{position:relative; flex:0 0 auto; width:112px; aspect-ratio:3/2; border-radius:12px; overflow:hidden;
+        background:var(--surface-2); cursor:zoom-in}
+  .loop img{position:absolute; top:0; left:0; height:100%; width:auto; max-width:none;
+            animation:fotos 1.6s steps(1) infinite}
+  .loop.grande{width:100%; cursor:zoom-out}
+  .loopw.grande{flex-direction:column; align-items:stretch}
+  .loop-t{font-size:14px; color:var(--ink-2); line-height:1.35; min-width:0}
+  .loop-t b{color:var(--ink); font-size:15.5px}
+  @keyframes fotos{0%{transform:translateX(0)} 50%{transform:translateX(-50%)}}
+  .demo{display:none}
+
+  /* filas de serie: Serie, Anterior, kg, reps y check */
+  .sgrid{display:flex; flex-direction:column; gap:6px; margin-top:12px}
+  .srow,.shead{display:grid; grid-template-columns:30px minmax(0,1fr) 66px 54px 46px; gap:6px; align-items:center}
+  .shead{font-size:11.5px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3); padding:0 2px}
+  .shead span:nth-child(3),.shead span:nth-child(4){text-align:center}
+  .srow{border-radius:12px; padding:4px 2px}
+  .srow.ok{background:var(--ok-soft)}
+  .srow.act{background:var(--accent-soft)}
+  .sn{font-weight:800; text-align:center; font-size:16px}
+  .prev{text-align:left; font-size:13.5px; color:var(--ink-2); font-weight:600; padding:8px 2px; min-height:40px; line-height:1.15}
+  .prev small{display:block; font-size:11.5px; color:var(--ink-3); font-weight:600}
+  .srow input{width:100%; min-width:0; padding:10px 4px; border-radius:10px; border:1px solid var(--line-2);
+        background:var(--surface); color:var(--ink); font-size:17px; font-weight:700; text-align:center;
+        font-variant-numeric:tabular-nums}
+  .srow.ok input{background:transparent; border-color:transparent}
+  .ck{width:44px; height:44px; border-radius:12px; border:2px solid var(--line-2); display:grid; place-items:center;
+      background:var(--surface)}
+  .ck svg{width:20px; height:20px; stroke:currentColor; fill:none; stroke-width:3; stroke-linecap:round; stroke-linejoin:round}
+  .srow.ok .ck{background:var(--ok); border-color:var(--ok); color:var(--on-ok)}
+  .srow:not(.ok) .ck svg{opacity:.25}
+  .sx{grid-column:2 / -1; display:flex; flex-wrap:wrap; gap:5px; align-items:center; font-size:12.5px; color:var(--ink-2);
+      padding:0 0 2px}
+  .sx .chip{padding:2px 8px; font-size:12px}
+  .srow.extra{border:1.5px dashed var(--deload); background:transparent}
+  .srow.extra.ok{border-style:solid; background:var(--deload-soft)}
+  .srow.extra .sn{color:var(--deload-ink); font-size:12.5px; letter-spacing:.04em}
+  .rpbtn{width:44px; height:44px; border-radius:12px; background:var(--deload-soft); color:var(--deload-ink);
+         font-weight:800; font-size:13px}
+  .avisokg{grid-column:1 / -1; margin:0; font-size:13.5px; color:var(--warn); line-height:1.35; padding:0 4px}
+
+  .plates{display:flex; align-items:center; gap:4px; flex-wrap:wrap; font-size:12.5px; color:var(--ink-2)}
+  .plate{display:inline-grid; place-items:center; min-width:24px; height:22px; border-radius:5px; padding:0 5px;
+         font-size:11.5px; font-weight:800; color:#fff}
+  .plate.l{color:#15171C}
+
+  .sets{display:grid; grid-template-columns:repeat(auto-fit, minmax(88px, 1fr)); gap:8px; margin-top:12px}
+  .set{border:1.5px solid var(--line-2); border-radius:14px; padding:10px 8px; min-height:64px;
        background:var(--surface); display:flex; flex-direction:column; align-items:center;
        justify-content:center; gap:2px; transition:transform .1s ease, background .15s ease}
   .set:active{transform:scale(.96)}
-  .set b{font-family:"IBM Plex Mono",monospace; font-size:18.5px; font-weight:600; line-height:1.1}
-  .set small{font-size:12.5px; color:var(--ink-2); letter-spacing:.01em}
-  .set.on{background:var(--ok); border-color:var(--ok); color:var(--surface)}
-  .set.on small{color:var(--surface); opacity:.9}
-  .set.on b::after{content:" ✓"; font-size:13.5px; opacity:.8}
-  .plates{margin-top:11px; display:flex; align-items:center; gap:4px; flex-wrap:wrap;
-          font-size:13px; color:var(--ink-2)}
-  .plate{display:inline-grid; place-items:center; min-width:26px; height:24px; border-radius:5px; padding:0 6px;
-         font-family:"IBM Plex Mono",monospace; font-size:12.5px; font-weight:600; color:#fff}
-  .plate.l{color:#15171C}
-  .note{font-size:14px; color:var(--ink-2); margin:10px 0 0; line-height:1.4}
+  .set b{font-size:19px; font-weight:800; line-height:1.1}
+  .set small{font-size:12.5px; color:var(--ink-2)}
+  .set.on{background:var(--ok); border-color:var(--ok); color:var(--on-ok)}
+  .set.on small{color:var(--on-ok); opacity:.85}
+  .set.drop{border-style:dashed; border-color:var(--deload)}
+  .set.drop b{color:var(--deload-ink)}
+  .set.drop.on{border-style:solid; background:var(--deload); color:var(--on-ok)}
+  .set.drop.on b{color:var(--on-ok)}
   .wfield{margin-top:11px; display:flex; align-items:center; gap:8px; font-size:14px; color:var(--ink-2)}
-  .wfield input{width:74px; padding:9px 8px; border-radius:9px; border:1px solid var(--line-2);
-                background:var(--surface-2); font-family:"IBM Plex Mono",monospace; font-size:15.5px}
+  .wfield input{width:80px; padding:10px 8px; border-radius:10px; border:1px solid var(--line-2);
+                background:var(--surface-2); font-size:16.5px; font-weight:700; text-align:center}
+  .resumen{display:flex; flex-wrap:wrap; gap:5px; margin-top:9px}
+  .pill{font-size:12.5px; font-weight:700; padding:3px 9px; border-radius:99px; background:var(--surface); color:var(--ink-2)}
 
-  /* alimentación */
-  .comdib{width:86px; height:86px; border-radius:50%; background:var(--accent-soft);
-          display:grid; place-items:center; margin:2px auto 14px}
-  .comdib svg{width:46px; height:46px; stroke:var(--accent); fill:none; stroke-width:1.6;
-              stroke-linecap:round; stroke-linejoin:round}
-  .btn.compra{margin-top:12px; gap:8px; text-decoration:none; background:var(--deload-soft);
-              color:var(--deload-ink); border-color:transparent; font-weight:600}
-  .btn.compra svg{width:17px; height:17px; stroke:currentColor; fill:none; stroke-width:1.8;
-                  stroke-linecap:round; stroke-linejoin:round}
+  /* hoja inferior para elegir recámara y técnica */
+  .hoja{position:fixed; inset:0; z-index:90; display:flex; align-items:flex-end; justify-content:center;
+        background:color-mix(in srgb, #000 45%, transparent)}
+  .hoja-c{background:var(--surface); width:100%; max-width:520px; border-radius:22px 22px 0 0;
+          padding:10px 16px calc(18px + env(safe-area-inset-bottom, 0px)); animation:hsube .22s cubic-bezier(.2,.8,.3,1)}
+  .hoja-c::before{content:""; display:block; width:40px; height:5px; border-radius:99px; background:var(--line-2); margin:0 auto 12px}
+  @keyframes hsube{from{transform:translateY(40px); opacity:.6} to{transform:none; opacity:1}}
+  .hoja h3{font-size:19px}
+  .hoja .hl{font-size:12.5px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); margin:14px 0 7px;
+            display:flex; align-items:center}
+  .hoja .stack{margin-top:16px}
 
-  /* días de entreno */
-  .dias{display:grid; grid-template-columns:repeat(7,1fr); gap:5px}
-  .dia{aspect-ratio:1/1; min-height:44px; border-radius:5px; border:1.5px solid var(--line-2);
-       background:var(--surface-2); font-family:"Cinzel",Georgia,serif; font-weight:700;
-       font-size:16px; color:var(--ink-2); cursor:pointer}
-  .dia.on{background:var(--accent); border-color:transparent; color:var(--accent-ink)}
-
-  /* primeros pasos */
-  .pasos{display:flex; flex-direction:column; gap:0}
-  .paso{display:flex; gap:12px; padding:13px 0; align-items:flex-start}
-  .paso + .paso{border-top:1px solid var(--line)}
-  .paso-n{flex:0 0 auto; width:28px; height:28px; border-radius:50%; display:grid; place-items:center;
-          font-family:"Cinzel",Georgia,serif; font-weight:700; font-size:14px;
-          background:var(--surface-2); color:var(--ink-3); border:1.5px solid var(--line-2)}
-  .paso.hecho .paso-n{background:var(--ok); color:#fff; border-color:transparent}
-  .paso.ahora .paso-n{background:var(--accent); color:var(--accent-ink); border-color:transparent}
-  .paso-t{flex:1 1 auto; min-width:0}
-  .paso-t b{display:block; font-size:16.5px; line-height:1.25}
-  .paso.hecho .paso-t b{color:var(--ink-3); text-decoration:line-through}
-  .paso-t p{margin:3px 0 0; font-size:14.5px; color:var(--ink-2); line-height:1.4}
-  .paso-t .btn{margin-top:9px; max-width:220px}
-
-  /* hoy toca o no */
-  .toca{display:flex; align-items:center; gap:7px; font-size:14.5px; margin-top:7px; color:var(--ink-2)}
-  .toca b{color:var(--ink)}
-  .toca i{width:9px; height:9px; border-radius:50%; background:var(--ok); display:block; flex:0 0 auto}
-  .toca.no i{background:var(--line-2)}
-
-  /* la i que explica la jerga */
-  .gi{display:inline-grid; place-items:center; width:19px; height:19px; flex:0 0 auto; position:relative;
-      border-radius:50%; border:1.5px solid var(--ink-3); color:var(--ink-3);
-      font-family:"Cinzel",Georgia,serif; font-size:12px; font-weight:700; line-height:1;
-      margin-left:5px; vertical-align:1px; cursor:pointer}
-  /* la i se ve pequena pero el dedo tiene 45px donde acertar */
-  .gi::after{content:""; position:absolute; inset:-13px; border-radius:50%}
-  .gi:hover{border-color:var(--accent); color:var(--accent)}
-  .info-c{text-align:left}
-  .info-c h2{font-size:23px; margin-bottom:8px}
-  .info-c .frase{margin-bottom:18px}
-
-  /* bienvenida: la pantalla se queda sola */
-  body.solo-bienv .tabs,
-  body.solo-bienv #foot,
-  body.solo-bienv .timer{display:none !important}
-  body.solo-bienv #app{padding-bottom:30px}
-
-  /* bienvenida */
-  .bienv{text-align:center; padding:26px 6px 10px; display:flex; flex-direction:column;
-         align-items:center}
-  .bpuntos{display:flex; gap:7px; margin-bottom:26px}
-  .bpuntos i{width:7px; height:7px; border-radius:50%; background:var(--line-2); display:block;
-             transition:width .2s ease}
-  .bpuntos i.on{background:var(--accent); width:22px; border-radius:99px}
-  .bicono{width:74px; height:74px; border-radius:50%; background:var(--accent-soft);
-          display:grid; place-items:center; margin-bottom:20px}
-  .bicono svg{width:36px; height:36px; stroke:var(--accent); fill:none; stroke-width:1.8;
-              stroke-linecap:round; stroke-linejoin:round}
-  .bienv h1{font-size:28px; line-height:1.15; margin:0 0 10px; max-width:15ch}
-  .bgrande{font-size:20px; color:var(--ink); margin:0 0 14px; font-weight:500}
-  .bchico{font-size:17px; color:var(--ink-2); line-height:1.5; margin:0 0 30px; max-width:32ch;
-          min-height:78px}
-  .bbotones{display:flex; flex-direction:column; gap:9px; width:100%; max-width:300px}
-
-  /* objetivo semanal, racha y logros */
-  .semana{display:flex; align-items:center; gap:15px}
-  .semana-t{flex:1 1 auto; min-width:0}
-  .semana-t b{font-family:"Cinzel","Palatino Linotype",Georgia,serif; font-size:20px; line-height:1.1; display:block}
-  .semana-t p{margin:3px 0 0; font-size:14.5px; color:var(--ink-2); line-height:1.35}
-  .anillo{position:relative; flex:0 0 auto}
-  .anillo svg{width:100%; height:100%; transform:rotate(-90deg)}
-  .anillo circle{fill:none; stroke-width:7; stroke-linecap:round}
-  .anillo .apista{stroke:var(--line)}
-  .anillo .atrazo{stroke:var(--accent); transition:stroke-dashoffset .5s ease}
-  .anillo .atrazo.ok{stroke:var(--ok)}
-  .acentro{position:absolute; inset:0; display:flex; flex-direction:column;
-           align-items:center; justify-content:center; gap:0}
-  .acentro b{font-family:"IBM Plex Mono",monospace; font-size:25px; font-weight:600; line-height:1}
-  .acentro small{font-size:12.5px; color:var(--ink-2); line-height:1.2}
-  .rachafila{display:flex; flex-wrap:wrap; gap:6px; margin-top:9px}
-  .rachapill{display:inline-flex; align-items:center; gap:4px; font-size:13.5px; font-weight:600;
-             padding:3px 9px; border-radius:99px; background:var(--surface-2);
-             border:1px solid var(--line); color:var(--ink-3)}
-  .rachapill svg{width:13px; height:13px; fill:currentColor; stroke:none}
-  .rachapill.on{background:var(--accent-soft); color:var(--accent); border-color:transparent}
-  .rachapill.esc.on{background:var(--ok-soft); color:var(--ok)}
-  .rachapill.pts{font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums}
-
-  .logros{display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:8px}
-  .logro{border:1px solid var(--line); border-radius:11px; padding:9px 10px; background:var(--surface-2);
-         opacity:.55}
-  .logro.on{opacity:1; background:var(--ok-soft); border-color:transparent}
-  .logro-n{font-weight:600; font-size:15px; line-height:1.2}
-  .logro.on .logro-n{color:var(--ok)}
-  .logro-d{font-size:13px; color:var(--ink-2); margin-top:2px; line-height:1.3}
-
-  .avisofel{background:var(--accent-soft); color:var(--accent); border-radius:10px;
-            padding:9px 11px; font-size:14.5px; line-height:1.35; margin:0 0 12px; text-align:left}
-  .logrosfel{display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin:0 0 13px}
-  .logropill{background:var(--ok); color:#fff; border-radius:99px; padding:4px 11px;
-             font-size:14px; font-weight:600}
-
-  /* orden de los entrenos, cuadrados que se arrastran */
-  .ordfila{display:flex; gap:7px; margin-top:9px; touch-action:none}
-  .ordcuadro{flex:1 1 0; min-width:0; touch-action:none; cursor:grab;
-             display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
-             border:1.5px solid var(--line-2); border-radius:13px; padding:12px 6px;
-             background:var(--surface-2);
-             transition:box-shadow .15s ease, background .15s ease, transform .14s ease}
-  .ordcuadro .ordpos{font-family:"Cinzel","Palatino Linotype",Georgia,serif; font-size:12.5px; letter-spacing:.08em;
-                     color:var(--ink-3); font-weight:600; line-height:1}
-  .ordcuadro .ordletra{font-family:"Cinzel","Palatino Linotype",Georgia,serif; font-weight:700; font-size:26px;
-                       line-height:1; color:var(--ink)}
-  .ordcuadro.primero{background:var(--accent); border-color:transparent}
-  .ordcuadro.primero .ordletra{color:var(--accent-ink)}
-  .ordcuadro.primero .ordpos{color:var(--accent-ink); opacity:.75}
-  .ordcuadro.arrastrando{cursor:grabbing; box-shadow:var(--shadow); z-index:2;
-                         position:relative; transition:none}
+  /* recámara y técnica: un toque */
+  .rirs{display:flex; gap:6px}
+  .rirs button{flex:1 1 0; min-height:52px; padding:5px 2px; border-radius:12px; border:1px solid var(--line-2);
+               background:var(--surface-2); font-weight:800; font-size:18px; line-height:1.1;
+               display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px}
+  .rirs button small{font-size:10.5px; font-weight:600; color:var(--ink-3)}
+  .rirs button[aria-pressed="true"]{background:var(--fill); color:#fff; border-color:transparent}
+  .rirs button[aria-pressed="true"] small{color:#fff; opacity:.85}
+  .tecs{display:flex; gap:6px}
+  .tecs button{flex:1 1 0; min-height:56px; padding:8px 4px; border-radius:12px; border:1px solid var(--line-2);
+               background:var(--surface-2); font-weight:800; font-size:18px; line-height:1.15;
+               display:flex; flex-direction:column; align-items:center; gap:1px}
+  .tecs button small{font-size:12.5px; font-weight:600; color:var(--ink-3)}
+  .tecs button[aria-pressed="true"]{background:var(--fill); color:#fff; border-color:transparent}
+  .tecs button[aria-pressed="true"] small{color:#fff; opacity:.85}
+  .tecs button[data-v="B"][aria-pressed="true"]{background:var(--deload-ink); color:var(--surface)}
+  .tecs button[data-v="C"][aria-pressed="true"]{background:var(--warn); color:var(--surface)}
+  .tecs button[data-v="B"][aria-pressed="true"] small,.tecs button[data-v="C"][aria-pressed="true"] small{color:var(--surface)}
 
   /* alternativas sin máquina */
   .altzona{margin-top:11px}
@@ -308,399 +325,339 @@
   .altbtn svg{width:15px; height:15px; stroke:currentColor; fill:none; stroke-width:2;
               stroke-linecap:round; stroke-linejoin:round; flex:0 0 auto}
   .altbtn.vuelve{margin-top:6px; color:var(--accent); border-color:var(--accent)}
-  .altlista{margin-top:9px; padding:11px; border-radius:12px; background:var(--surface-2);
-            border:1px solid var(--line); display:flex; flex-direction:column; gap:6px}
-  .altop{display:flex; align-items:center; gap:9px; width:100%; text-align:left;
-         border:1.5px solid var(--line-2); border-radius:10px; padding:9px 11px;
-         background:var(--surface)}
-  .altop .alton{flex:1 1 auto; font-weight:600; font-size:15.5px; line-height:1.2}
-  .altop .altok{flex:0 0 auto; font-family:"Cinzel","Palatino Linotype",Georgia,serif; font-size:12.5px;
-                letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3);
-                border:1px solid var(--line); border-radius:6px; padding:2px 6px}
+  .altlista{margin-top:9px; padding:10px; border-radius:12px; background:var(--surface-2);
+            display:flex; flex-direction:column; gap:6px}
+  .altop{display:flex; align-items:center; gap:9px; width:100%; text-align:left; min-height:46px;
+         border:1.5px solid var(--line-2); border-radius:11px; padding:9px 11px; background:var(--surface)}
+  .altop .alton{flex:1 1 auto; font-weight:700; font-size:15px; line-height:1.2}
+  .altop .altok{flex:0 0 auto; font-size:11.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase;
+                color:var(--ink-3)}
   .altop.on{border-color:var(--accent); background:var(--accent-soft)}
   .altop.on .alton{color:var(--accent)}
-  .altmark{font-family:"Cinzel","Palatino Linotype",Georgia,serif; font-style:normal; font-size:12.5px;
-           letter-spacing:.1em; text-transform:uppercase; color:var(--accent);
-           background:var(--accent-soft); border-radius:5px; padding:1px 5px; vertical-align:2px}
+  .altmark{font-style:normal; font-size:11.5px; font-weight:800; letter-spacing:.08em; text-transform:uppercase;
+           color:var(--accent); background:var(--accent-soft); border-radius:5px; padding:1px 5px; vertical-align:2px}
   .jej{border-top:1px solid var(--line); padding-top:10px; margin-top:10px}
-  .jej:first-of-type{border-top:0}
 
   /* jump set por vueltas */
-  .js-bloque .ex-load b{font-size:20px}
-  .vuelta{border:1.5px solid var(--line-2); border-radius:13px; padding:9px 10px 10px; margin-top:9px;
-          background:var(--surface)}
-  .vuelta.ok{border-color:var(--ok); background:var(--ok-soft)}
-  .vuelta-n{font-family:"Cinzel","Palatino Linotype",Georgia,serif; font-size:13.5px; letter-spacing:.1em;
-            text-transform:uppercase; font-weight:600; color:var(--ink-3); margin-bottom:7px}
+  .js-bloque .ex-load b{font-size:19px}
+  .vuelta{border:1.5px solid var(--line-2); border-radius:14px; padding:9px 10px 10px; margin-top:9px}
+  .vuelta.ok{border-color:transparent; background:var(--ok-soft)}
+  .vuelta-n{font-size:12px; letter-spacing:.1em; text-transform:uppercase; font-weight:800; color:var(--ink-3); margin-bottom:7px}
   .vuelta.ok .vuelta-n{color:var(--ok)}
   .vuelta-ej{display:flex; flex-direction:column; gap:6px}
-  .jchip{display:flex; align-items:center; gap:9px; width:100%; text-align:left;
-         border:1.5px solid var(--line-2); border-radius:11px; padding:9px 10px;
-         background:var(--surface-2); transition:transform .1s ease}
+  .jchip{display:flex; align-items:center; gap:9px; width:100%; text-align:left; min-height:48px;
+         border:1.5px solid var(--line-2); border-radius:12px; padding:9px 10px;
+         background:var(--surface); transition:transform .1s ease}
   .jchip:active{transform:scale(.98)}
-  .jchip .jn{flex:0 0 auto; width:21px; height:21px; border-radius:7px; background:var(--line);
-             color:var(--ink-2); display:grid; place-items:center;
-             font-family:"IBM Plex Mono",monospace; font-size:12.5px; font-weight:600}
-  .jchip .jt{flex:1 1 auto; font-weight:600; font-size:16px; line-height:1.2; min-width:0}
-  .jchip .jr{flex:0 0 auto; font-size:13.5px; color:var(--ink-2); white-space:nowrap;
-             font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums}
-  .jchip .jr b{font-size:18.5px; color:var(--ink); font-weight:600}
-  .jchip.on{background:var(--ok); border-color:var(--ok); color:var(--surface)}
-  .jchip.on .jn{background:rgba(255,255,255,.25); color:var(--surface)}
-  .jchip.on .jr,.jchip.on .jr b{color:var(--surface)}
-  .jchip.on .jt::after{content:" ✓"; opacity:.85}
-
-  /* duración estimada */
-  .dura{display:flex; align-items:center; gap:5px; margin-top:7px; font-size:13.5px; color:var(--ink-2)}
-  .dura svg{width:14px; height:14px; stroke:currentColor; fill:none; stroke-width:2;
-            stroke-linecap:round; flex:0 0 auto}
-
-  /* demostración del ejercicio */
-  .demo{margin:13px 0 0; padding:0}
-  .demo.previa{margin:11px 0 0}
-  .demo.previa img{opacity:.75}
-  .demo img{display:block; width:100%; height:auto; max-width:100%;
-            border-radius:10px; background:var(--surface-2)}
-  .demo figcaption{font-size:13px; color:var(--ink-3); margin-top:5px; text-align:center}
-
-  /* botones */
-  .btn{display:inline-flex; align-items:center; justify-content:center; gap:7px; border-radius:11px;
-       padding:12px 15px; font-weight:600; font-size:16px; background:var(--surface-2);
-       border:1px solid var(--line); width:100%}
-  .btn.primary{background:var(--accent); color:var(--accent-ink); border-color:transparent}
-  .btn.ghost{background:transparent}
-  .btn.sm{padding:8px 11px; font-size:14.5px; width:auto}
-  .btn[disabled]{opacity:.45; cursor:default}
-  .row{display:flex; gap:9px}
+  .jchip .jn{flex:0 0 auto; width:22px; height:22px; border-radius:7px; background:var(--surface-2);
+             color:var(--ink-2); display:grid; place-items:center; font-size:12.5px; font-weight:800}
+  .jchip .jt{flex:1 1 auto; font-weight:700; font-size:15.5px; line-height:1.2; min-width:0}
+  .jchip .jr{flex:0 0 auto; font-size:13px; color:var(--ink-2); white-space:nowrap}
+  .jchip .jr b{font-size:17px; color:var(--ink); font-weight:800}
+  .jchip.on{background:var(--ok); border-color:var(--ok); color:var(--on-ok)}
+  .jchip.on .jn{background:rgba(255,255,255,.25); color:var(--on-ok)}
+  .jchip.on .jr,.jchip.on .jr b{color:var(--on-ok)}
 
   /* aproximación antes del básico */
-  .aprox{background:var(--accent-soft); border-radius:10px; padding:10px 13px; margin:0 0 11px;
-         display:flex; flex-direction:column; gap:3px}
-  .aprox .ap-t{font-weight:700; color:var(--accent); font-size:13px; letter-spacing:.05em;
-         text-transform:uppercase}
-  .aprox .ap-l{margin:2px 0 4px; padding-left:20px; font-size:16px; line-height:1.6}
+  .aprox .ap-l{margin:0; padding-left:18px; font-size:15px; line-height:1.6}
   .aprox .ap-l small{color:var(--ink-3)}
-  .aprox .ap-f{font-size:14.5px; color:var(--ink-3); line-height:1.4}
+  .rpz{display:none}
 
-  /* rest pause: cuenta atrás y reps extra en la última serie */
-  .rpz{display:flex; gap:10px; align-items:flex-end; margin:10px 0 2px; flex-wrap:wrap}
-  .rpz .btn{flex:1 1 150px}
-  .rpz .campo-s{flex:1 1 130px}
-  /* rest pause y drop: una ronda aparte, con borde de trazos */
-  .srow.extra{border-style:dashed}
-  .srow.extra.ok{border-style:solid}
-  .expl{font-size:15px; color:var(--ink-2); margin:6px 0 0; line-height:1.35}
-  .set.drop{border-style:dashed}
-  .set.drop.on{border-style:solid}
+  /* botones */
+  .btn{display:inline-flex; align-items:center; justify-content:center; gap:7px; border-radius:14px;
+       padding:13px 15px; font-weight:800; font-size:15.5px; background:var(--surface-2);
+       border:1px solid var(--line); width:100%; min-height:48px; text-decoration:none; color:inherit}
+  .btn.primary{background:var(--fill); color:#fff; border-color:transparent}
+  .today .btn.primary{background:#fff; color:#1D5B82}
+  .btn.ghost{background:transparent}
+  .btn.sm{padding:8px 12px; font-size:14px; width:auto; min-height:40px}
+  .btn[disabled]{opacity:.45; cursor:default}
+  .btn.compra{margin-top:12px; background:var(--deload-soft); color:var(--deload-ink); border-color:transparent}
+  .btn.compra svg{width:17px; height:17px; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round}
+  .afil{font-size:12px; color:var(--ink-3); margin:6px 0 0; text-align:center}
+  .row{display:flex; gap:9px}
+
   .t-fuera{display:block; margin-top:5px; padding:0; border:0; background:none; font:inherit;
            font-size:12.5px; color:var(--ink-2); text-decoration:underline; text-align:left; cursor:pointer}
 
-  /* cronómetro */
-  .timer{position:fixed; left:0; right:0; z-index:40;
-         bottom:calc(var(--tabh) + env(safe-area-inset-bottom, 0px));
-         display:flex; justify-content:center; padding:0 12px 10px; pointer-events:none}
-  .timer-in{pointer-events:auto; width:100%; max-width:496px; background:var(--surface);
-            border:1px solid var(--line); border-radius:16px; box-shadow:var(--shadow);
-            padding:11px 13px; display:flex; align-items:center; gap:12px}
+  /* cronómetro: panel inferior con anillo */
+  .timer{position:fixed; left:0; right:0; z-index:40; bottom:calc(var(--tabh) + env(safe-area-inset-bottom, 0px));
+         display:flex; justify-content:center; padding:0 10px 8px; pointer-events:none}
+  .timer-in{pointer-events:auto; width:100%; max-width:500px; background:var(--surface);
+            border:1px solid var(--line); border-radius:18px; box-shadow:var(--shadow);
+            padding:10px 12px; display:flex; align-items:center; gap:11px}
   .timer.late .timer-in{border-color:var(--ok); background:var(--ok-soft)}
-
-  /* aviso de versión nueva, encima de las pestañas */
-  .nueva{position:fixed; left:0; right:0; z-index:41;
-         bottom:calc(var(--tabh) + env(safe-area-inset-bottom, 0px));
-         display:flex; justify-content:center; padding:0 12px 10px; pointer-events:none}
-  .nueva-in{pointer-events:auto; width:100%; max-width:496px; background:var(--accent);
-            color:var(--accent-ink); border-radius:16px; box-shadow:var(--shadow);
-            padding:11px 13px 11px 16px; display:flex; align-items:center; gap:12px; font-size:16px}
-  .nueva-in span{flex:1}
-  .nueva-in button{font:inherit; font-weight:600; background:var(--accent-ink); color:var(--accent);
-            border:0; border-radius:10px; padding:8px 14px; cursor:pointer}
-  .t-num{font-family:"IBM Plex Mono",monospace; font-size:31px; font-weight:600; letter-spacing:-.02em;
-         font-variant-numeric:tabular-nums; line-height:1; min-width:86px}
-  .t-lab{flex:1 1 auto; font-size:13.5px; color:var(--ink-2); line-height:1.3}
-  .t-lab b{display:block; color:var(--ink); font-size:15px; font-weight:600}
-  .t-btn{width:40px; height:40px; border-radius:11px; background:var(--surface-2); border:1px solid var(--line);
-         display:grid; place-items:center; font-size:13.5px; font-weight:600; flex:0 0 auto;
-         font-family:"IBM Plex Mono",monospace}
-  .t-btn.stop{background:var(--accent); color:var(--accent-ink); border-color:transparent}
-  .t-track{height:3px; background:var(--line); border-radius:99px; overflow:hidden; margin-top:8px}
+  .t-num{font-size:30px; font-weight:800; letter-spacing:-.02em; line-height:1; min-width:78px}
+  .t-lab{flex:1 1 auto; font-size:13px; color:var(--ink-2); line-height:1.3; min-width:0}
+  .t-lab b{display:block; color:var(--ink); font-size:15px; font-weight:800}
+  .t-btn{width:46px; height:46px; border-radius:13px; background:var(--surface-2); border:1px solid var(--line);
+         display:grid; place-items:center; font-size:14px; font-weight:800; flex:0 0 auto}
+  .t-btn.stop{background:var(--fill); color:#fff; border-color:transparent}
+  .t-track{height:4px; background:var(--line); border-radius:99px; overflow:hidden; margin-top:7px}
   .t-track i{display:block; height:100%; background:var(--accent); transition:width .25s linear}
 
-  /* tabs */
+  /* aviso de versión nueva */
+  .nueva{position:fixed; left:0; right:0; z-index:41; bottom:calc(var(--tabh) + env(safe-area-inset-bottom, 0px));
+         display:flex; justify-content:center; padding:0 10px 8px; pointer-events:none}
+  .nueva-in{pointer-events:auto; width:100%; max-width:500px; background:var(--fill); color:#fff;
+            border-radius:18px; box-shadow:var(--shadow); padding:11px 13px 11px 16px;
+            display:flex; align-items:center; gap:12px; font-size:15.5px; font-weight:600}
+  .nueva-in span{flex:1}
+  .nueva-in button{font:inherit; font-weight:800; background:#fff; color:#1D5B82; border-radius:11px; padding:8px 14px}
+
+  /* pestañas */
   .tabs{position:fixed; left:0; right:0; bottom:0; z-index:50; background:var(--surface);
         border-top:1px solid var(--line); padding-bottom:env(safe-area-inset-bottom, 0px)}
-  .tabs-in{max-width:520px; margin:0 auto; display:grid; grid-template-columns:repeat(7,1fr)}
-  .tab{height:var(--tabh); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px;
-       font-family:"Cinzel","Palatino Linotype",Georgia,serif; font-size:13px; letter-spacing:.06em; text-transform:uppercase;
-       font-weight:600; color:var(--ink-3); min-width:0; overflow:hidden}
-  /* siete pestañas en un móvil: letra un punto menor y sin aire extra */
-  @media (max-width:430px){ .tab{font-size:10.5px; letter-spacing:.02em} }
-  .tab svg{width:21px; height:21px; stroke:currentColor; fill:none; stroke-width:1.9;
-           stroke-linecap:round; stroke-linejoin:round}
+  .tabs-in{max-width:520px; margin:0 auto; display:grid; grid-template-columns:repeat(5,1fr)}
+  .tab{height:var(--tabh); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
+       font-size:12px; font-weight:700; color:var(--ink-3); min-width:0}
+  .tab svg{width:23px; height:23px; stroke:currentColor; fill:none; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round}
   .tab[aria-selected="true"]{color:var(--accent)}
+
+  /* la i que explica la jerga */
+  .gi{display:inline-grid; place-items:center; width:19px; height:19px; flex:0 0 auto; position:relative;
+      border-radius:50%; border:1.5px solid var(--ink-3); color:var(--ink-3);
+      font-size:11.5px; font-weight:800; line-height:1; margin-left:5px; vertical-align:1px; cursor:pointer}
+  .gi::after{content:""; position:absolute; inset:-13px; border-radius:50%}
+  .info-c{text-align:left}
+  .info-c h2{font-size:21px; margin-bottom:8px}
+  .info-c .frase{margin-bottom:18px}
+
+  /* bienvenida */
+  body.solo-bienv .tabs, body.solo-bienv #foot, body.solo-bienv .timer{display:none !important}
+  body.solo-bienv #app{padding-bottom:30px}
+  .bienv{text-align:center; padding:30px 6px 10px; display:flex; flex-direction:column; align-items:center}
+  .bpuntos{display:flex; gap:7px; margin-bottom:28px}
+  .bpuntos i{width:7px; height:7px; border-radius:50%; background:var(--line-2); display:block; transition:width .2s ease}
+  .bpuntos i.on{background:var(--accent); width:22px; border-radius:99px}
+  .bicono{width:78px; height:78px; border-radius:24px; background:var(--accent-soft); display:grid; place-items:center; margin-bottom:22px}
+  .bicono svg{width:38px; height:38px; stroke:var(--accent); fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round}
+  .bienv h1{font-size:28px; line-height:1.15; margin:0 0 10px; max-width:16ch}
+  .bgrande{font-size:19px; color:var(--ink); margin:0 0 12px; font-weight:600}
+  .bchico{font-size:16px; color:var(--ink-2); line-height:1.45; margin:0 0 30px; max-width:32ch; min-height:70px}
+  .bbotones{display:flex; flex-direction:column; gap:9px; width:100%; max-width:300px}
+
+  /* primeros pasos */
+  .pasos{display:flex; flex-direction:column}
+  .paso{display:flex; gap:12px; padding:12px 0; align-items:flex-start}
+  .paso + .paso{border-top:1px solid var(--line)}
+  .paso-n{flex:0 0 auto; width:28px; height:28px; border-radius:50%; display:grid; place-items:center;
+          font-weight:800; font-size:14px; background:var(--surface-2); color:var(--ink-3)}
+  .paso.hecho .paso-n{background:var(--ok); color:var(--on-ok)}
+  .paso.ahora .paso-n{background:var(--fill); color:#fff}
+  .paso-t{flex:1 1 auto; min-width:0}
+  .paso-t b{display:block; font-size:16px; line-height:1.25}
+  .paso.hecho .paso-t b{color:var(--ink-3); text-decoration:line-through}
+  .paso-t p{margin:3px 0 0; font-size:14.5px; color:var(--ink-2); line-height:1.4}
+  .paso-t .btn{margin-top:9px; max-width:220px}
+
+  /* progreso: racha, camino y calendario */
+  .semana{display:flex; align-items:center; gap:15px}
+  .semana-t{flex:1 1 auto; min-width:0}
+  .semana-t b{font-size:19px; font-weight:800; line-height:1.15; display:block}
+  .semana-t p{margin:3px 0 0; font-size:14.5px; color:var(--ink-2); line-height:1.35}
+  .anillo{position:relative; flex:0 0 auto}
+  .anillo svg{width:100%; height:100%; transform:rotate(-90deg)}
+  .anillo circle{fill:none; stroke-width:8; stroke-linecap:round}
+  .anillo .apista{stroke:var(--line)}
+  .anillo .atrazo{stroke:var(--accent); transition:stroke-dashoffset .5s ease}
+  .anillo .atrazo.ok{stroke:var(--ok)}
+  .acentro{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center}
+  .acentro b{font-size:26px; font-weight:800; line-height:1}
+  .acentro small{font-size:12px; color:var(--ink-2); line-height:1.2}
+  .rachafila{display:flex; flex-wrap:wrap; gap:6px; margin-top:9px}
+  .rachapill{display:inline-flex; align-items:center; gap:4px; font-size:13px; font-weight:700;
+             padding:4px 10px; border-radius:99px; background:var(--surface-2); color:var(--ink-2)}
+  .rachapill svg{width:13px; height:13px; fill:currentColor; stroke:none}
+  .rachapill.on{background:var(--accent-soft); color:var(--accent)}
+  .rachapill.esc.on{background:var(--deload-soft); color:var(--deload-ink)}
+  .camino{display:grid; grid-template-columns:repeat(8,1fr); gap:4px; margin:10px 0 8px}
+  .camino i{height:10px; border-radius:5px; background:var(--line)}
+  .camino i.past{background:var(--ok)}
+  .camino i.now{background:var(--accent)}
+  .camino-t{display:flex; justify-content:space-between; gap:10px; font-size:14px; font-weight:700}
+  .camino-t span:last-child{color:var(--ink-2); font-weight:600}
+  .logros{display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:8px}
+  .logro{border-radius:12px; padding:9px 11px; background:var(--surface-2); opacity:.6}
+  .logro.on{opacity:1; background:var(--ok-soft)}
+  .logro-n{font-weight:700; font-size:14.5px; line-height:1.2}
+  .logro.on .logro-n{color:var(--ok)}
+  .logro-d{font-size:12.5px; color:var(--ink-2); margin-top:2px; line-height:1.3}
+  .avisofel{background:var(--accent-soft); color:var(--accent); border-radius:12px; padding:9px 11px;
+            font-size:14px; line-height:1.35; margin:0 0 12px; text-align:left}
+  .logrosfel{display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin:0 0 13px}
+  .logropill{background:var(--ok); color:var(--on-ok); border-radius:99px; padding:4px 11px; font-size:13.5px; font-weight:700}
+
+  /* orden de los entrenos */
+  .ordfila{display:flex; gap:7px; margin-top:9px; touch-action:none}
+  .ordcuadro{flex:1 1 0; min-width:0; touch-action:none; cursor:grab; display:flex; flex-direction:column;
+             align-items:center; justify-content:center; gap:2px; border:1.5px solid var(--line-2); border-radius:14px;
+             padding:12px 6px; background:var(--surface-2); transition:box-shadow .15s ease, transform .14s ease}
+  .ordcuadro .ordpos{font-size:12px; font-weight:700; color:var(--ink-3); line-height:1}
+  .ordcuadro .ordletra{font-family:var(--f-marca); font-weight:700; font-size:26px; line-height:1}
+  .ordcuadro.primero{background:var(--fill); border-color:transparent; color:#fff}
+  .ordcuadro.primero .ordpos{color:#fff; opacity:.8}
+  .ordcuadro.arrastrando{cursor:grabbing; box-shadow:var(--shadow); z-index:2; position:relative; transition:none}
+
+  /* días de entreno */
+  .dias{display:grid; grid-template-columns:repeat(7,1fr); gap:5px}
+  .dia{aspect-ratio:1/1; min-height:44px; border-radius:12px; border:1.5px solid var(--line-2);
+       background:var(--surface-2); font-weight:800; font-size:16px; color:var(--ink-2)}
+  .dia.on{background:var(--fill); border-color:transparent; color:#fff}
 
   /* maximales */
   .rm{display:flex; align-items:center; gap:11px; padding:11px 0}
   .rm + .rm{border-top:1px solid var(--line)}
-  .rm-n{flex:1 1 auto; font-weight:600; font-size:16px}
-  .rm-n small{display:block; font-weight:400; font-size:13px; color:var(--ink-3)}
-  .rm input{width:84px; padding:10px 9px; border-radius:10px; border:1px solid var(--line-2);
-            background:var(--surface-2); font-family:"IBM Plex Mono",monospace; font-size:17.5px;
-            text-align:right; font-variant-numeric:tabular-nums}
+  .rm-n{flex:1 1 auto; font-weight:700; font-size:16px; min-width:0}
+  .rm-n small{display:block; font-weight:500; font-size:13px; color:var(--ink-3)}
+  .rm input{width:86px; padding:10px 9px; border-radius:11px; border:1px solid var(--line-2);
+            background:var(--surface-2); font-size:17px; font-weight:700; text-align:right}
   .rm .u{font-size:13.5px; color:var(--ink-3); width:16px}
+  .rmgrid{display:grid; grid-template-columns:minmax(0,1fr) 76px 98px; gap:0 8px; align-items:center}
+  .rmgrid .th{font-size:11.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3); font-weight:800; padding-bottom:6px}
+  .rmgrid .th.n{text-align:right}
+  .rmgrid .sep{border-top:1px solid var(--line)}
+  .rmgrid .cel{padding:11px 0}
+  .rmgrid .rm-n{font-size:16px}
+  .rmgrid .rm-n .veces{display:inline-block; margin-top:4px; font-size:11.5px; padding:2px 8px}
+  .rm-teo{display:flex; flex-direction:column; align-items:flex-end; gap:4px; text-align:right}
+  .rm-teo b{font-size:17px; font-weight:800; color:var(--accent); line-height:1}
+  .rm-teo small{font-size:12px; color:var(--ink-3); line-height:1.15}
+  .usar-teo{background:var(--fill); color:#fff; border-radius:8px; padding:4px 9px; font-size:12.5px; font-weight:800}
+  .rm-in{display:flex; align-items:center; gap:5px; justify-content:flex-end}
+  .rm-in input{width:100%; min-width:0; padding:9px 9px; border-radius:11px; border:1px solid var(--line-2);
+               background:var(--surface-2); font-size:18px; font-weight:800; text-align:right}
+  @media (max-width:380px){ .rmgrid{grid-template-columns:minmax(0,1fr) 66px 88px; gap:0 6px} }
 
-  table{width:100%; border-collapse:collapse; font-size:15px}
-  th,td{text-align:left; padding:7px 6px; border-bottom:1px solid var(--line)}
-  th{font-family:"Cinzel","Palatino Linotype",Georgia,serif; font-size:13px; letter-spacing:.08em; text-transform:uppercase;
-     color:var(--ink-3); font-weight:600}
-  td.n,th.n{text-align:right; font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums}
+  table{width:100%; border-collapse:collapse; font-size:14.5px}
+  th,td{text-align:left; padding:8px 6px; border-bottom:1px solid var(--line)}
+  th{font-size:11.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3); font-weight:800}
+  td.n,th.n{text-align:right}
   .scroll{overflow-x:auto; -webkit-overflow-scrolling:touch}
 
   /* plan */
-  .ph{display:flex; gap:12px; padding:11px 0; align-items:flex-start}
+  .ph{display:flex; gap:12px; padding:10px 0; align-items:flex-start}
   .ph + .ph{border-top:1px solid var(--line)}
-  .ph-dot{flex:0 0 auto; width:30px; height:30px; border-radius:9px; background:var(--surface-2);
-          border:1px solid var(--line); display:grid; place-items:center;
-          font-family:"Cinzel","Palatino Linotype",Georgia,serif; font-weight:700; font-size:14.5px; color:var(--ink-2)}
-  .ph.now .ph-dot{background:var(--accent); color:var(--accent-ink); border-color:transparent}
-  .ph.past .ph-dot{background:var(--ok-soft); color:var(--ok); border-color:transparent}
-  .ph-t{flex:1 1 auto}
-  .ph-t b{font-size:16px; display:block}
-  .ph-t small{font-size:13.5px; color:var(--ink-2); display:block; margin-top:1px}
-  .chip{display:inline-block; font-size:12.5px; font-weight:600; padding:2px 7px; border-radius:99px;
-        margin-top:5px; margin-right:4px}
-  .chip.test{background:var(--warn-soft); color:var(--warn)}
-  .chip.now{background:var(--accent-soft); color:var(--accent)}
+  .ph-dot{flex:0 0 auto; width:30px; height:30px; border-radius:10px; background:var(--surface-2);
+          display:grid; place-items:center; font-weight:800; font-size:14px; color:var(--ink-2)}
+  .ph.now .ph-dot{background:var(--fill); color:#fff}
+  .ph.past .ph-dot{background:var(--ok-soft); color:var(--ok)}
+  .ph-t{flex:1 1 auto; min-width:0}
+  .ph-t b{font-size:15.5px; display:block}
+  .ph-t small{font-size:13px; color:var(--ink-2); display:block; margin-top:1px}
+  .ph-t .chip{margin-top:5px; margin-right:4px}
 
-  /* formulario de cuenta */
+  /* formularios */
   .campo{display:flex; flex-direction:column; gap:5px; margin-bottom:10px}
-  .campo label{font-size:13.5px; color:var(--ink-2); font-weight:500}
-  .campo input{padding:11px 12px; border-radius:11px; border:1px solid var(--line-2);
-               background:var(--surface-2); font-size:17.5px; width:100%}
+  .campo label{font-size:13.5px; color:var(--ink-2); font-weight:600}
+  .campo input{padding:12px; border-radius:12px; border:1px solid var(--line-2); background:var(--surface-2); font-size:17px; width:100%}
   .campo input::placeholder{color:var(--ink-3)}
+  .campo-s{display:flex; flex-direction:column; gap:4px; min-width:0}
+  .campo-s > span{font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3); font-weight:800}
+  .campo-s .inw{display:flex; align-items:center; gap:5px}
+  .campo-s input{width:100%; min-width:0; padding:12px; border-radius:12px; border:1px solid var(--line-2);
+        background:var(--surface-2); font-size:20px; font-weight:800; text-align:center}
+  .campo-s .u{font-size:13.5px; color:var(--ink-3)}
+  select.btn{appearance:none; text-align:left}
 
-  /* guia de pasos */
-  .guia{list-style:none; counter-reset:paso; margin:0; padding:0; display:flex;
-        flex-direction:column; gap:13px}
-  .guia li{counter-increment:paso; display:grid; grid-template-columns:27px 1fr; gap:11px;
-           align-items:start}
-  .guia li::before{content:counter(paso); grid-row:span 2; width:27px; height:27px; border-radius:9px;
-                   background:var(--accent-soft); color:var(--accent); display:grid; place-items:center;
-                   font-family:"Cinzel","Palatino Linotype",Georgia,serif; font-weight:700; font-size:15.5px}
-  .guia li b{font-size:16px; line-height:1.25}
-  .guia li span{grid-column:2; font-size:14.5px; color:var(--ink-2); line-height:1.45; margin-top:2px}
+  .guia{list-style:none; counter-reset:paso; margin:0; padding:0; display:flex; flex-direction:column; gap:10px}
+  .guia li{counter-increment:paso; display:grid; grid-template-columns:26px 1fr; gap:10px; align-items:start}
+  .guia li::before{content:counter(paso); grid-row:span 2; width:26px; height:26px; border-radius:8px;
+                   background:var(--accent-soft); color:var(--accent); display:grid; place-items:center; font-weight:800; font-size:14px}
+  .guia li b{font-size:15px; line-height:1.25}
+  .guia li span{grid-column:2; font-size:14px; color:var(--ink-2); line-height:1.4; margin-top:1px}
 
-  /* chispa de evolucion */
-  .spark{color:var(--accent); flex:0 0 auto; overflow:visible}
+  .spark{color:var(--ok); flex:0 0 auto; overflow:visible}
 
-  /* progreso de la sesion */
-  .prog{display:flex; align-items:center; gap:8px; margin-top:9px}
-  .prog-t{flex:1 1 auto; height:6px; border-radius:99px; background:var(--line); overflow:hidden}
-  .prog-t i{display:block; height:100%; background:var(--ok); border-radius:99px;
-            transition:width .25s ease}
-  .prog span{font-family:"IBM Plex Mono",monospace; font-size:13px; color:var(--ink-2);
-             font-variant-numeric:tabular-nums}
+  .caja{width:100%; min-height:120px; margin-top:8px; padding:9px; border-radius:12px;
+        border:1px solid var(--line-2); background:var(--surface-2); color:var(--ink); font-size:14px; line-height:1.5; resize:vertical}
+  .avat{width:40px; height:40px; border-radius:50%; flex:0 0 auto; background:var(--surface-2); object-fit:cover}
+  .usar{display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin-top:12px}
+  .usar > span{font-size:13px; color:var(--ink-2); width:100%; font-weight:600}
+  .usar .btn{font-size:13.5px; padding:6px 10px; min-height:36px}
 
-  .caja{width:100%; min-height:120px; margin-top:8px; padding:9px; border-radius:10px;
-        border:1px solid var(--line-2); background:var(--surface-2); color:var(--ink);
-        font-size:16px; line-height:1.5; resize:vertical}
-  .avat{width:40px; height:40px; border-radius:50%; flex:0 0 auto; background:var(--surface-2);
-        border:1px solid var(--line); object-fit:cover}
-  .usar{display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin-top:12px;
-        padding-top:11px; border-top:1px solid var(--line)}
-  .usar > span{font-size:13.5px; color:var(--ink-2); width:100%}
-  .usar .btn{font-size:14px; padding:6px 10px}
-
-  /* evolución de marcas */
+  /* marcas: evolución */
   .evo{padding:11px 0}
   .evo + .evo{border-top:1px solid var(--line)}
-  .evo-h{display:flex; align-items:baseline; gap:8px}
-  .evo-h b{font-size:16px; flex:1 1 auto}
-  .evo-kg{font-size:16.5px; font-weight:600}
-  .chip.up{background:var(--ok-soft); color:var(--ok); margin:0}
-  .chip.down{background:var(--warn-soft); color:var(--warn); margin:0}
+  .evo-h{display:flex; align-items:center; gap:8px}
+  .evo-h b{font-size:15.5px; flex:1 1 auto}
+  .evo-kg{font-size:17px; font-weight:800}
   .evo-l{display:flex; gap:6px; margin-top:8px; overflow-x:auto; padding-bottom:2px}
-  .mk{flex:0 0 auto; background:var(--surface-2); border:1px solid var(--line); border-radius:9px;
-      padding:5px 8px; display:flex; flex-direction:column; min-width:72px}
-  .mk b{font-size:15px; font-weight:600}
-  .mk small{font-size:12.5px; color:var(--ink-3); white-space:nowrap}
-  .conv-rm{display:flex; align-items:baseline; justify-content:space-between; gap:10px;
-           background:var(--accent-soft); color:var(--accent); border-radius:10px;
-           padding:9px 12px; margin-bottom:10px}
-  .conv-rm span{font-family:"Cinzel","Palatino Linotype",Georgia,serif; font-size:13.5px; letter-spacing:.12em;
-                text-transform:uppercase; font-weight:600}
-  .conv-rm b{font-size:22px; font-weight:600}
+  .mk{flex:0 0 auto; background:var(--surface-2); border-radius:10px; padding:5px 9px; display:flex; flex-direction:column; min-width:72px}
+  .mk b{font-size:14.5px; font-weight:800}
+  .mk small{font-size:12px; color:var(--ink-3); white-space:nowrap}
 
-  .seg{display:flex; gap:6px; background:var(--surface-2); padding:4px; border-radius:12px;
-       border:1px solid var(--line)}
-  .seg button{flex:1 1 0; padding:11px 6px; border-radius:9px; font-size:14.5px; font-weight:600; color:var(--ink-2)}
+  /* resultado grande, de un vistazo */
+  .gran{display:flex; align-items:baseline; gap:6px; flex-wrap:wrap}
+  .gran b{font-size:40px; font-weight:800; letter-spacing:-.02em; line-height:1}
+  .gran span{font-size:15px; color:var(--ink-2); font-weight:700}
+  .conv-rm{display:flex; align-items:baseline; gap:8px; margin:4px 0 2px}
+  .conv-rm span{font-size:15px; color:var(--ink-2); font-weight:700}
+  .conv-rm b{font-size:40px; font-weight:800; letter-spacing:-.02em; line-height:1}
+  .calc{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px}
+
+  .seg{display:flex; gap:5px; background:var(--surface-2); padding:4px; border-radius:13px}
+  .seg button{flex:1 1 0; padding:10px 6px; border-radius:10px; font-size:14.5px; font-weight:700; color:var(--ink-2); min-height:42px}
   .seg button[aria-pressed="true"]{background:var(--surface); color:var(--ink); box-shadow:var(--shadow)}
 
-  .banner{background:var(--deload-soft); color:var(--deload-ink); border-radius:11px; padding:10px 12px;
+  .banner{background:var(--deload-soft); color:var(--deload-ink); border-radius:12px; padding:10px 12px;
           font-size:14px; line-height:1.4; display:flex; gap:9px; align-items:flex-start}
-  .foot{margin-top:22px; font-size:13px; color:var(--ink-3); line-height:1.5}
+  .foot{margin-top:26px; font-size:12.5px; color:var(--ink-3); line-height:1.5}
 
-  /* ---------- registro por serie ---------- */
-  .ex.lock{opacity:.55}
-  .ex.lock .ex-head{cursor:default}
-  .lockmsg{padding:12px 13px; font-size:14px; color:var(--ink-2); border-top:1px solid var(--line);
-           display:flex; gap:8px; align-items:center}
-  .lockmsg svg{width:15px; height:15px; stroke:currentColor; fill:none; stroke-width:2; flex:0 0 auto}
+  /* comida */
+  .comdib{display:none}
+  .com-h{display:flex; align-items:center; gap:10px; margin-bottom:8px}
+  .com-ic{width:38px; height:38px; border-radius:12px; background:var(--accent-soft); display:grid; place-items:center; flex:0 0 auto}
+  .com-ic svg{width:22px; height:22px; stroke:var(--accent); fill:none; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round}
+  .com-h b{font-size:16.5px; font-weight:800}
+  .com-h small{display:block; font-size:13px; color:var(--ink-2); font-weight:600}
 
-  .srow{border:1.5px solid var(--line-2); border-radius:13px; padding:10px 11px 11px; margin-top:9px;
-        background:var(--surface)}
-  .srow.ok{border-color:var(--ok); background:var(--ok-soft)}
-  .srow-h{display:flex; align-items:baseline; gap:8px; flex-wrap:wrap}
-  .srow-h b{font-family:"Cinzel","Palatino Linotype",Georgia,serif; font-size:17.5px; letter-spacing:.02em}
-  .srow-h .objetivo{font-size:14px; color:var(--ink-2); display:flex; align-items:baseline; gap:4px}
-  .srow-h .objetivo b{font-family:"IBM Plex Mono",monospace; font-size:26px; font-weight:600;
-                      color:var(--ink); line-height:1; letter-spacing:-.02em;
-                      font-variant-numeric:tabular-nums}
-  .srow.ok .srow-h .objetivo b{color:color-mix(in srgb, var(--ok) 80%, var(--ink))}
-  .srow-h .teo{margin-left:auto; font-size:14px; color:var(--ink-2); white-space:nowrap}
-  .srow-h .teo b{font-family:"IBM Plex Mono",monospace; font-size:16.5px; color:var(--ink);
-                 font-variant-numeric:tabular-nums; letter-spacing:0}
-  .srow.ok .srow-h .teo,.srow.ok .srow-h .reps{color:color-mix(in srgb, var(--ok) 75%, var(--ink))}
-
-  .campos{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:9px; margin-top:10px}
-  .campo-s{display:flex; flex-direction:column; gap:4px; min-width:0}
-  .campo-s > span{font-family:"Cinzel","Palatino Linotype",Georgia,serif; font-size:13px; letter-spacing:.1em;
-                  text-transform:uppercase; color:var(--ink-3); font-weight:600}
-  .campo-s .inw{display:flex; align-items:center; gap:5px}
-  .campo-s input,.campo-s select{width:100%; min-width:0; padding:9px 10px; border-radius:10px;
-        border:1px solid var(--line-2); background:var(--surface-2); color:var(--ink);
-        font-family:"IBM Plex Mono",monospace; font-size:17.5px; font-variant-numeric:tabular-nums}
-  .campo-s select{font-family:"EB Garamond",Georgia,serif; font-size:16px; appearance:none;
-        background-image:linear-gradient(45deg,transparent 50%,var(--ink-3) 50%),
-                         linear-gradient(135deg,var(--ink-3) 50%,transparent 50%);
-        background-position:calc(100% - 15px) 50%, calc(100% - 10px) 50%;
-        background-size:5px 5px, 5px 5px; background-repeat:no-repeat; padding-right:28px}
-  .campo-s input.falta,.campo-s select.falta{border-color:var(--warn); background:var(--warn-soft)}
-  .campo-s .u{font-size:13.5px; color:var(--ink-3)}
-  .campo-s.ancho{grid-column:1 / -1}
-  .tecs{grid-column:1 / -1; display:flex; gap:5px}
-  .tecs button{flex:1 1 0; padding:9px 4px; border-radius:10px; border:1px solid var(--line-2);
-               background:var(--surface-2); font-weight:600; font-size:15px; line-height:1.15;
-               display:flex; flex-direction:column; align-items:center; gap:1px}
-  .tecs button small{font-size:12.5px; font-weight:400; color:var(--ink-3)}
-  .tecs button[aria-pressed="true"]{background:var(--accent); color:var(--accent-ink); border-color:transparent}
-  .tecs button[aria-pressed="true"] small{color:var(--accent-ink); opacity:.85}
-  .tecs button[data-v="C"][aria-pressed="true"]{background:var(--warn); color:#fff}
-  .tecs button[data-v="C"][aria-pressed="true"] small{color:#fff}
-  .tecs button[data-v="B"][aria-pressed="true"]{background:var(--deload-ink); color:var(--surface)}
-  .tecs button[data-v="B"][aria-pressed="true"] small{color:var(--surface)}
-  .resumen{display:flex; flex-wrap:wrap; gap:5px; margin-top:9px}
-  .pill{font-size:13px; font-weight:600; padding:3px 8px; border-radius:99px;
-        background:var(--surface-2); border:1px solid var(--line); color:var(--ink-2);
-        font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums}
-
-  /* ---------- maximales, ejercicio, teórico y tu marca ---------- */
-  .rmgrid{display:grid; grid-template-columns:minmax(0,1fr) 76px 94px; gap:0 8px; align-items:center}
-  .rmgrid .th{font-family:"Cinzel","Palatino Linotype",Georgia,serif; font-size:12.5px; letter-spacing:.08em;
-              text-transform:uppercase; color:var(--ink-3); font-weight:600; padding-bottom:7px}
-  .rmgrid .th.n{text-align:right}
-  .rmgrid .sep{border-top:1px solid var(--line)}
-  .rmgrid .cel{padding:10px 0}
-  .rm-teo{display:flex; flex-direction:column; align-items:flex-end; gap:3px; text-align:right}
-  .rm-teo b{font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums;
-            font-size:17.5px; font-weight:600; color:var(--accent); line-height:1}
-  .rm-teo small{font-size:12.5px; color:var(--ink-3); line-height:1.15}
-  .usar-teo{background:var(--accent); color:var(--accent-ink); border-radius:7px;
-            padding:3px 9px; font-size:13px; font-weight:600}
-  .rm-in{display:flex; align-items:center; gap:5px; justify-content:flex-end}
-  .rm-in input{width:100%; min-width:0; padding:8px 9px; border-radius:10px;
-               border:1px solid var(--line-2); background:var(--surface-2);
-               font-family:"IBM Plex Mono",monospace; font-size:17.5px; text-align:right;
-               font-variant-numeric:tabular-nums}
-  @media (max-width:380px){
-    .rmgrid{grid-template-columns:minmax(0,1fr) 66px 84px; gap:0 6px}
-    .rm-in input{font-size:16.5px; padding:7px 7px}
-  }
-
-  /* ---------- calendario ---------- */
+  /* calendario */
   .cal-nav{display:flex; align-items:center; gap:10px; margin-bottom:10px}
-  .cal-nav b{flex:1 1 auto; font-family:"Cinzel","Palatino Linotype",Georgia,serif; font-size:20px}
-  .cal-nav button{width:44px; height:44px; border-radius:10px; background:var(--surface-2);
-                  border:1px solid var(--line); display:grid; place-items:center; font-size:16.5px; flex:0 0 auto}
+  .cal-nav b{flex:1 1 auto; font-size:18px; font-weight:800}
+  .cal-nav button{width:44px; height:44px; border-radius:12px; background:var(--surface-2); display:grid; place-items:center; font-size:18px; flex:0 0 auto}
   .cal-g{display:grid; grid-template-columns:repeat(7,1fr); gap:4px}
-  .cal-g .dow{text-align:center; font-family:"Cinzel","Palatino Linotype",Georgia,serif; font-size:12.5px; font-weight:600;
-              letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3); padding-bottom:3px}
-  .cal-d{aspect-ratio:1/1; border-radius:10px; display:flex; flex-direction:column; align-items:center;
-         justify-content:center; gap:0; font-family:"IBM Plex Mono",monospace; font-size:14.5px;
-         font-variant-numeric:tabular-nums; color:var(--ink-2); background:var(--surface-2);
-         border:1px solid transparent; line-height:1.1}
+  .cal-g .dow{text-align:center; font-size:12px; font-weight:800; color:var(--ink-3); padding-bottom:3px}
+  .cal-d{aspect-ratio:1/1; border-radius:10px; display:flex; flex-direction:column; align-items:center; justify-content:center;
+         font-size:14px; font-weight:600; color:var(--ink-2); background:var(--surface-2); border:1.5px solid transparent; line-height:1.1}
   .cal-d.out{background:transparent; color:var(--ink-3); opacity:.4}
-  .cal-d.hoy{border-color:var(--accent); color:var(--accent); font-weight:600}
-  .cal-d.on{background:var(--accent); color:var(--accent-ink); font-weight:600; border-color:transparent}
-  .cal-d.on.f{background:var(--warn); color:#fff}
-  .cal-d.on small{font-family:"Cinzel","Palatino Linotype",Georgia,serif; font-size:12.5px; letter-spacing:.06em;
-                  line-height:1; opacity:.9}
-  .cal-k{display:flex; flex-wrap:wrap; gap:12px; margin-top:12px; font-size:13.5px; color:var(--ink-2)}
+  .cal-d.hoy{border-color:var(--accent); color:var(--accent); font-weight:800}
+  .cal-d.on{background:var(--ok); color:var(--on-ok); font-weight:800}
+  .cal-d.on.f{background:var(--warn); color:var(--surface)}
+  .cal-d.on small{font-size:11px; font-weight:800; line-height:1; opacity:.9}
+  .cal-k{display:flex; flex-wrap:wrap; gap:12px; margin-top:12px; font-size:13px; color:var(--ink-2)}
   .cal-k span{display:flex; align-items:center; gap:5px}
-  .cal-k i{width:13px; height:13px; border-radius:4px; display:block}
-  .kpis{display:grid; grid-template-columns:repeat(3,1fr); gap:9px}
-  .kpi{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
-       padding:12px 10px; text-align:center}
-  .kpi b{display:block; font-family:"IBM Plex Mono",monospace; font-size:24px; font-weight:600;
-         line-height:1.1; font-variant-numeric:tabular-nums}
-  .kpi small{display:block; font-size:12.5px; color:var(--ink-2); margin-top:2px; line-height:1.25}
+  .cal-k i{width:12px; height:12px; border-radius:4px; display:block}
+  .kpis{display:grid; grid-template-columns:repeat(3,1fr); gap:8px}
+  .kpi{background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:12px 8px; text-align:center}
+  .kpi b{display:block; font-size:24px; font-weight:800; line-height:1.1}
+  .kpi small{display:block; font-size:12px; color:var(--ink-2); margin-top:2px; line-height:1.25}
 
-  /* ---------- felicitación ---------- */
-  .fel{position:fixed; inset:0; z-index:80; display:grid; place-items:center; padding:20px;
-       background:color-mix(in srgb, var(--ink) 55%, transparent); backdrop-filter:blur(3px)}
-  .fel-c{background:var(--surface); border-radius:20px; padding:26px 22px 20px; max-width:360px; width:100%;
-         text-align:center; box-shadow:var(--shadow); animation:sube .28s cubic-bezier(.2,.8,.3,1)}
+  /* felicitación y diálogos */
+  .fel{position:fixed; inset:0; z-index:95; display:grid; place-items:center; padding:20px;
+       background:color-mix(in srgb, #000 50%, transparent); backdrop-filter:blur(3px)}
+  .fel-c{background:var(--surface); border-radius:22px; padding:24px 20px 18px; max-width:370px; width:100%;
+         text-align:center; box-shadow:var(--shadow); animation:sube .28s cubic-bezier(.2,.8,.3,1);
+         max-height:calc(100% - 20px); overflow-y:auto}
   @keyframes sube{from{opacity:0; transform:translateY(14px) scale(.97)} to{opacity:1; transform:none}}
-  .fel-ic{width:62px; height:62px; border-radius:50%; background:var(--ok); color:#fff; margin:0 auto 14px;
+  .fel-ic{width:58px; height:58px; border-radius:50%; background:var(--ok); color:var(--on-ok); margin:0 auto 12px;
           display:grid; place-items:center}
-  .fel-ic svg{width:31px; height:31px; stroke:currentColor; fill:none; stroke-width:3;
-              stroke-linecap:round; stroke-linejoin:round}
-  .fel-c h2{font-size:25px; line-height:1.1}
-  .fel-c .frase{font-size:16.5px; color:var(--ink-2); margin:7px 0 16px; line-height:1.4}
-  .fel-c .kpis{margin-bottom:16px}
-  .fel-c .kpi{background:var(--surface-2)}
-  :root:not([data-theme="light"]) .top::after{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='13' viewBox='0 0 26 13'%3E%3Cpath d='M0 12h26M3 12V3h14v6.5H9V6.5h3.5' fill='none' stroke='%233D3529' stroke-width='1.6'/%3E%3C/svg%3E")}
-  @media (prefers-color-scheme: light){
-    :root:not([data-theme="dark"]) .top::after{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='13' viewBox='0 0 26 13'%3E%3Cpath d='M0 12h26M3 12V3h14v6.5H9V6.5h3.5' fill='none' stroke='%23C2BAA8' stroke-width='1.6'/%3E%3C/svg%3E")}
-  }
-  :root[data-theme="dark"] .top::after{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='13' viewBox='0 0 26 13'%3E%3Cpath d='M0 12h26M3 12V3h14v6.5H9V6.5h3.5' fill='none' stroke='%233D3529' stroke-width='1.6'/%3E%3C/svg%3E")}
+  .fel-ic svg{width:29px; height:29px; stroke:currentColor; fill:none; stroke-width:3; stroke-linecap:round; stroke-linejoin:round}
+  .fel-c h2{font-size:23px; line-height:1.15}
+  .fel-c .frase{font-size:15.5px; color:var(--ink-2); margin:6px 0 14px; line-height:1.4}
+  .fel-c .kpis{margin:12px 0 14px}
+  .fel-c .kpi{background:var(--surface-2); border:0}
+  .fel-c .anillo{margin:0 auto}
+  .sig{background:var(--surface-2); border-radius:14px; padding:12px; margin:0 0 14px; text-align:left}
+  .sig b{font-size:15px}
+  .sig .dias{grid-template-columns:repeat(7,1fr); margin:9px 0}
+  .sig .dia{min-height:40px; font-size:13px; display:flex; flex-direction:column; align-items:center; justify-content:center; line-height:1.1}
+  .sig .dia small{font-size:10.5px; font-weight:600; opacity:.8}
+  .sig input{width:100%; padding:10px 12px; border-radius:11px; border:1px solid var(--line-2); background:var(--surface);
+             font-size:17px; font-weight:700}
+  .siguiente{display:flex; align-items:center; gap:6px}
 
-  /* ---------- acabado clásico ---------- */
-  .brand{font-size:22px; letter-spacing:.14em}
-  .eyebrow{letter-spacing:.2em; font-weight:600}
-  h1,h2,h3{letter-spacing:.03em}
-  .today h2,.fel-c h2{letter-spacing:.05em}
-  /* el medallón de la letra, como un camafeo */
-  .letter{border-radius:50%; box-shadow:inset 0 0 0 2px color-mix(in srgb, var(--surface) 45%, transparent);
-          font-size:27px; letter-spacing:.02em}
-  .tag{letter-spacing:.14em; border-radius:4px}
-  .btn{border-radius:4px; letter-spacing:.04em}
-  .card,.ex,.srow,.vuelta,.kpi,.logro,.altop,.jchip,.ordcuadro,.set{border-radius:5px}
-  .timer-in,.fel-c{border-radius:6px}
-  .cal-d{border-radius:4px}
-  .anillo .atrazo{stroke:var(--accent)}
-  .acentro b{font-family:"Cinzel","Palatino Linotype",Georgia,serif; font-size:27px; font-weight:700}
-  .logro.on{box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--ok) 35%, transparent)}
-  .fel-ic{background:var(--deload); box-shadow:0 0 0 5px var(--deload-soft)}
-  .foot{font-style:italic}
-
-  /* recamara en chips: la decision mas repetida de la app, a un toque */
-  .rirs{display:flex; gap:5px}
-  .rirs button{flex:1 1 0; min-height:46px; padding:5px 2px; border-radius:10px; border:1px solid var(--line-2);
-               background:var(--surface-2); font-weight:600; font-size:16px; line-height:1.1;
-               display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px;
-               font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums}
-  .rirs button small{font-size:10.5px; font-weight:400; color:var(--ink-3); font-family:"EB Garamond",Georgia,serif}
-  .rirs button[aria-pressed="true"]{background:var(--accent); color:var(--accent-ink); border-color:transparent}
-  .rirs button[aria-pressed="true"] small{color:var(--accent-ink); opacity:.85}
-  .rirs.falta button{border-color:var(--warn); background:var(--warn-soft)}
-  /* aviso suave si el dato huele a dedazo */
-  .avisokg{grid-column:1 / -1; margin:0; font-size:14px; color:var(--warn); line-height:1.35}
-  /* ajustes en dos bloques */
-  .aj-h{font-size:19px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-2);
-        border-bottom:2px solid var(--line-2); padding-bottom:7px; margin-top:8px}
-  /* texto solo para lectores de pantalla */
-  .sr-only{position:absolute; width:1px; height:1px; margin:-1px; padding:0; overflow:hidden;
-           clip:rect(0 0 0 0); white-space:nowrap; border:0}
+  .sr-only{position:absolute; width:1px; height:1px; margin:-1px; padding:0; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0}
   @media (prefers-reduced-motion: reduce){*{transition:none !important; animation:none !important}}
 </style>
 
@@ -744,7 +701,7 @@
    del 31 de mayo de 2025 y de las tablas de rutina por microciclo.     */
 
 /* súbela en cada despliegue: la app instalada la compara para avisar de que hay otra */
-var VERSION = "4 de noviembre de 2026, 23:30";
+var VERSION = "5 de noviembre de 2026, 00:12";
 var BARRA = 20;
 var PESO_CORP_DEF = 75;   /* peso corporal por defecto, se cambia en Ajustes */
 function pesoCorp(){ return state.peso > 0 ? state.peso : PESO_CORP_DEF; }
@@ -1244,27 +1201,47 @@ function guardaApuntes(p, f, L, lista){
    peso y de más a menos repeticiones. No se apuntan; activan sin cansar. */
 function aproxHTML(e, c){
   if(e.t !== "b") return "";
+  var li = "", n = 0, pie = "";
   if(e.bw){
-    return '<div class="aprox"><span class="ap-t">Calentamiento' + info("aprox") + '</span>' +
-      '<ul class="ap-l"><li><b>3 a 5 dominadas</b> sin lastre</li>' +
-      '<li>45 segundos de pausa y <b>otras 3 a 5</b></li></ul>' +
-      '<span class="ap-f">Y a la primera serie de verdad.</span></div>';
+    li = '<li><b>3 a 5 dominadas</b> sin lastre</li><li>45 segundos y <b>otras 3 a 5</b></li>';
+    n = 2; pie = "Y a la primera serie de verdad.";
+  }else{
+    var w = c[0] ? c[0].kg : 0;
+    if(!w) return "";
+    var esca = [[BARRA, 8, "la barra sola"], [redondea(w * 0.5), 5, "la mitad"],
+                [redondea(w * 0.75), 3, "tres cuartos"]], usados = {};
+    esca.forEach(function(a){
+      var kg = Math.max(BARRA, a[0]);
+      if(kg >= w || usados[kg]) return;
+      usados[kg] = 1; n++;
+      li += '<li><b>' + nf(kg) + ' kg</b> por ' + a[1] + ' <small>' + a[2] + '</small></li>';
+    });
+    if(!li) return "";
+    pie = "Medio minuto entre escalones y a la primera serie con " + nf(w) + " kg.";
   }
-  var w = c[0] ? c[0].kg : 0;
-  if(!w) return "";
-  var esca = [[BARRA, 8, "la barra sola"], [redondea(w * 0.5), 5, "la mitad del peso"],
-              [redondea(w * 0.75), 3, "tres cuartos"]], li = "", usados = {};
-  esca.forEach(function(a){
-    var kg = Math.max(BARRA, a[0]);
-    if(kg >= w || usados[kg]) return;
-    usados[kg] = 1;
-    li += '<li><b>' + nf(kg) + ' kg</b> por ' + a[1] + ' <small>' + a[2] + '</small></li>';
-  });
-  if(!li) return "";
-  return '<div class="aprox"><span class="ap-t">Calentamiento' + info("aprox") + '</span>' +
-    '<ul class="ap-l">' + li + '</ul>' +
-    '<span class="ap-f">Cada escalón: más peso, menos repeticiones. Medio minuto entre ellos ' +
-    'y a la primera serie con ' + nf(w) + ' kg.</span></div>';
+  return '<details class="fold aprox"><summary>Calentamiento: ' + n + (n === 1 ? " serie" : " series") +
+    '</summary><div class="in"><ul class="ap-l">' + li + '</ul>' +
+    '<p class="expl">' + pie + info("aprox") + '</p></div></details>';
+}
+
+/* lo que hiciste la última vez en esa misma serie, sacado de tus registros */
+function anterior(e, j){
+  var R = state.registros || [];
+  for(var k = R.length - 1; k >= 0; k--){
+    var r = R[k];
+    if(r.ex === e.n && r.s === j + 1 && r.kg > 0) return {kg:r.kg, reps:r.reps};
+  }
+  return null;
+}
+
+/* las dos fotos del ejercicio alternando, como un vídeo corto */
+function loopHTML(e, texto){
+  var ft = fotoDe(e);
+  return '<div class="loopw">' + (ft
+    ? '<button class="loop" type="button" data-loop="1" style="aspect-ratio:500/' + altoFoto(ft) + '" ' +
+      'aria-label="Ampliar la foto de ' + esc(nombreEj(e)) + '"><img src="img/' + ft + '.webp" ' +
+      'loading="lazy" decoding="async" alt="Inicio y final de ' + esc(nombreEj(e)) + '"></button>'
+    : '') + '<div class="loop-t">' + texto + '</div></div>';
 }
 
 function rmTeorico(k){
@@ -1455,10 +1432,19 @@ function nf2(n){
 function mmss(s){ var m = Math.floor(Math.abs(s) / 60), r = Math.abs(s) % 60;
   return (s < 0 ? "-" : "") + m + ":" + (r < 10 ? "0" : "") + r; }
 
+/* oscuro de serie, para el gimnasio; claro o el del sistema, en Ajustes */
+function aplicaTema(){
+  var t = state.tema || "oscuro";
+  document.documentElement.setAttribute("data-theme",
+    t === "claro" ? "light" : (t === "sistema" ? "system" : "dark"));
+  var m = document.querySelector('meta[name="theme-color"]');
+  if(m) m.setAttribute("content", t === "claro" ? "#F3F1EC" : "#101214");
+}
 function render(){
+  aplicaTema();
   var p = state.pos, f = fase(p.f);
   document.getElementById("where").textContent =
-    f.n.replace("Bloque de fuerza", "Fuerza") + " sem " + (p.s + 1) + "/" + f.sem;
+    f.n.replace("Bloque de fuerza", "Fuerza") + ", semana " + (p.s + 1) + " de " + f.sem;
   var hechas = sesionesHechas(p), tot = totalSesiones();
   var b = document.getElementById("bar");
   b.innerHTML = '<i class="' + (esDescarga(p) ? "deload" : "") + '" style="width:' +
@@ -1466,10 +1452,11 @@ function render(){
 
   modoBienvenida(!state.visto);
   if(!state.visto){ vBienvenida(); return; }
+  /* las pestañas de la versión 1 viven ahora dentro de otras */
+  if(tab === "previo") tab = "hoy";
+  if(tab === "cal" || tab === "plan") tab = "prog";
   if(tab === "hoy") vHoy();
-  else if(tab === "previo") vPrevio();
-  else if(tab === "cal") vCal();
-  else if(tab === "plan") vPlan();
+  else if(tab === "prog") vProgreso();
   else if(tab === "com") vCom();
   else if(tab === "rm") vRM();
   else vAjustes();
@@ -1500,8 +1487,7 @@ function primerosPasos(){
     '<div class="pasos">' +
     paso(1, tieneMarcas, true,
          "Mide la fuerza que tienes hoy",
-         "Haz un test de cada básico y apunta el peso máximo que mueves una vez. " +
-         "Todo el plan sale de esos seis números. Dentro tienes el paso a paso.",
+         "Apunta el peso máximo que mueves una vez en cada básico. Todo el plan sale de ahí.",
          "Ir a mis maximales", "rm") +
     paso(2, tieneDias, tieneMarcas,
          "Elige tus tres días",
@@ -1509,7 +1495,7 @@ function primerosPasos(){
          "Elegir mis días", "aj") +
     paso(3, haEntrenado, tieneMarcas && tieneDias,
          "Déjate llevar",
-         "Ya está. Abre la app el día que toque y haz lo que te diga, ejercicio por ejercicio.",
+         "Abre la app el día que toque y sigue lo que diga.",
          "", "") +
     '</div></div></div>';
 }
@@ -1626,8 +1612,7 @@ function bloqueJS(p, f, lista, ini, fin, act){
   }
 
   h += '<div class="ex-body"' + (done || !abierto ? " hidden" : "") + '>';
-  h += '<p class="note">Una serie de cada uno, seguidas. Cambias cada 30 segundos.' +
-    info("jumpset") + '</p>';
+  h += '<p class="expl">Una serie de cada uno, cambiando cada 30 segundos.' + info("jumpset") + '</p>';
 
   for(var v = 0; v < vueltas; v++){
     var completa = ejs.every(function(q){
@@ -1663,11 +1648,8 @@ function bloqueJS(p, f, lista, ini, fin, act){
   });
 
   ejs.forEach(function(q){
-    var ft = fotoDe(q.e);
-    if(!ft) return;
-    h += '<figure class="demo"><img src="img/' + ft + '.webp" width="1000" height="' + altoFoto(ft) + '" ' +
-      'loading="lazy" decoding="async" alt="Ejecución de ' + esc(nombreEj(q.e)) + '">' +
-      '<figcaption>' + esc(nombreEj(q.e)) + '</figcaption></figure>';
+    if(!fotoDe(q.e)) return;
+    h += loopHTML(q.e, '<b>' + esc(nombreEj(q.e)) + '</b>');
   });
 
   h += '</div>';
@@ -1679,45 +1661,68 @@ function bloqueJS(p, f, lista, ini, fin, act){
   return h + '</div>';
 }
 
+/* ---------- movilidad antes de empezar: primer paso del entreno ---------- */
+function previoHTML(empezado){
+  var pv = sesion.prev || {}, n = 0;
+  PREVIO.forEach(function(_, k){ if(pv[k]) n++; });
+  var todo = n === PREVIO.length || sesion.prevNo;
+  var h = '<div class="sect"><details class="fold cardf"' + (todo || empezado ? "" : " open") + '>' +
+    '<summary>Movilidad, 5 min<span class="chip' + (todo ? " ok" : "") + '" style="margin-left:6px">' +
+    (sesion.prevNo && n < PREVIO.length ? "saltada" : n + " de " + PREVIO.length) + '</span></summary>' +
+    '<div class="in"><div class="previo">';
+  PREVIO.forEach(function(e, k){
+    h += '<div class="pv' + (pv[k] ? " on" : "") + '">' +
+      '<button class="pv-ck" type="button" data-pv="' + k + '" aria-pressed="' + !!pv[k] + '" ' +
+      'aria-label="Hecho: ' + esc(e.n) + '"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button>' +
+      '<div class="pv-t">' + esc(e.n) + '<small>' + esc(e.d) + '</small></div>' +
+      '<details><summary>Cómo se hace</summary><p>' + esc(e.c) + '</p><p>' + esc(e.q) + '</p></details></div>';
+  });
+  h += '</div>' + (todo ? '' : '<button class="btn sm ghost" type="button" data-prevno="1" style="margin-top:6px">Hoy me lo salto</button>') +
+    '</div></details></div>';
+  return h;
+}
+function textoSiguiente(){
+  var s = state.siguiente;
+  if(!s || !s.iso || s.iso < iso()) return "";
+  return (s.iso === iso() ? "hoy" : NOMBREDIA[diaDe(deIso(s.iso))]) + (s.hora ? " a las " + s.hora : "");
+}
+
 function vHoy(){
   var p = state.pos, f = fase(p.f), L = letra(f, p.e), lista = RUT[f.rut][L];
   var clave = p.f + "-" + p.s + "-" + p.e;
   if(sesion.k !== clave || !sesion.sets){ sesion = {k:clave, sets:{}}; saveSesion(); }
+  var nh = hechosSesion(p, lista), toca = hoyTocaEntrenar(), sigT = textoSiguiente();
+  var empezado = nh > 0 || Object.keys(sesion.log || {}).length > 0 || Object.keys(sesion.sets || {}).length > 0;
 
   var h = bannerInstalar() + primerosPasos() + avisos(p);
   h += '<div class="sect"><div class="today">' +
-       '<div class="letter' + (f.tipo === "fuerza" ? " f" : "") + '">' + L + '</div><div>' +
-       '<h2>Entreno ' + L + '</h2><div class="sub">' + esc(f.n) + ' semana ' + (p.s + 1) +
-       ' de ' + f.sem + ', sesión ' + (p.e + 1) + ' de ' + porSemana(f) + '</div>' +
-       '<div class="prog"><div class="prog-t"><i style="width:' +
-       Math.round(hechosSesion(p, lista) / lista.length * 100) + '%"></i></div>' +
-       '<span>' + hechosSesion(p, lista) + ' de ' + lista.length + '</span></div>' +
-       '<div class="dura"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="8"/>' +
-       '<path d="M12 9v4l2.5 2.5M9 2h6"/></svg>~' + enHoras(duracion(p, lista)) +
-       '</div>' +
-       '<div class="toca' + (hoyTocaEntrenar() ? "" : " no") + '"><i></i>' +
-       (hoyTocaEntrenar() ? '<span><b>Hoy toca.</b> Es uno de tus días.</span>'
-        : '<span><b>Hoy descansas.</b> Te toca el <b>' + NOMBREDIA[proximoDia()] + '</b>.</span>') + '</div>' +
-       '</div></div>';
-
+    '<span class="sub">' + esc(f.n) + ', semana ' + (p.s + 1) + ' de ' + f.sem +
+    ', sesión ' + (p.e + 1) + ' de ' + porSemana(f) + '</span>' +
+    '<h2>Entreno ' + L + '</h2>' +
+    '<div class="chips"><span class="chip">~' + enHoras(duracion(p, lista)) + '</span>' +
+    '<span class="chip">' + lista.length + ' ejercicios</span>' +
+    '<span class="chip' + (toca ? "" : " no") + '">' +
+    (toca ? "Hoy toca" : "Hoy descansas, toca el " + NOMBREDIA[proximoDia()]) + '</span>' +
+    (sigT ? '<span class="chip">Siguiente: ' + esc(sigT) + '</span>' : '') + '</div>' +
+    '<div class="prog"><div class="prog-t"><i style="width:' + Math.round(nh / lista.length * 100) + '%"></i></div>' +
+    '<span>' + nh + ' de ' + lista.length + '</span></div>';
   if(f.tipo === "fuerza"){
     var w = FUERZA_SEM[Math.min(p.s, 6)];
-    h += '<div class="banner" style="margin-top:10px"><b>' + w.int + '</b><span>Coeficiente ' +
-      nf(w.coef) + ', ' + w.reps + ' reps por serie. Calienta subiendo de 5 en 5 kg.</span></div>';
+    h += '<div class="banner"><b>' + w.int + '</b><span>Coeficiente ' + nf(w.coef) + ', ' + w.reps +
+      ' reps por serie. Calienta de 5 en 5 kg.</span></div>';
   }
   if(state.ejemplo){
-    h += '<div class="banner" style="margin-top:10px"><b>Ejemplo</b><span>Estos pesos no son tuyos. ' +
-      'Mete tus marcas y se recalcula todo.</span></div>';
+    h += '<div class="banner"><b>Ejemplo</b><span>Estos pesos no son tuyos: mete tus marcas.</span></div>';
   }
-  h += '</div>';
+  h += '</div></div>';
+
+  h += previoHTML(empezado);
 
   var act = activo(p, lista);
   h += '<div class="sect"><div class="eyebrow">La sesión</div>';
 
   for(var i = 0; i < lista.length; i++){
     var e = lista[i];
-
-    /* los jump set seguidos se pintan juntos: una vuelta tras otra */
     if(e.js){
       var fin = i;
       while(fin + 1 < lista.length && lista[fin + 1].js) fin++;
@@ -1729,108 +1734,81 @@ function vHoy(){
     (function(e, i){
     var c = cargas(p, e), sets = sesion.sets[i] || [];
     var done = exHecho(p, e, i), lock = bloqueado(p, lista, i);
-    var tag = e.t === "b" ? '<span class="tag b">básico</span>' :
-             (e.js ? '<span class="tag js">jump set</span>' : '<span class="tag">complem</span>');
+    var tag = e.t === "b" ? '<span class="tag b">básico</span>' : '<span class="tag">complem.</span>';
     var kg = c[0].kg, manual = state.pesos[nombreEj(e)];
     var carga = kg ? nf(kg) + (c[c.length - 1].kg !== kg ? " a " + nf(c[c.length - 1].kg) : "") + " kg"
                    : (manual ? nf(manual) + " kg" : "a tu peso");
     if(e.bw && kg) carga = "+" + nf(Math.max(0, kg - pesoCorp())) + " kg";
+    var esquema = esBasico(e) ? c.length + " x " + c.map(function(x){ return x.reps; }).join("-")
+                              : c.length + " al fallo";
     h += '<div class="ex' + (done ? " done" : "") + (lock ? " lock" : "") + '" data-ex="' + i + '">' +
       '<button class="ex-head"' + (lock ? " disabled" : ' data-open="' + i + '"') + '>' + tag +
-      '<span class="ex-name">' + esc(nombreEj(e)) +
-      (esAlt(e) ? ' <i class="altmark">alt</i>' : '') + '</span>' +
-      '<span class="ex-load"><b>' + esc(carga) + '</b><small>' + c.length + ' x ' +
-      c.map(function(x){ return x.reps; }).join("-") + '</small></span></button>';
+      '<span class="ex-name">' + esc(nombreEj(e)) + (esAlt(e) ? ' <i class="altmark">alt</i>' : '') + '</span>' +
+      (lock ? '<svg class="exico" viewBox="0 0 24 24" aria-label="Se abre al terminar el anterior"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>' : '') +
+      '<span class="ex-load"><b>' + esc(carga) + '</b><small>' + esquema + '</small></span></button>';
+    if(lock){ h += '</div>'; return; }
 
-    if(lock){
-      /* la foto se ve igual, para saber de antemano qué máquina hace falta */
-      if(fotoDe(e)){
-        h += '<div class="ex-body" style="padding-top:0"><figure class="demo previa">' +
-          '<img src="img/' + fotoDe(e) + '.webp" width="1000" height="' + altoFoto(fotoDe(e)) + '" loading="lazy" ' +
-          'decoding="async" alt="Ejecución de ' + esc(nombreEj(e)) + '"></figure></div>';
-      }
-      h += '<div class="lockmsg"><svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="10" rx="2"/>' +
-        '<path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>' +
-        'Termina el anterior y se abre.</div></div>';
-      return;
-    }
-
-    h += '<div class="ex-body"' + (done || i !== act ? " hidden" : "") + '>';
-
-    if(fotoDe(e)){
-      /* carga diferida: no se descarga hasta que abres el ejercicio */
-      h += '<figure class="demo"><img src="img/' + fotoDe(e) + '.webp" width="1000" height="' + altoFoto(fotoDe(e)) + '" ' +
-        'loading="lazy" decoding="async" alt="Ejecución de ' + esc(nombreEj(e)) + '">' +
-        '<figcaption>Inicio y final del movimiento</figcaption></figure>';
-    }else if(esAlt(e)){
-      h += '<p class="note">Sin foto. Si dudas, míralo en vídeo antes de cargar peso.</p>';
-    }
+    /* con rest pause pendiente el ejercicio sigue abierto: ahí se apuntan esas reps */
+    var rpPend = !!(f.rp && esBasico(e) && done && !(apunte(i, c.length - 1) || {}).rp2);
+    h += '<div class="ex-body"' + ((done && !rpPend) || (!done && i !== act) ? " hidden" : "") + '>';
 
     if(esBasico(e)){
-      h += '<p class="note">Apunta cada serie. Hasta que no lo hagas no se abre el siguiente.' +
-        info("basico") + '</p>';
+      h += loopHTML(e, '<b>' + c.length + ' series</b> de ' + c.map(function(x){ return x.reps; }).join(", ") +
+        '<br>Descanso ' + mmss(descansoDe(p, e)) + info("basico"));
       h += aproxHTML(e, c);
+      h += '<div class="sgrid"><div class="shead"><span></span><span>Anterior</span><span>kg</span><span>reps</span><span></span></div>';
+      var libre = -1;
       c.forEach(function(x, j){
         var teo = teoDe(e, x.kg);
         var r = apunte(i, j) || {}, ok = setHecho(e, i, j, teo, x.reps);
-        var val = kgApuntado(i, j, teo), vrep = repsApuntadas(i, j, x.reps);
-        h += '<div class="srow' + (ok ? " ok" : "") + '">' +
-          '<div class="srow-h"><b>Serie ' + (j + 1) + '</b>' +
-          '<span class="objetivo"><b>' + x.reps + '</b> reps</span>' +
-          '<span class="teo">teórico <b>' + (teo ? (e.bw ? "+" : "") + nf(teo) : "libre") + '</b> kg</span></div>';
-        var pl = discos((!e.bw && (apunte(i, j) || {}).kg) || x.kg, e.bw);
-        if(pl){
-          h += '<div class="plates"><span>Barra ' + nf(BARRA) + ' kg y por lado</span>';
-          pl.forEach(function(d){
-            h += '<span class="plate' + (d === 5 ? " l" : "") + '" style="background:var(' + PCOL[d] + ')">' +
-              nf2(d) + '</span>';
-          });
-          h += '</div>';
-        }else if(x.kg && x.kg <= BARRA && !e.bw){
-          h += '<div class="plates"><span>Solo la barra</span></div>';
-        }
-        h += '<div class="campos">' +
-          '<label class="campo-s"><span>Peso</span><div class="inw">' +
+        if(!ok && libre < 0) libre = j;
+        var val = kgApuntado(i, j, teo), vrep = repsApuntadas(i, j, x.reps), an = anterior(e, j);
+        h += '<div class="srow' + (ok ? " ok" : (j === libre ? " act" : "")) + '">' +
+          '<span class="sn">' + (j + 1) + '</span>' +
+          (an ? '<button class="prev" type="button" data-prev="' + i + ',' + j + '" data-kg="' + an.kg + '" data-reps="' + an.reps + '" ' +
+                'aria-label="Copiar lo de la última vez">' + nf(an.kg) + ' x ' + an.reps + '<small>toca y copia</small></button>'
+              : '<span class="prev"><small>sin datos</small></span>') +
           '<input inputmode="decimal" data-real="' + i + ',' + j + '" data-teo="' + (teo || 0) + '" value="' +
-          (val ? nf(val) : "") + '" aria-label="Peso real de la serie ' + (j + 1) + '">' +
-          '<span class="u">kg</span></div></label>' +
-          '<label class="campo-s"><span>Reps</span><div class="inw">' +
-          '<input inputmode="numeric" data-reps="' + i + ',' + j + '" value="' +
-          (vrep ? vrep : "") + '" aria-label="Repeticiones reales de la serie ' + (j + 1) + '">' +
-          '<span class="u">reps</span></div></label>' +
-          '<div class="campo-s ancho"><span>Recámara' + info("recamara") + '</span>' +
-          '<div class="rirs' + (r.rir === undefined || r.rir === "" ? ' falta' : '') + '" role="group"' +
-          ' aria-label="Repeticiones en recámara de la serie ' + (j + 1) + '">' +
-          [["0","al fallo"],["1",""],["2",""],["3",""],["4",""],["5","o más"]].map(function(o){
-            return '<button type="button" data-rirb="' + i + ',' + j + '" data-v="' + o[0] + '" aria-pressed="' +
-              (String(r.rir) === o[0]) + '">' + o[0] + (o[1] ? '<small>' + o[1] + '</small>' : '') + '</button>';
-          }).join("") + '</div></div>' +
-          '<div class="tecs" role="group" aria-label="Técnica de la serie ' + (j + 1) + '">' +
-          [["A","limpia"],["B","alguna rota"],["C","rota"]].map(function(t){
-            return '<button data-tec="' + i + ',' + j + '" data-v="' + t[0] + '" aria-pressed="' +
-              (r.tec === t[0]) + '">' + t[0] + '<small>' + t[1] + '</small></button>';
-          }).join("") + '</div>' +
-          '<p class="avisokg" data-avisokg="' + i + ',' + j + '" hidden></p>' +
-          '</div>';
-        h += '</div>';
+          (val ? nf(val) : "") + '" aria-label="Peso de la serie ' + (j + 1) + '">' +
+          '<input inputmode="numeric" data-reps="' + i + ',' + j + '" value="' + (vrep ? vrep : "") + '" ' +
+          'aria-label="Repeticiones de la serie ' + (j + 1) + '">' +
+          '<button class="ck" type="button" data-ck="' + i + ',' + j + '" aria-label="' + (ok ? "Cambiar" : "Apuntar") +
+          ' la serie ' + (j + 1) + '"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button>';
+        h += '<div class="sx">';
+        if(ok){
+          h += '<span class="chip ok">Recámara ' + esc(String(r.rir)) + '</span><span class="chip ok">Técnica ' + esc(r.tec) + '</span>';
+        }else{
+          h += '<span>Objetivo <b>' + x.reps + '</b> reps, teórico <b>' + (teo ? (e.bw ? "+" : "") + nf(teo) : "libre") + '</b> kg</span>';
+          if(j === libre){
+            var pl = discos((!e.bw && r.kg) || x.kg, e.bw);
+            if(pl){
+              h += '<span class="plates">Barra y por lado:';
+              pl.forEach(function(d){
+                h += '<span class="plate' + (d === 5 ? " l" : "") + '" style="background:var(' + PCOL[d] + ')">' + nf2(d) + '</span>';
+              });
+              h += '</span>';
+            }
+          }
+        }
+        h += '</div><p class="avisokg" data-avisokg="' + i + ',' + j + '" hidden></p></div>';
         if(f.rp && j === c.length - 1){
           var kRp = kgApuntado(i, j, teo);
           h += '<div class="srow extra' + (r.rp2 ? " ok" : "") + '">' +
-            '<div class="srow-h"><b>Rest pause</b>' +
-            '<span class="objetivo"><b>15</b> s y al fallo</span>' +
-            '<span class="teo">' + (kRp ? 'mismo peso <b>' + (e.bw ? "+" : "") + nf(kRp) + '</b> kg' : 'mismo peso') +
-            '</span></div>' +
-            '<p class="expl">Al cerrar la serie ' + (j + 1) + ' arranca sola la cuenta de 15 segundos. ' +
-            'Al cero, sigue hasta el fallo.' + info("restpause") + '</p>' +
-            '<div class="rpz">' +
-            '<button class="btn sm" type="button" data-rpt="1">Contar 15 segundos</button>' +
-            '<label class="campo-s"><span>Reps tras la pausa</span><div class="inw">' +
-            '<input inputmode="numeric" data-rp2="' + i + ',' + j + '" value="' + (r.rp2 || "") + '" ' +
+            '<span class="sn">RP</span><span class="prev">15 s y<br>al fallo</span>' +
+            '<span class="prev" style="text-align:center; font-weight:800; color:var(--ink)">' + (kRp ? (e.bw ? "+" : "") + nf(kRp) : "") + '</span>' +
+            '<input inputmode="numeric" data-rp2="' + i + ',' + j + '" value="' + (r.rp2 || "") + '" placeholder="reps" ' +
             'aria-label="Repeticiones tras la pausa de 15 segundos">' +
-            '<span class="u">reps</span></div></label></div></div>';
+            '<button class="rpbtn" type="button" data-rpt="1" aria-label="Contar 15 segundos">15 s</button>' +
+            '<p class="sx expl" style="margin:0">Arranca sola al apuntar la serie ' + (j + 1) +
+            '. Al cero, sigue hasta el fallo.' + info("restpause") + '</p></div>';
         }
       });
+      h += '</div>';
     }else{
+      var txt = (e.js ? "Alterna cada 30 segundos." : '<b>Al fallo</b>' + info("fallo") +
+        '<br>Descanso ' + mmss(descansoDe(p, e)) + ' entre series');
+      if(!fotoDe(e) && esAlt(e)) txt += '<br>Sin foto: míralo en vídeo antes de cargar.';
+      h += loopHTML(e, txt);
       h += '<div class="sets">';
       c.forEach(function(x, j){
         h += '<button class="set' + (sets[j] ? " on" : "") + '" data-set="' + i + ',' + j + '">' +
@@ -1845,44 +1823,32 @@ function vHoy(){
       }
       h += '</div>';
       if(hayDrop){
-        h += '<p class="expl">Drop: al fallar la última serie, baja a <b data-dropn="' + esc(nombreEj(e)) + '">' +
-          (kDrop ? nf(kDrop) + ' kg' : 'un 15% menos') + '</b> y sigue sin descanso hasta el fallo.' +
-          info("drop") + '</p>';
-        if(!kDrop) h += '<p class="expl">Apunta abajo tu peso y te calculo el del drop.</p>';
+        h += '<p class="expl">Drop: al fallar la última, baja a <b data-dropn="' + esc(nombreEj(e)) + '">' +
+          (kDrop ? nf(kDrop) + ' kg' : 'un 15% menos') + '</b> y sigue sin descanso.' + info("drop") + '</p>';
       }
       var pl2 = discos(c[0].kg, e.bw);
       if(pl2){
-        h += '<div class="plates"><span>Barra ' + nf(BARRA) + ' kg y por lado</span>';
+        h += '<div class="plates" style="margin-top:10px">Barra y por lado:';
         pl2.forEach(function(d){
-          h += '<span class="plate' + (d === 5 ? " l" : "") + '" style="background:var(' + PCOL[d] + ')">' +
-            nf2(d) + '</span>';
+          h += '<span class="plate' + (d === 5 ? " l" : "") + '" style="background:var(' + PCOL[d] + ')">' + nf2(d) + '</span>';
         });
         h += '</div>';
       }
       if(!e.rm){
-        h += '<div class="wfield"><label for="w' + i + '">Peso</label>' +
-          '<input id="w' + i + '" class="mono" inputmode="decimal" data-peso="' + esc(nombreEj(e)) +
+        h += '<div class="wfield"><label for="w' + i + '">Tu peso</label>' +
+          '<input id="w' + i + '" inputmode="decimal" data-peso="' + esc(nombreEj(e)) +
           '" value="' + (manual ? nf(manual) : "") + '" placeholder="kg"><span>kg</span></div>';
       }
       h += panelAlt(e, i);
     }
-
-    h += '<p class="note">' + (e.js ? "Alterna cada 30 segundos."
-        : e.t === "b" ? "Descanso " + mmss(descansoDe(p, e)) + " entre series"
-        : "Al fallo" + info("fallo") + ". " + mmss(descansoDe(p, e)) + " de descanso entre series") +
-      (f.rp && e.t === "b" ? ", última serie en rest pause" + info("restpause") : "") +
-      (f.dr && !e.js && e.t !== "b" ? ", la última en drop" + info("drop") : "") + '</p>';
     h += '</div>';
 
     if(done && esBasico(e)){
-      h += '<div class="resumen" style="padding:0 13px 12px">';
+      h += '<div class="resumen" style="padding:0 14px 12px">';
       c.forEach(function(x, j){
-        var r = apunte(i, j) || {};
-        var tj = teoDe(e, x.kg);
-        h += '<span class="pill">' + nf(kgApuntado(i, j, tj)) + ' kg, ' +
-          repsApuntadas(i, j, x.reps) + ' reps' +
-          (r.rp2 ? " y " + esc(String(r.rp2)) + " tras la pausa" : "") + ', recámara ' + esc(String(r.rir)) +
-          ', ' + esc(r.tec || "") + '</span>';
+        var r = apunte(i, j) || {}, tj = teoDe(e, x.kg);
+        h += '<span class="pill">' + nf(kgApuntado(i, j, tj)) + ' x ' + repsApuntadas(i, j, x.reps) +
+          (r.rp2 ? " + " + esc(String(r.rp2)) : "") + ', ' + esc(r.tec || "") + '</span>';
       });
       h += '</div>';
     }
@@ -1891,7 +1857,7 @@ function vHoy(){
   }
   h += '</div>';
 
-  var quedan = lista.length - hechosSesion(p, lista);
+  var quedan = lista.length - nh;
   h += '<div class="sect stack">' +
     '<button class="btn primary" id="cerrar">' +
     (quedan ? "Terminar el entreno, quedan " + quedan : "Terminar el entreno y avanzar") + '</button>' +
@@ -1899,6 +1865,56 @@ function vHoy(){
     '<button class="btn sm ghost" style="flex:1" id="atras">Sesión anterior</button></div></div>';
 
   view.innerHTML = h;
+}
+
+/* hoja inferior al tocar el check: recámara y técnica, a un toque cada una */
+function abreHoja(i, j){
+  var p = state.pos, f = fase(p.f), e = RUT[f.rut][letra(f, p.e)][i], c = cargas(p, e), x = c[j];
+  if(!x) return;
+  var teo = teoDe(e, x.kg), lg = logEx(i);
+  lg[j] = lg[j] || {};
+  var r = lg[j], yaHecha = setHecho(e, i, j, teo, x.reps);
+  var sel = {rir: r.rir === undefined || r.rir === null ? "" : String(r.rir), tec: r.tec || "A"};
+  var el = document.createElement("div");
+  el.className = "hoja";
+  function pinta(){
+    var listo = sel.rir !== "" && !!sel.tec;
+    el.innerHTML = '<div class="hoja-c" role="dialog" aria-modal="true" aria-label="Apuntar la serie">' +
+      '<h3>Serie ' + (j + 1) + ': ' + (e.bw ? "+" : "") + nf(kgApuntado(i, j, teo)) + ' kg x ' + repsApuntadas(i, j, x.reps) + '</h3>' +
+      '<div class="hl">¿Cuántas te sobraban?' + info("recamara") + '</div>' +
+      '<div class="rirs" role="group" aria-label="Recámara">' +
+      [["0","al fallo"],["1",""],["2",""],["3",""],["4",""],["5","o más"]].map(function(o){
+        return '<button type="button" data-hr="' + o[0] + '" aria-pressed="' + (sel.rir === o[0]) + '">' + o[0] +
+          (o[1] ? '<small>' + o[1] + '</small>' : '') + '</button>';
+      }).join("") + '</div>' +
+      '<div class="hl">¿Cómo ha salido?' + info("tecnica") + '</div>' +
+      '<div class="tecs" role="group" aria-label="Técnica">' +
+      [["A","limpia"],["B","alguna rota"],["C","rota"]].map(function(t){
+        return '<button type="button" data-ht="' + t[0] + '" aria-pressed="' + (sel.tec === t[0]) + '">' + t[0] +
+          '<small>' + t[1] + '</small></button>';
+      }).join("") + '</div>' +
+      '<div class="stack"><button class="btn primary" type="button" data-hok="1"' + (listo ? "" : " disabled") + '>Apuntar la serie</button>' +
+      (yaHecha ? '<button class="btn ghost" type="button" data-hquita="1">Desmarcar</button>'
+               : '<button class="btn ghost" type="button" data-hno="1">Cancelar</button>') + '</div></div>';
+  }
+  function cierra(){ el.remove(); document.removeEventListener("keydown", tecla); }
+  function tecla(ev){ if(ev.key === "Escape") cierra(); }
+  el.addEventListener("click", function(ev){
+    var b;
+    if(ev.target === el){ cierra(); return; }
+    if((b = ev.target.closest("[data-hr]"))){ sel.rir = b.dataset.hr; pinta(); return; }
+    if((b = ev.target.closest("[data-ht]"))){ sel.tec = b.dataset.ht; pinta(); return; }
+    if(ev.target.closest("[data-hok]")){
+      r.rir = sel.rir; r.tec = sel.tec; saveSesion(); cierra();
+      if(setHecho(e, i, j, teo, x.reps)) trasSerie(p, e, i, j);
+      render(); return;
+    }
+    if(ev.target.closest("[data-hquita]")){ r.rir = ""; r.tec = ""; saveSesion(); cierra(); render(); return; }
+    if(ev.target.closest("[data-hno]")) cierra();
+  });
+  pinta();
+  document.body.appendChild(el);
+  document.addEventListener("keydown", tecla);
 }
 
 function vPlan(){
@@ -1945,6 +1961,21 @@ function vPlan(){
     '<div><b>En fuerza aprietas, en volumen no</b><p class="note" style="margin:2px 0 0">' +
     'En los primeros ciclos paras antes de fallar. En el bloque de fuerza vas al límite.</p></div>' +
     '</div></div>';
+  return h;
+}
+
+function vProgreso(){
+  var p = state.pos, f = fase(p.f), sig = fase(p.f + 1 < FASES.length ? p.f + 1 : 0);
+  var h = '<div class="sect"><div class="card">' +
+    '<div class="camino-t"><span>' + esc(f.n) + ' de ' + FASES.length + ' bloques</span>' +
+    '<span>semana ' + (p.s + 1) + ' de ' + f.sem + '</span></div>' +
+    '<div class="camino" aria-hidden="true">' + FASES.map(function(x, k){
+      return '<i class="' + (k < p.f ? "past" : (k === p.f ? "now" : "")) + '"></i>';
+    }).join("") + '</div>' +
+    '<p class="expl" style="margin:0">Después: ' + esc(sig.n.toLowerCase()) + ', ' + esc(sig.nota) + '.</p></div></div>';
+  h += vCal();
+  h += '<div class="sect"><details class="fold cardf"><summary>Los ' + FASES.length + ' bloques del plan</summary>' +
+    '<div class="in">' + vPlan() + '</div></details></div>';
   view.innerHTML = h;
 }
 
@@ -1977,8 +2008,7 @@ function evoHTML(){
   var m = state.marcas || [];
   var h = '<div class="sect"><div class="eyebrow">Evolución por ciclo</div><div class="card">';
   if(!m.length){
-    return h + '<p class="note" style="margin:0">Todavía no hay marcas guardadas. Cada vez que cambies ' +
-      'un maximal o cierres un ciclo se guarda una foto, con su fecha y su ciclo.</p></div></div>';
+    return h + '<p class="expl" style="margin:0">Aún no hay marcas guardadas: se guardan al cambiar un maximal o cerrar un ciclo.</p></div></div>';
   }
   var alguno = false;
   LIFTS.forEach(function(l){
@@ -2007,24 +2037,24 @@ function evoHTML(){
 }
 
 function convHTML(pk, rp){
-  if(!(pk > 0) || !(rp > 0) || rp > 20) return '<p class="note" style="margin:0">Mete un peso y entre 1 y 20 repeticiones.</p>';
+  if(!(pk > 0) || !(rp > 0) || rp > 20) return '<p class="expl" style="margin:0">Mete un peso y de 1 a 20 repeticiones.</p>';
   var rm = rmDesde(pk, rp), h = "";
-  h += '<div class="conv-rm"><span>1RM</span><b class="mono">' + nf(redondea(rm)) + ' kg</b></div>';
-  h += '<div class="scroll"><table><thead><tr><th>Objetivo</th><th class="n">Peso</th>' +
+  h += '<div class="conv-rm"><b>' + nf(redondea(rm)) + '</b><span>kg de marca</span></div>' +
+    '<p class="expl" style="margin:0">Cada repetición vale un 3%, fórmula de Maurice y Rydin.</p>';
+  h += '<details class="fold"><summary>Tabla por repeticiones</summary><div class="in scroll"><table><thead><tr><th>Objetivo</th><th class="n">Peso</th>' +
        '<th class="n">Factor</th></tr></thead><tbody>';
   [1,2,3,4,5,6,8,10,12,15].forEach(function(o){
     var f = mrFactor(rp, o);
-    h += '<tr' + (o === rp ? ' style="color:var(--accent)"' : '') + '><td>' + o + ' rep' +
+    h += '<tr' + (o === rp ? ' style="color:var(--accent); font-weight:800"' : '') + '><td>' + o + ' rep' +
       (o > 1 ? "s" : "") + '</td><td class="n">' + nf(redondea(pk * f)) + ' kg</td>' +
       '<td class="n">x' + f.toFixed(2).replace(".", ",") + '</td></tr>';
   });
-  h += '</tbody></table></div>';
-  h += '<div class="usar"><span>Guardar como 1RM de</span>';
+  h += '</tbody></table></div></details>';
+  h += '<details class="fold"><summary>Guardarlo como marca</summary><div class="in"><div class="usar" style="margin:0">';
   LIFTS.forEach(function(l){
-    h += '<button class="btn sm" data-usar="' + l.k + '" data-kg="' + redondea(rm) + '">' +
-      esc(l.n) + '</button>';
+    h += '<button class="btn sm" data-usar="' + l.k + '" data-kg="' + redondea(rm) + '">' + esc(l.n) + '</button>';
   });
-  h += '</div>';
+  h += '</div></div></details>';
   return h;
 }
 
@@ -2037,17 +2067,15 @@ function vRM(){
       .replace(/<div class="flag info">[\s\S]*?<\/div><\/div>/g, "");
   }
 
-  h += '<div class="sect"><div class="eyebrow">Maximales</div><div class="card">' +
+  h += '<div class="sect"><div class="eyebrow">Tus maximales' + info("maximal") + '</div><div class="card">' +
     '<div class="rmgrid">' +
-    '<span class="th">Ejercicio</span>' +
-    '<span class="th n">Teórico</span>' +
-    '<span class="th n">Tu marca</span>';
+    '<span class="th">Ejercicio</span><span class="th n">Teórico</span><span class="th n">Tu marca</span>';
   var hayTeo = false;
   LIFTS.forEach(function(l, i){
     var t = rmTeorico(l.k), act = state.rms[l.k] || 0, sp = i ? " sep" : "";
     if(t) hayTeo = true;
     h += '<div class="cel' + sp + ' rm-n">' + esc(l.n) +
-      '<small>' + esc(l.s) + (state.rmsFecha[l.k] ? ", " + esc(state.rmsFecha[l.k]) : "") + '</small></div>';
+      (act ? '<br><span class="chip veces">' + nf2(act / pesoCorp()) + ' veces tu peso</span>' : '') + '</div>';
     h += '<div class="cel' + sp + ' rm-teo">' + (t
       ? '<b>' + nf(t.kg) + '</b>' + (t.kg !== act
           ? '<button class="usar-teo" data-teo="' + l.k + '" data-kg="' + t.kg + '" ' +
@@ -2056,74 +2084,58 @@ function vRM(){
           : '<small>coincide</small>')
       : '<small>aún no</small>') + '</div>';
     h += '<div class="cel' + sp + ' rm-in">' +
-      '<input class="mono" inputmode="decimal" data-rm="' + l.k + '" value="' +
+      '<input inputmode="decimal" data-rm="' + l.k + '" value="' +
       (state.rms[l.k] ? nf(state.rms[l.k]) : "") + '" aria-label="1RM de ' + esc(l.n) + '">' +
       '<span class="u">kg</span></div>';
   });
   h += '</div>';
-  h += '<p class="note">' + (hayTeo
-    ? 'Calculado con lo que has levantado. Toca la diferencia y lo adopto.'
-    : 'Se llena solo cuando apuntes unas cuantas series.') + '</p>';
+  h += '<p class="expl">' + (hayTeo
+    ? 'El teórico sale de tus series del último ciclo. Toca la diferencia y lo adopto.'
+    : 'El teórico se llena solo cuando apuntes unas cuantas series.') + '</p>';
   h += '</div></div>';
 
-  h += '<div class="sect"><div class="eyebrow">De dónde sale</div><div class="card">' +
-    '<p class="note" style="margin:0">Mira lo que has levantado en el último ciclo y calcula tu marca ' +
-    'hacia atrás. No cuenta lo que hiciste con técnica regular o mal.</p>' +
-    '<p class="note">Es un cálculo, no un test. Si te cuadra, tócalo y se guarda.</p></div></div>';
+  h += '<div class="sect"><div class="eyebrow">Calculadora</div><div class="card">' +
+    '<div class="calc">' +
+    '<label class="campo-s"><span>Levantaste</span><div class="inw"><input id="cp" inputmode="decimal" value="100"><span class="u">kg</span></div></label>' +
+    '<label class="campo-s"><span>Repeticiones</span><div class="inw"><input id="cr" inputmode="numeric" value="8"></div></label>' +
+    '</div><div id="conv-out">' + convHTML(100, 8) + '</div></div></div>';
 
   h += evoHTML();
 
-  h += '<div class="sect"><div class="eyebrow">Cómo buscar tu maximal</div><div class="card">' +
-    '<p class="note" style="margin:0 0 12px">Tu maximal' + info("maximal") + ' es el peso máximo que ' +
-    'levantas una sola vez, bien hecho. De ahí sale todo lo demás.</p>' +
-    guia([
-      ["Ve descansado", "Un solo ejercicio por día. Nunca sentadilla y peso muerto el mismo día."],
-      ["Calienta con la tabla de abajo", "Te dice qué peso poner en cada serie."],
-      ["Sube de uno en uno", "Del 90% en adelante, una repetición por intento y 2 minutos de descanso."],
-      ["Empuja rápido", "Aunque la barra suba lenta, tú empuja fuerte."],
-      ["Para a tiempo", "Si se te atasca a mitad, ese es tu tope de hoy. No pruebes otra vez."],
-      ["Ponte seguro", "Pon los pines del rack. En banca sin ayuda, sin cierres en la barra."],
-      ["Apúntala arriba", "Los pesos del plan se recalculan solos."]
-    ]) + '</div></div>';
-
+  var pend = f.test && !state.tests[f.id];
   var rmSel = state.rms.sentadilla || 125;
-  h += '<div class="sect"><div class="eyebrow">Protocolo del test</div><div class="card">' +
-    '<p class="note" style="margin:0 0 8px">Sobre una marca de ' + nf(redondea(rmSel)) +
-    ' kg en sentadilla.</p>' +
+  h += '<div class="sect"><div class="eyebrow">El test</div>';
+  h += '<details class="fold cardf"' + (pend || tocaTest(p) ? " open" : "") + '><summary>Cómo buscar tu maximal</summary><div class="in">' +
+    guia([
+      ["Ve descansado", "Un ejercicio por día. Nunca sentadilla y peso muerto juntos."],
+      ["Calienta con la tabla", "Te dice qué peso poner en cada serie."],
+      ["Sube de uno en uno", "Del 90% en adelante, una repetición y 2 minutos de descanso."],
+      ["Empuja rápido", "Aunque la barra suba lenta, tú empuja fuerte."],
+      ["Para a tiempo", "Si se atasca a mitad, ese es tu tope de hoy."],
+      ["Ponte seguro", "Pines del rack puestos. En banca sin ayuda, sin cierres."],
+      ["Apúntala arriba", "Los pesos del plan se recalculan solos."]
+    ]) + '<p class="expl">Tres veces al año, cuando el plan lo pida. Más a menudo cansa y no dice nada nuevo.</p>' +
+    '</div></details>';
+  h += '<details class="fold cardf" style="margin-top:8px"' + (pend ? " open" : "") + '><summary>Series del test</summary><div class="in">' +
+    '<p class="expl" style="margin:0 0 6px">Sobre ' + nf(redondea(rmSel)) + ' kg en sentadilla. Antes, 10 minutos de cardio suave.</p>' +
     '<div class="scroll"><table><thead><tr><th>Serie</th><th class="n">Peso</th><th class="n">%</th>' +
-    '<th class="n">Reposo</th></tr></thead><tbody>';
+    '<th class="n">Pausa</th></tr></thead><tbody>';
   [[6,0.50,"30 s"],[4,0.65,"45 s"],[2,0.80,"1:00"],[1,0.90,"1:30"],[1,0.93,"1:45"],[1,0.97,"2:00"],[1,1.00,""]]
     .forEach(function(r){
       h += '<tr><td>' + r[0] + ' rep' + (r[0] > 1 ? "s" : "") + '</td><td class="n">' +
         nf(redondea(rmSel * r[1])) + ' kg</td><td class="n">' + Math.round(r[1] * 100) + '%</td>' +
         '<td class="n">' + r[2] + '</td></tr>';
     });
-  h += '</tbody></table></div>' +
-    '<p class="note">Antes, 10 minutos de cardio suave y movilidad.</p>';
-  if(f.test && !state.tests[f.id]){
+  h += '</tbody></table></div></div></details>';
+  if(pend){
     h += '<button class="btn primary" style="margin-top:10px" id="test-ok">Test hecho, seguir con el plan</button>';
   }
-  h += '</div></div>';
+  h += '</div>';
 
-  h += '<div class="sect"><div class="eyebrow">Cada cuánto</div><div class="card">' +
-    '<p class="note" style="margin:0">Tres veces al año, cuando el plan te lo pida. ' +
-    'Medir más a menudo cansa y no dice nada nuevo.</p></div></div>';
-
-  h += '<div class="sect"><div class="eyebrow">Convertidor de pesos</div><div class="card">' +
-    '<p class="note" style="margin:0 0 10px">Cada repetición vale un 3% del peso. ' +
-    'Pon lo que levantaste y te digo tu marca.</p>' +
-    '<div class="row"><div class="wfield" style="margin:0"><label for="cp">Levantaste</label>' +
-    '<input id="cp" class="mono" inputmode="decimal" value="100"><span>kg</span></div>' +
-    '<div class="wfield" style="margin:0"><label for="cr">a</label>' +
-    '<input id="cr" class="mono" inputmode="numeric" value="8"><span>reps</span></div></div>' +
-    '<div id="conv-out">' + convHTML(100, 8) + '</div></div></div>';
-
-  h += '<div class="sect"><div class="eyebrow">Peso por semana del bloque de fuerza</div><div class="card scroll">' +
+  h += '<div class="sect"><details class="fold cardf"><summary>Pesos del bloque de fuerza</summary><div class="in scroll">' +
     '<table><thead><tr><th>Sem</th><th class="n">Coef</th>';
-  var CORTO = {sentadilla:"Sentadilla", banca:"Banca", muerto:"Muerto", militar:"Militar"};
-  ["sentadilla","banca","muerto","militar"].forEach(function(k){
-    h += '<th class="n">' + esc(CORTO[k]) + '</th>';
-  });
+  var CORTO = {sentadilla:"Sentad.", banca:"Banca", muerto:"Muerto", militar:"Militar"};
+  ["sentadilla","banca","muerto","militar"].forEach(function(k){ h += '<th class="n">' + esc(CORTO[k]) + '</th>'; });
   h += '</tr></thead><tbody>';
   FUERZA_SEM.forEach(function(w, i){
     h += '<tr><td>' + (i + 1) + ' <small style="color:var(--ink-3)">' + w.reps + ' rep' +
@@ -2133,7 +2145,7 @@ function vRM(){
     });
     h += '</tr>';
   });
-  h += '</tbody></table></div></div>';
+  h += '</tbody></table></div></details></div>';
   view.innerHTML = h;
 }
 
@@ -2232,21 +2244,21 @@ function delMes(ref){
    Los cuatro ejercicios son los que marca el entrenador de Marcos. */
 var PREVIO = [
   {n:"Rodillo en glúteos y espalda alta",
-   c:"Siéntate sobre el rodillo y pásalo despacio por cada glúteo; luego túmbate y recorre la espalda alta, de media espalda a los hombros.",
+   c:"Siéntate en el rodillo y pásalo por cada glúteo. Luego, tumbado, por la espalda alta.",
    d:"8 a 10 pasadas lentas por zona",
-   q:"Despierta el tejido y quita los puntos duros antes de cargar."},
+   q:"Quita los puntos duros antes de cargar."},
   {n:"Cruce de pierna tumbado",
-   c:"Boca arriba, brazos en cruz. Sube una pierna estirada y llévala al lado contrario hasta acercarla a la mano, sin que el tronco se despegue. Vuelve y cambia.",
+   c:"Boca arriba y en cruz. Lleva una pierna estirada hacia la mano contraria, con la espalda pegada.",
    d:"8 cruces por pierna",
-   q:"Suelta la cadera y la zona lumbar manteniendo el tronco firme, justo lo que piden la sentadilla y el peso muerto."},
+   q:"Suelta cadera y lumbar para la sentadilla y el peso muerto."},
   {n:"Libro abierto con piernas ancladas",
-   c:"Túmbate de lado con las rodillas dobladas y sujetas (vale bloquearlas bajo una barra). Abre el pecho hacia el otro lado buscando apoyar toda la espalda en el suelo, y respira hondo ahí.",
+   c:"De lado, rodillas dobladas y sujetas. Abre el pecho hacia el otro lado y respira hondo.",
    d:"6 respiraciones por lado",
-   q:"Da la rotación de espalda alta que luego piden la banca y el remo, sin que la cadera se mueva."},
+   q:"Da a la espalda alta el giro que piden la banca y el remo."},
   {n:"Molinillo tumbado de lado",
-   c:"De lado, rodillas dobladas y cadera quieta. El brazo de arriba dibuja un círculo grande y pegado al suelo, pasando junto a la oreja, como si barrieras a tu alrededor.",
+   c:"De lado y con la cadera quieta. El brazo de arriba dibuja un círculo grande pegado al suelo.",
    d:"6 círculos por lado",
-   q:"Abre hombro y pecho con control: prepara la postura de todos los presses."}
+   q:"Abre hombro y pecho para todos los presses."}
 ];
 function vPrevio(){
   var h = '<div class="sect"><div class="eyebrow">Antes de cada entreno</div><div class="card">' +
@@ -2345,7 +2357,7 @@ function vCal(){
       esc(s.d) + '</div></div>';
   });
   h += '</div></div>';
-  view.innerHTML = h;
+  return h;
 }
 
 /* ============================ GLOSARIO ============================
@@ -2377,7 +2389,9 @@ var GLOSARIO = {
   fallo:     {t:"Al fallo",
               d:"Sigues hasta que no sale ni una repetición más con buena postura. Las reps que marca la app son orientativas: si salen más, haz más y apúntalas."},
   aprox:     {t:"Calentamiento del básico",
-              d:"Escalones para llegar al peso de trabajo sin sustos: empiezas con la barra sola y en cada escalón subes el peso y bajas las repeticiones. Así activas el gesto sin gastarte. Medio minuto entre escalones. No se apuntan ni cuentan como series. Si es el segundo básico del día y ya vienes caliente, con el último escalón llega."},
+              d:"Escalones hasta el peso de trabajo: más peso y menos repeticiones en cada uno. No se apuntan, y si ya vienes caliente basta con el último."},
+  escudo:    {t:"Escudo",
+              d:"Ganas uno cada 4 semanas cumplidas, hasta 2. Si una semana fallas, se gasta solo y la racha sigue."},
   coef:      {t:"Coeficiente",
               d:"El número por el que se multiplica tu marca para sacar el peso de hoy. Si tu marca es 100 y el coeficiente 0,80, te tocan 80 kg."}
 };
@@ -2518,9 +2532,7 @@ function bannerInstalar(){
   }
   return '<div class="flag info" style="margin-bottom:10px"><div class="ic">+</div><div>' +
     '<h3>Instálala en tu iPhone</h3>' +
-    '<p>Dale al botón de Compartir, el cuadrado con la flecha hacia arriba, baja y elige ' +
-    'Añadir a pantalla de inicio. Queda con su icono, a pantalla completa y funcionando ' +
-    'sin cobertura.</p>' +
+    '<p>Compartir, y luego Añadir a pantalla de inicio. Queda a pantalla completa y sin cobertura funciona.</p>' +
     '<button class="act" data-nobanner="1"><span>Ya está, no me lo enseñes más</span></button></div></div>';
 }
 
@@ -2611,18 +2623,54 @@ function felicita(f, L, nApuntes, cerroFase, extra){
         var l = LOGROS.filter(function(x){ return x.id === id; })[0];
         return l ? '<span class="logropill">' + esc(l.n) + '</span>' : "";
       }).join("") + '</div>' : "") +
-    (nApuntes ? '<p class="note" style="margin:0 0 14px">' + nApuntes +
+    (nApuntes ? '<p class="expl" style="margin:0 0 14px">' + nApuntes +
       ' series apuntadas, ' + (10 + nApuntes + (extra.meta ? 25 : 0)) + ' puntos.</p>' : '') +
-    '<button class="btn primary" id="fel-ok">Seguir</button></div>';
+    sigHTML() +
+    '<button class="btn primary" id="fel-ok">Guardar y seguir</button></div>';
   document.body.appendChild(el);
   try{ if(navigator.vibrate) navigator.vibrate([25, 60, 25]); }catch(e){}
   var ok = el.querySelector("#fel-ok");
   ok.focus();
   function cierra(){ el.remove(); document.removeEventListener("keydown", tecla); }
   function tecla(ev){ if(ev.key === "Escape") cierra(); }
-  ok.addEventListener("click", cierra);
-  el.addEventListener("click", function(ev){ if(ev.target === el) cierra(); });
+  ok.addEventListener("click", function(){
+    var d = el.querySelector("[data-sigd][aria-pressed='true']"), hr = el.querySelector("#sig-hora");
+    if(d){
+      state.siguiente = {iso:d.dataset.sigd, hora:(hr && hr.value) || ""};
+      if(hr && hr.value) state.sigHora = hr.value;
+      save(); render();
+    }
+    cierra();
+  });
+  el.addEventListener("click", function(ev){
+    var b = ev.target.closest("[data-sigd]");
+    if(b){
+      el.querySelectorAll("[data-sigd]").forEach(function(x){
+        var on = x === b; x.classList.toggle("on", on); x.setAttribute("aria-pressed", on);
+      });
+      return;
+    }
+    if(ev.target === el) cierra();
+  });
   document.addEventListener("keydown", tecla);
+}
+
+/* Intención de implementación: decir ahora qué día y a qué hora será el
+   siguiente entreno hace más probable que ocurra. Sale al cerrar la sesión. */
+function sigHTML(){
+  var hoyD = new Date(), elegido = "", botones = "";
+  for(var k = 1; k <= 7; k++){
+    var d = new Date(hoyD.getFullYear(), hoyD.getMonth(), hoyD.getDate() + k), di = iso(d);
+    if(!elegido && diasPlan().indexOf(diaDe(d)) > -1) elegido = di;
+  }
+  if(!elegido) elegido = iso(new Date(hoyD.getFullYear(), hoyD.getMonth(), hoyD.getDate() + 1));
+  for(var j = 1; j <= 7; j++){
+    var d2 = new Date(hoyD.getFullYear(), hoyD.getMonth(), hoyD.getDate() + j), i2 = iso(d2), on = i2 === elegido;
+    botones += '<button type="button" class="dia' + (on ? " on" : "") + '" data-sigd="' + i2 + '" aria-pressed="' + on + '" ' +
+      'aria-label="' + NOMBREDIA[diaDe(d2)] + ' ' + d2.getDate() + '">' + LETRADIA[diaDe(d2)] + '<small>' + d2.getDate() + '</small></button>';
+  }
+  return '<div class="sig"><b>¿Cuándo es el siguiente?</b><div class="dias">' + botones + '</div>' +
+    '<input type="time" id="sig-hora" value="' + esc(state.sigHora || "19:00") + '" aria-label="Hora del siguiente entreno"></div>';
 }
 
 /* Tu etiqueta de Amazon Afiliados. Mientras esté vacía, los botones llevan
@@ -2639,8 +2687,7 @@ function botonCompra(busqueda, texto){
   return '<a class="btn compra" href="' + enlaceCompra(busqueda) + '" target="_blank" rel="noopener sponsored">' +
     '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 7h12l1 13H5zM9 7a3 3 0 0 1 6 0"/></svg>' +
     esc(texto) + '</a>' +
-    (AFILIADO ? '<p class="note" style="margin:6px 0 0; font-size:13px">Enlace de afiliado: ' +
-    'si compras desde aquí, me llevo una pequeña comisión y a ti te cuesta lo mismo.</p>' : "");
+    (AFILIADO ? '<p class="afil">Enlace de afiliado: me llevo una comisión y a ti te cuesta lo mismo.</p>' : "");
 }
 
 /* las ilustraciones, dibujadas aquí para no depender de fotos de nadie */
@@ -2660,78 +2707,62 @@ function dibujoCom(cual){
 function vCom(){
   var kg = pesoCorp();
   var pMin = Math.round(kg * 1.6), pMax = Math.round(kg * 2);
+  function cab(ic, t, sub){
+    return '<div class="com-h">' + dibujoCom(ic).replace("comdib", "com-ic") +
+      '<div><b>' + t + '</b><small>' + sub + '</small></div></div>';
+  }
+  function plegable(t, items){
+    return '<details class="fold"><summary>' + t + '</summary><div class="in"><ul>' +
+      items.map(function(x){ return '<li>' + x + '</li>'; }).join("") + '</ul></div></details>';
+  }
+  var h = '<div class="sect"><div class="eyebrow">Comer construye lo que el entreno rompe</div>';
 
-  var h = '<div class="sect"><div class="card semana">' +
-    '<div class="semana-t"><b>La comida es la otra mitad</b>' +
-    '<p>Entrenar rompe el músculo. Comer lo construye. ' +
-    'Sin esto, el plan se queda a medias.</p></div></div></div>';
+  h += '<div class="card">' + cab("prote", "Proteína", "La base, lo único obligatorio") +
+    '<div class="gran"><b>' + pMin + ' a ' + pMax + '</b><span>g al día</span></div>' +
+    '<p class="expl">1,6 a 2 g por kilo, con tus ' + nf(kg) + ' kg de Ajustes.</p>' +
+    '<div class="chips" style="margin-top:10px"><span class="chip">Pechuga, 30 g</span><span class="chip">3 huevos, 20 g</span>' +
+    '<span class="chip">Yogur griego, 10 g</span><span class="chip">Legumbres</span></div>' +
+    plegable("Cuándo y el batido", [
+      "Da igual la hora: repártela en 3 o 4 comidas.",
+      "La media hora tras entrenar es un mito.",
+      "El batido vale si no llegas con comida. Uno al día como mucho."]) +
+    plegable("Cómo elegir un batido", [
+      "Suero de leche, whey. Aislada si la leche te sienta pesada.",
+      "Al menos 20 g de proteína por cada 30 g de producto.",
+      "Ingredientes, cuantos menos mejor. Las marcas blancas de tiendas de suplementos salen mejor de precio."]) +
+    botonCompra("proteina whey aislada 20g", "Ver proteínas en Amazon") + '</div>';
 
-  h += '<div class="sect"><div class="eyebrow">1. Proteína, la base</div><div class="card">' +
-    dibujoCom("prote") +
-    '<div class="conv-rm"><span>Tu objetivo diario</span><b class="mono">' +
-    pMin + ' a ' + pMax + '&nbsp;g</b></div>' +
-    '<p class="note" style="margin:0">Entre 1,6 y 2 gramos por kilo de peso. ' +
-    'Con tus ' + nf(kg) + ' kg, el peso que tienes puesto en Ajustes, eso son ' + pMin + ' a ' + pMax + ' g al día. ' +
-    'Es lo único de esta página que es obligatorio.</p>' +
-    '<p class="note"><b>De dónde sacarla.</b> Huevos, pollo, pescado, carne, ' +
-    'lácteos y legumbres. Para que te hagas una idea: una pechuga son ~30 g, ' +
-    'tres huevos ~20 g, un yogur griego ~10 g.</p>' +
-    '<p class="note"><b>Cuándo.</b> Da igual la hora. Reparte en 3 o 4 comidas ' +
-    'y cubre el total del día. La ventana de media hora tras entrenar es un mito.</p>' +
-    '<p class="note"><b>El batido.</b> Vale si no llegas con comida. ' +
-    'Es comida en polvo, no magia. Uno al día como mucho.</p>' +
-    '<p class="note"><b>Cómo elegir uno bueno.</b> Que ponga suero de leche, whey, ' +
-    'aislada si te sienta pesada la leche. Al menos 20 g de proteína por cada 30 g de producto, ' +
-    'y cuanto más corta la lista de ingredientes, mejor. Las marcas blancas de las tiendas de ' +
-    'suplementos suelen ser la mejor relación calidad precio.</p>' +
-    botonCompra("proteina whey aislada 20g", "Ver proteínas en Amazon") +
-    '</div></div>';
+  h += '<div class="card" style="margin-top:10px">' + cab("crea", "Creatina", "La única que compensa") +
+    '<div class="gran"><b>5 g</b><span>al día</span></div>' +
+    '<p class="expl">Monohidrato, todos los días, entrenes o no.</p>' +
+    plegable("Qué esperar", [
+      "Unas repeticiones más con el mismo peso y algo más de músculo con los meses.",
+      "Hasta 1 kg más las primeras semanas: es agua en el músculo, no grasa.",
+      "Funciona por acumulación, no por tomarla antes de entrenar."]) +
+    plegable("Cómo elegir una buena", [
+      "Un solo ingrediente: creatina monohidrato.",
+      "Si pone <b>Creapure</b>, mejor: es la materia prima alemana de referencia.",
+      "En polvo sale más barata que en cápsulas y es lo mismo. Nada de mezclas con cafeína."]) +
+    botonCompra("creatina monohidrato creapure polvo", "Ver creatinas en Amazon") + '</div>';
 
-  h += '<div class="sect"><div class="eyebrow">2. Creatina, la única que compensa</div><div class="card">' +
-    dibujoCom("crea") +
-    '<div class="conv-rm"><span>Dosis</span><b class="mono">5 g al día</b></div>' +
-    '<p class="note" style="margin:0"><b>Monohidrato</b>, el de toda la vida y el más barato. ' +
-    'Es el suplemento con más estudios del mundo en fuerza: unas repeticiones más ' +
-    'con el mismo peso, y algo más de músculo con los meses.</p>' +
-    '<p class="note"><b>Todos los días</b>, entrenes o no, a la hora que te acuerdes. ' +
-    'Funciona por acumulación, no por tomarla antes de entrenar.</p>' +
-    '<p class="note"><b>Subirás ~1 kg las primeras semanas.</b> Es agua dentro del músculo. ' +
-    'Buena señal, no grasa.</p>' +
-    '<p class="note"><b>Cómo elegir una buena.</b> Un solo ingrediente: creatina monohidrato. ' +
-    'Si pone <b>Creapure</b>, mejor: es la materia prima alemana de referencia y cuesta poco más. ' +
-    'En polvo sale más barata que en cápsulas y es lo mismo. Nada de mezclas con cafeína ni fórmulas raras.</p>' +
-    botonCompra("creatina monohidrato creapure polvo", "Ver creatinas en Amazon") +
-    '</div></div>';
+  h += '<div class="card" style="margin-top:10px">' + cab("magne", "Magnesio bisglicinato", "Para dormir mejor") +
+    '<div class="gran"><b>200 a 300</b><span>mg al día</span></div>' +
+    '<p class="expl">De magnesio elemental, de media a una hora antes de acostarte.</p>' +
+    plegable("Por qué y qué esperar", [
+      "Dormir es donde el músculo se construye.",
+      "El bisglicinato se absorbe bien, no revuelve la tripa y la glicina relaja.",
+      "Coger el sueño antes y menos calambres.",
+      "No es un somnífero: si duermes mal, mira antes horario y pantallas."]) +
+    plegable("Cómo elegir uno bueno", [
+      "Que diga bisglicinato o glicinato quelado.",
+      "Que indique los mg de <b>magnesio elemental</b> por dosis, no los de la cápsula.",
+      "Sin mezclas con diez cosas más. El óxido de magnesio, ni gratis: se absorbe mal."]) +
+    botonCompra("magnesio bisglicinato quelado elemental", "Ver magnesio en Amazon") + '</div></div>';
 
-  h += '<div class="sect"><div class="eyebrow">3. Magnesio bisglicinato, para el descanso</div><div class="card">' +
-    dibujoCom("magne") +
-    '<p class="note" style="margin:0">Aquí el objetivo no es levantar más: es <b>dormir mejor</b>. ' +
-    'Y dormir es donde el músculo se construye, así que el descanso es parte del plan.</p>' +
-    '<p class="note"><b>Por qué bisglicinato.</b> Es magnesio unido a glicina. Se absorbe bien, ' +
-    'no revuelve la tripa como otras formas, y la glicina de por sí relaja. ' +
-    'Por eso es la forma de la noche.</p>' +
-    '<p class="note"><b>Cómo se toma.</b> De 200 a 300 mg de magnesio al día, ' +
-    'media hora o una hora antes de acostarte. Ojo al bote: mira los mg de ' +
-    '<b>magnesio elemental</b>, no los de la cápsula entera, que no son lo mismo.</p>' +
-    '<p class="note"><b>Qué puedes esperar.</b> Conciliar algo antes y menos calambres, ' +
-    'sobre todo si comes poco de donde hay magnesio: frutos secos, legumbres, ' +
-    'verdura de hoja y chocolate negro. No es un somnífero: si duermes mal de verdad, ' +
-    'lo primero es el horario y las pantallas, no una cápsula.</p>' +
-    '<p class="note"><b>Cómo elegir uno bueno.</b> Que la etiqueta diga bisglicinato o ' +
-    'glicinato quelado y los mg de magnesio elemental por dosis. Sin mezclas con diez cosas más. ' +
-    'Y el óxido de magnesio, ni gratis: es el barato porque se absorbe mal.</p>' +
-    botonCompra("magnesio bisglicinato quelado elemental", "Ver magnesio en Amazon") +
-    '</div></div>';
-
-  h += '<div class="sect"><div class="card">' +
-    '<p class="note" style="margin:0"><b>Lo que no está aquí, no lo necesitas.</b> ' +
-    'Quemagrasas, aminoácidos sueltos, boosters: dinero tirado para un natural. ' +
-    'Primero la proteína, luego dormir, y la creatina si quieres el extra.</p></div></div>';
-
-  h += '<div class="sect"><div class="banner"><b>Ojo</b><span>Esto no es consejo médico. ' +
-    'Si tienes el riñón delicado, tomas medicación o estás embarazada, ' +
-    'pregunta a tu médico antes de suplementarte.</span></div></div>';
-
+  h += '<div class="sect"><p class="expl" style="margin:0"><b>Lo demás, no lo necesitas.</b> ' +
+    'Quemagrasas, aminoácidos y boosters son dinero tirado para un natural.</p></div>';
+  h += '<div class="sect"><div class="banner"><b>Ojo</b><span>No es consejo médico. Con el riñón delicado, ' +
+    'medicación o embarazo, pregunta antes a tu médico.</span></div></div>';
   view.innerHTML = h;
 }
 
@@ -2746,8 +2777,7 @@ function cuentaHTML(){
       '<small>' + (cuenta.sync === "cuenta"
         ? "Guardado en tu cuenta, privado y en todos tus dispositivos"
         : "Guardado en este navegador") + '</small></div></div>' +
-      '<p class="note" style="margin:0">Entras con tu cuenta de Claude y la app te reconoce. ' +
-      'Cada persona que abra el enlace ve su propio entrenamiento, nunca el tuyo.</p>';
+      '<p class="expl" style="margin:0">Cada persona que abra el enlace ve solo su entrenamiento.</p>';
     return h + '</div></div>';
   }
 
@@ -2760,18 +2790,16 @@ function cuentaHTML(){
      : deneg ? "Sin acceso, guardando en este dispositivo"
              : "Guardado en tu cuenta, en todos tus dispositivos") + '</small></div></div>';
     if(pend){
-      h += '<div class="flag deload" style="margin-top:10px"><div class="ic">·</div><div>' +
+      h += '<div class="flag deload" style="margin-top:10px"><div class="ic">!</div><div>' +
         '<h3>Tu cuenta está pendiente</h3>' +
-        '<p>Hasta que te den acceso, la aplicación funciona entera y guarda en este ' +
-        'dispositivo. En cuanto te aprueben, tu entrenamiento se sincroniza solo.</p>' +
+        '<p>Mientras, la app funciona entera y guarda aquí. Al aprobarte, se sincroniza sola.</p>' +
         '</div></div>' +
         '<button class="btn" id="au-revisar" style="margin-top:10px">Comprobar si ya tengo acceso</button>';
     }
     if(deneg){
       h += '<div class="flag test" style="margin-top:10px"><div class="ic">!</div><div>' +
         '<h3>Esta cuenta no tiene acceso</h3>' +
-        '<p>Habla con quien te pasó la aplicación. Mientras, puedes seguir usándola ' +
-        'en este dispositivo.</p></div></div>';
+        '<p>Habla con quien te pasó la app. Mientras, sigue usándola aquí.</p></div></div>';
     }
     h += '<button class="btn" id="au-salir" style="margin-top:10px">Salir de la cuenta</button>' +
       '<p class="note" id="au-estado" style="margin-bottom:0"></p>';
@@ -2780,9 +2808,8 @@ function cuentaHTML(){
 
   /* con la nube disponible, pero sin entrar */
   if(nube){
-    h += '<p class="note" style="margin:0 0 11px">Crea una cuenta y tendrás tu entrenamiento en ' +
-      'cualquier dispositivo, en cuanto te den acceso. Mientras tanto, y también si prefieres no ' +
-      'registrarte, la aplicación funciona igual y guarda en este navegador.</p>' +
+    h += '<p class="expl" style="margin:0 0 11px">Con cuenta, tu entreno está en todos tus dispositivos. ' +
+      'Sin ella, funciona igual y guarda aquí.</p>' +
       '<div class="campo"><label for="au-mail">Correo</label>' +
       '<input id="au-mail" type="email" autocomplete="email" inputmode="email" placeholder="tu@correo.com"></div>' +
       '<div class="campo"><label for="au-pass">Contraseña</label>' +
@@ -2797,176 +2824,161 @@ function cuentaHTML(){
   /* sin nube configurada: solo este navegador */
   h += '<div class="rm" style="padding-top:0"><div class="avat"></div>' +
     '<div class="rm-n">Este dispositivo<small>Guardado en este navegador</small></div></div>' +
-    '<p class="note" style="margin:0">Tus pesos, tus marcas y por dónde vas se guardan en este navegador. ' +
-    'Nadie más los ve, tampoco quien te pasó el enlace. Si cambias de dispositivo o borras los datos ' +
-    'del navegador, empiezas de cero. Guarda el código de más abajo.</p>';
+    '<p class="expl" style="margin:0">Se guarda en este navegador y nadie más lo ve. ' +
+    'Si lo borras, empiezas de cero: guarda tu código.</p>';
   return h + '</div></div>';
 }
 
+function grupo(ico, t, sub, cuerpo){
+  return '<details class="grupo"><summary><span class="gico"><svg viewBox="0 0 24 24">' + ico + '</svg></span>' +
+    '<span>' + t + '<small>' + sub + '</small></span></summary><div class="in">' + cuerpo + '</div></details>';
+}
 function vAjustes(){
-  var p = state.pos;
-  var h = '<div class="sect"><h2 class="aj-h">Tu entreno</h2></div>';
+  var p = state.pos, dp = diasPlan(), g1 = "", g2 = "", g3 = "", g4 = "";
 
-  var dp = diasPlan();
-  h += '<div class="sect"><div class="eyebrow">Tus días de entreno</div><div class="card">' +
-    '<p class="note" style="margin:0 0 11px">Toca los días que vas al gimnasio. ' +
-    'Con tres a la semana es suficiente.</p>' +
+  g1 += '<div class="sect" id="sect-dias"><div class="eyebrow">Tus días</div><div class="card">' +
     '<div class="dias" data-dias="1">' + [1,2,3,4,5,6,7].map(function(n){
       var on = dp.indexOf(n) > -1;
       return '<button class="dia' + (on ? " on" : "") + '" data-v="' + n + '" ' +
         'aria-pressed="' + on + '" aria-label="' + NOMBREDIA[n] + '">' + LETRADIA[n] + '</button>';
     }).join("") + '</div>' +
-    '<p class="note">Entrenas <b>' + dp.length + (dp.length === 1 ? ' día' : ' días') + '</b> por semana: ' +
-    dp.map(function(n){ return NOMBREDIA[n]; }).join(", ") + '.</p>' +
-    '<p class="note">Cada 4 semanas ganas un <b>escudo</b>. Si una semana fallas, se gasta solo y la ' +
-    'racha sigue. Un viaje no te borra tres meses.</p></div></div>';
+    '<p class="expl">' + dp.length + (dp.length === 1 ? ' día' : ' días') + ' por semana: ' +
+    dp.map(function(n){ return NOMBREDIA[n]; }).join(", ") + '. Con tres basta.</p>' +
+    '<p class="expl">Cada 4 semanas cumplidas ganas un escudo.' + info("escudo") + '</p></div></div>';
 
-  h += '<div class="sect"><div class="eyebrow">Sesiones por semana</div><div class="card stack">' +
-    '<div><b>Entrenos A y B</b><p class="note" style="margin:2px 0 8px">Full body, cada grupo dos veces por semana.</p>' +
+  g1 += '<div class="sect"><div class="eyebrow">Sesiones por semana</div><div class="card stack">' +
+    '<div><b>A y B</b><p class="expl" style="margin:2px 0 8px">Cuerpo entero, cada grupo dos veces.</p>' +
     '<div class="seg" data-seg="AB">' + [3,4,5].map(function(n){
       return '<button data-v="' + n + '" aria-pressed="' + (state.porSemana.AB === n) + '">' + n + '</button>';
     }).join("") + '</div></div>' +
-    '<div><b>Entrenos A, B y C</b><p class="note" style="margin:2px 0 8px">Push pull leg. Con 3 sesiones cada grupo cae a una vez por semana.</p>' +
+    '<div><b>A, B y C</b><p class="expl" style="margin:2px 0 8px">Empuje, tirón y pierna. Con 3, cada grupo una vez.</p>' +
     '<div class="seg" data-seg="ABC">' + [3,4,5,6].map(function(n){
       return '<button data-v="' + n + '" aria-pressed="' + (state.porSemana.ABC === n) + '">' + n + '</button>';
     }).join("") + '</div></div></div></div>';
 
-  h += '<div class="sect"><div class="eyebrow">Orden de los entrenos</div><div class="card stack">' +
-    '<p class="note" style="margin:0">Arrastra los cuadrados.</p>';
-  [["AB", "Entrenos A y B"], ["ABC", "Entrenos A, B y C"]].forEach(function(r){
+  g1 += '<div class="sect"><div class="eyebrow">Orden de los entrenos</div><div class="card stack">' +
+    '<p class="expl" style="margin:0">Arrastra los cuadrados.</p>';
+  [["AB", "A y B"], ["ABC", "A, B y C"]].forEach(function(r){
     var act = ordenDe(r[0]);
-    h += '<div><b>' + esc(r[1]) + '</b>' +
+    g1 += '<div><b>' + esc(r[1]) + '</b>' +
       '<div class="ordfila" data-ord="' + r[0] + '">' +
       act.map(function(x, k){
         return '<button class="ordcuadro' + (k === 0 ? " primero" : "") + '" data-l="' + x + '" tabindex="0" ' +
           'aria-label="Entreno ' + x + ', posición ' + (k + 1) + ' de ' + act.length + '">' +
-          '<span class="ordpos">' + (k + 1) + 'º</span>' +
-          '<span class="ordletra">' + x + '</span></button>';
+          '<span class="ordpos">' + (k + 1) + 'º</span><span class="ordletra">' + x + '</span></button>';
       }).join("") + '</div>' +
-      '<p class="note ordtxt" style="margin:8px 0 0">Empiezas por el ' + act[0] +
-      ', luego el ' + act.slice(1).join(", luego el ") + ', y vuelta a empezar.</p>' +
-      '</div>';
+      '<p class="expl ordtxt" style="margin:8px 0 0">Empiezas por el ' + act[0] +
+      ', luego el ' + act.slice(1).join(", luego el ") + ', y vuelta a empezar.</p></div>';
   });
-  h += '</div></div>';
+  g1 += '</div></div>';
 
-  h += '<div class="sect"><div class="eyebrow">Tu peso corporal</div><div class="card">' +
+  g1 += '<div class="sect"><div class="eyebrow">Tu peso corporal</div><div class="card">' +
     '<div class="rm" style="padding-top:0"><div class="rm-n">Peso corporal' +
-    '<small>Se usa para calcular el lastre de las dominadas</small></div>' +
-    '<input class="mono" inputmode="decimal" id="peso-corp" value="' + nf(pesoCorp()) + '" ' +
-    'aria-label="Tu peso corporal"><span class="u">kg</span></div>' +
-    '<p class="note" style="margin-bottom:0">En dominadas, el lastre es tu marca menos tu peso.</p>' +
-    '</div></div>';
+    '<small>Para el lastre de las dominadas y la proteína</small></div>' +
+    '<input inputmode="decimal" id="peso-corp" value="' + nf(pesoCorp()) + '" ' +
+    'aria-label="Tu peso corporal"><span class="u">kg</span></div></div></div>';
 
-  h += '<div class="sect" id="sect-aviso"><div class="eyebrow">Aviso fuera de la app</div><div class="card">';
-  var pOK = ("Notification" in window) && ("PushManager" in window) && ("serviceWorker" in navigator);
-  if(pushGuardado() && !pushActivo()){
-    h += '<p class="note" style="margin:0 0 10px"><b>Ojo: la vía fina está a medias.</b> ' +
-      'Este móvil tiene la suscripción hecha, pero el servidor de avisos no responde ' +
-      '(falta montarlo: AVISOS.md del repositorio). Así no llega nada. Quítala y usa la ' +
-      'vía de ntfy, o monta el servidor.</p>' +
-      '<div class="row"><button class="btn primary" style="flex:1" data-push="off">Quitar la suscripción</button>' +
-      (state.ntfy ? '' : '<button class="btn" style="flex:1" data-ntfy="on">Activar con ntfy</button>') +
-      '</div>';
-  }else if(pushGuardado()){
-    h += '<p class="note" style="margin:0 0 10px">Activado en este dispositivo: el final del ' +
-      'descanso llega como notificación aunque estés en otra app o con el móvil bloqueado. ' +
-      'Tarda hasta 15 segundos. En modo silencio, vibra.</p>' +
-      '<div class="row"><button class="btn primary" style="flex:1" data-push="test">Probar aviso</button>' +
-      '<button class="btn" style="flex:1" data-push="off">Quitarlo</button></div>';
-  }else if(state.ntfy){
-    h += '<p class="note" style="margin:0 0 10px">Activado con la app <b>ntfy</b>. Tu canal: ' +
-      '<b>' + state.ntfy + '</b>. Si sales de la app o bloqueas el móvil con el cronómetro en ' +
-      'marcha, el final del descanso te llega por ahí.</p>' +
-      '<p class="note" style="margin:0 0 10px"><b>Para que llegue, dos pasos en la app ntfy:</b> ' +
-      'suscríbete a tu canal (dale al más, pega el nombre con Copiar canal) y permite sus ' +
-      'notificaciones en los Ajustes del iPhone. Luego dale a Probar aviso con el móvil ' +
-      'bloqueado. No compartas el canal: quien lo tenga puede mandarte avisos.</p>' +
-      '<div class="row"><button class="btn primary" style="flex:1" data-ntfy="test">Probar aviso</button>' +
-      '<button class="btn" style="flex:1" data-ntfy="copia">Copiar canal</button>' +
-      '<button class="btn" style="flex:1" data-ntfy="off">Quitarlo</button></div>';
-  }else{
-    h += '<p class="note" style="margin:0 0 10px">El pitido solo suena con la app a la vista: ' +
-      'iPhone congela las webs en segundo plano. Para que te avise fuera hay dos caminos.</p>' +
-      '<p class="note" style="margin:0 0 6px"><b>El rápido: la app gratuita ntfy.</b> ' +
-      'Instálala del App Store y pulsa aquí; te doy un canal y dos pasos.</p>' +
-      '<button class="btn primary" style="width:100%" data-ntfy="on">Activar con ntfy</button>' +
-      (pOK ? '<p class="note" style="margin:10px 0 6px"><b>El fino, sin app extra.</b> ' +
-      'Notificaciones propias. Antes hay que montar el servidor una vez: AVISOS.md del repositorio.</p>' +
-      '<button class="btn" style="width:100%" data-push="on">Activar avisos propios</button>' : "");
-  }
-  h += '<p class="note" id="push-estado" style="margin:8px 0 0"></p></div></div>';
-
-  h += '<div class="sect"><div class="eyebrow">Cronómetro</div><div class="card">' +
-    '<div class="row">' + [90,105,120,180].map(function(s){
-      return '<button class="btn sm" style="flex:1" data-timer="' + s + '">' + mmss(s) + '</button>';
-    }).join("") + '</div>' +
-    '<p class="note">También arranca solo al marcar una serie.</p>' +
-    '<p class="note">El aviso suena por encima de tu música, sin pararla. Para oírlo, ' +
-    'quita el modo silencio y sube el volumen. Con el móvil bloqueado o en otra app no ' +
-    'puede sonar, es un límite del iPhone con las webs: déjala a la vista mientras ' +
-    'descansas, la pantalla no se apaga sola.</p></div></div>';
-
-  h += '<div class="sect"><div class="eyebrow">Dónde estoy</div><div class="card stack">' +
-    '<div class="row"><div style="flex:1"><label class="note" for="selF">Fase</label>' +
+  g1 += '<div class="sect"><div class="eyebrow">Dónde estoy</div><div class="card stack">' +
+    '<div class="row"><div style="flex:1"><label class="expl" for="selF">Fase</label>' +
     '<select id="selF" class="btn" style="margin-top:4px">' + FASES.map(function(f, i){
       return '<option value="' + i + '"' + (i === p.f ? " selected" : "") + '>' + esc(f.n) + '</option>';
     }).join("") + '</select></div>' +
-    '<div style="flex:0 0 96px"><label class="note" for="selS">Semana</label>' +
+    '<div style="flex:0 0 96px"><label class="expl" for="selS">Semana</label>' +
     '<select id="selS" class="btn" style="margin-top:4px">' +
     Array.apply(null, {length:fase(p.f).sem}).map(function(_, i){
       return '<option value="' + i + '"' + (i === p.s ? " selected" : "") + '>' + (i + 1) + '</option>';
     }).join("") + '</select></div></div>' +
-    '<p class="note" style="margin:0">Solo si te saltas semanas.</p>' +
-    '</div></div>';
+    '<p class="expl" style="margin:0">Solo si te saltas semanas.</p></div></div>';
 
-  h += '<div class="sect"><div class="eyebrow">Material que se asume</div><div class="card">' +
-    '<p class="note" style="margin:0"><b>La barra pesa ' + nf(BARRA) + ' kg y va incluida.</b> ' +
-    'Si pone 80 kg son la barra más 30 por lado.</p>' +
-    '<p class="note">Si tu barra pesa otra cosa, resta la diferencia.</p></div></div>';
+  g1 += '<div class="sect"><div class="eyebrow">Material</div><div class="card">' +
+    '<p class="expl" style="margin:0">La barra pesa ' + nf(BARRA) + ' kg y va incluida: 80 kg son la barra y 30 por lado.</p>' +
+    '<p class="expl">Si tu barra pesa otra cosa, resta la diferencia.</p></div></div>';
 
-  h += '<div class="sect"><h2 class="aj-h">La app</h2></div>';
+  /* avisos */
+  g2 += '<div class="sect" id="sect-aviso"><div class="eyebrow">Fuera de la app</div><div class="card">';
+  var pOK = ("Notification" in window) && ("PushManager" in window) && ("serviceWorker" in navigator);
+  if(pushGuardado() && !pushActivo()){
+    g2 += '<p class="expl" style="margin:0 0 10px"><b>La vía fina está a medias.</b> ' +
+      'El servidor de avisos no responde, así que no llega nada.</p>' +
+      '<div class="row"><button class="btn primary" style="flex:1" data-push="off">Quitarla</button>' +
+      (state.ntfy ? '' : '<button class="btn" style="flex:1" data-ntfy="on">Activar con ntfy</button>') + '</div>';
+  }else if(pushGuardado()){
+    g2 += '<p class="expl" style="margin:0 0 10px"><b>Activado.</b> El final del descanso llega aunque estés en otra app.</p>' +
+      '<p class="expl" style="margin:0 0 10px">Tarda hasta 15 segundos. En silencio, vibra.</p>' +
+      '<div class="row"><button class="btn primary" style="flex:1" data-push="test">Probar aviso</button>' +
+      '<button class="btn" style="flex:1" data-push="off">Quitarlo</button></div>';
+  }else if(state.ntfy){
+    g2 += '<p class="expl" style="margin:0 0 10px"><b>Activado con ntfy.</b> Tu canal: <b>' + state.ntfy + '</b></p>' +
+      '<div class="row"><button class="btn primary" style="flex:1" data-ntfy="test">Probar</button>' +
+      '<button class="btn" style="flex:1" data-ntfy="copia">Copiar canal</button>' +
+      '<button class="btn" style="flex:1" data-ntfy="off">Quitar</button></div>' +
+      '<details class="fold"><summary>Si no llega</summary><div class="in"><ul>' +
+      '<li>En ntfy, suscríbete a tu canal: botón más y pega el nombre.</li>' +
+      '<li>Permite sus notificaciones en Ajustes del iPhone.</li>' +
+      '<li>Prueba con el móvil bloqueado.</li>' +
+      '<li>No compartas el canal: quien lo tenga puede mandarte avisos.</li></ul></div></details>';
+  }else{
+    g2 += '<p class="expl" style="margin:0 0 10px">Con la app cerrada no suena: el iPhone congela las webs.</p>' +
+      '<button class="btn primary" data-ntfy="on">Activar con la app ntfy, gratis</button>' +
+      (pOK ? '<details class="fold"><summary>La vía fina, sin app extra</summary><div class="in">' +
+        '<p class="expl">Necesita montar el servidor una vez: AVISOS.md del repositorio.</p>' +
+        '<button class="btn" style="margin-top:8px" data-push="on">Activar avisos propios</button></div></details>' : "");
+  }
+  g2 += '<p class="expl" id="push-estado" style="margin:8px 0 0"></p></div></div>';
 
-  h += cuentaHTML();
+  g2 += '<div class="sect"><div class="eyebrow">Cronómetro</div><div class="card">' +
+    '<div class="row">' + [90,105,120,180].map(function(s){
+      return '<button class="btn sm" style="flex:1" data-timer="' + s + '">' + mmss(s) + '</button>';
+    }).join("") + '</div>' +
+    '<p class="expl">Arranca solo al marcar una serie y suena por encima de tu música.</p>' +
+    '<p class="expl">En modo silencio no suena: es la regla del iPhone.</p></div></div>';
 
-
-  h += '<div class="sect"><div class="eyebrow">Descargar la progresión</div><div class="card">' +
+  /* cuenta y datos */
+  g3 += cuentaHTML();
+  g3 += '<div class="sect"><div class="eyebrow">Descargar la progresión</div><div class="card">' +
     '<div class="row"><button class="btn primary" style="flex:1" id="dl-marcas">Maximales</button>' +
     '<button class="btn" style="flex:1" id="dl-ses">Sesiones</button>' +
     '<button class="btn" style="flex:1" id="dl-series">Series</button></div>' +
-    '<p class="note" id="dl-estado">Se abren en Excel.</p>' +
-    '<textarea id="dl-caja" class="mono caja" readonly hidden aria-label="Datos para copiar"></textarea>' +
-    '</div></div>';
-
-  h += '<div class="sect"><div class="eyebrow">Cambiar de dispositivo</div><div class="card">' +
-    '<p class="note" style="margin:0 0 10px">Copia el código y pégalo en el otro móvil. ' +
-    'Guárdalo también por si acaso.</p>' +
+    '<p class="expl" id="dl-estado">Se abren en Excel.</p>' +
+    '<textarea id="dl-caja" class="caja" readonly hidden aria-label="Datos para copiar"></textarea></div></div>';
+  g3 += '<div class="sect"><div class="eyebrow">Cambiar de dispositivo</div><div class="card">' +
+    '<p class="expl" style="margin:0 0 10px">Copia el código y pégalo en el otro móvil.</p>' +
     '<div class="row"><button class="btn primary" style="flex:1" id="cod-sacar">Copiar mi código</button>' +
     '<button class="btn" style="flex:1" id="cod-meter">Pegar un código</button></div>' +
-    '<p class="note" id="cod-estado"></p>' +
-    '<textarea id="cod-caja" class="mono caja" hidden aria-label="Código del entrenamiento" ' +
+    '<p class="expl" id="cod-estado"></p>' +
+    '<textarea id="cod-caja" class="caja" hidden aria-label="Código del entrenamiento" ' +
     'placeholder="Pega aquí el código y dale a Restaurar"></textarea>' +
-    '<button class="btn primary" id="cod-ok" hidden style="margin-top:8px">Restaurar</button>' +
-    '</div></div>';
+    '<button class="btn primary" id="cod-ok" hidden style="margin-top:8px">Restaurar</button></div></div>';
 
-  h += '<div class="sect"><div class="eyebrow">Llevártela al móvil</div><div class="card">' +
-    '<p class="note" style="margin:0 0 10px">No está en las tiendas. Se instala desde el navegador.</p>' +
-    '<ol class="guia" style="margin-bottom:11px">' +
-    '<li><b>iPhone</b><span>En Safari: Compartir, y Añadir a pantalla de inicio. Tiene que ser Safari.</span></li>' +
-    '<li><b>Android</b><span>En Chrome: menú de los tres puntos, Instalar aplicación.</span></li>' +
-    '<li><b>Ordenador</b><span>En Chrome o Edge, el icono de instalar al final de la barra de direcciones.</span></li>' +
-    '</ol>' +
-    '<p class="note"><b>Funciona sin cobertura.</b> En el sótano del gimnasio abre igual.</p>' +
-    '<div class="banner" style="margin-top:11px"><b>Ojo</b><span>La app instalada empieza vacía. ' +
-    'Copia tu código antes de instalar y pégalo dentro. Con cuenta, no hace falta.</span></div></div></div>';
+  /* la app */
+  var tema = state.tema || "oscuro";
+  g4 += '<div class="sect"><div class="eyebrow">Apariencia</div><div class="seg" data-tema="1">' +
+    [["oscuro","Oscuro"],["claro","Claro"],["sistema","Sistema"]].map(function(t){
+      return '<button data-v="' + t[0] + '" aria-pressed="' + (tema === t[0]) + '">' + t[1] + '</button>';
+    }).join("") + '</div></div>';
+  g4 += '<div class="sect"><div class="eyebrow">Llevártela al móvil</div><div class="card">' +
+    '<ol class="guia" style="margin-bottom:8px">' +
+    '<li><b>iPhone</b><span>En Safari: Compartir y Añadir a pantalla de inicio.</span></li>' +
+    '<li><b>Android</b><span>En Chrome: menú de tres puntos, Instalar aplicación.</span></li>' +
+    '<li><b>Ordenador</b><span>En Chrome o Edge, el icono de instalar de la barra.</span></li></ol>' +
+    '<p class="expl">Funciona sin cobertura. Instalada empieza vacía: sin cuenta, copia antes tu código.</p></div></div>';
+  g4 += '<div class="sect"><div class="eyebrow">Versión</div><div class="card">' +
+    '<p class="expl" style="margin:0 0 10px">Tienes la del ' + VERSION + '.</p>' +
+    '<button class="btn" data-actualiza="1">Buscar actualización</button>' +
+    '<p class="expl" id="ver-estado" style="margin:8px 0 0"></p></div></div>';
+  g4 += '<div class="sect"><button class="btn" id="ver-bienv">Ver otra vez la bienvenida</button></div>';
 
-  h += '<div class="sect"><div class="eyebrow">Versión</div><div class="card">' +
-    '<p class="note" style="margin:0 0 10px">Tienes la versión del ' + VERSION + '. ' +
-    'La app se actualiza sola al abrirla con cobertura; si la tienes abierta desde hace días, pulsa aquí.</p>' +
-    '<button class="btn" style="width:100%" data-actualiza="1">Buscar actualización</button>' +
-    '<p class="note" id="ver-estado" style="margin:8px 0 0"></p></div></div>';
-
-  h += '<div class="sect"><button class="btn" id="ver-bienv">Ver otra vez la bienvenida</button></div>';
-  view.innerHTML = h;
+  var I = {
+    ent:'<path d="M3 9v6M6 6.5v11M18 6.5v11M21 9v6M6 12h12"/>',
+    av:'<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10 21h4"/>',
+    cu:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+    app:'<rect x="6" y="2" width="12" height="20" rx="3"/><path d="M11 18h2"/>'
+  };
+  view.innerHTML = '<div class="sect">' +
+    grupo(I.ent, "Entreno", "Días, sesiones, orden y peso", g1) +
+    grupo(I.av, "Avisos y cronómetro", "Que suene aunque cierres la app", g2) +
+    grupo(I.cu, "Cuenta y datos", "Nube, código y descargas", g3) +
+    grupo(I.app, "App", "Apariencia, instalar y versión", g4) + '</div>';
 }
 
 /* ============================ DESCARGAS ============================ */
@@ -3269,6 +3281,36 @@ document.getElementById("tplus").addEventListener("click", function(){
 
 document.addEventListener("click", function(ev){
   var el;
+  if((el = ev.target.closest("[data-ck]"))){
+    var ck = el.dataset.ck.split(",");
+    abreHoja(+ck[0], +ck[1]); return;
+  }
+  if((el = ev.target.closest("[data-prev]"))){
+    var pa = el.dataset.prev.split(","), plg = logEx(+pa[0]);
+    plg[+pa[1]] = plg[+pa[1]] || {};
+    plg[+pa[1]].kg = parseFloat(el.dataset.kg); plg[+pa[1]].reps = parseInt(el.dataset.reps, 10);
+    saveSesion(); render(); return;
+  }
+  if((el = ev.target.closest("[data-loop]"))){
+    el.classList.toggle("grande");
+    if(el.parentElement) el.parentElement.classList.toggle("grande");
+    return;
+  }
+  if((el = ev.target.closest("[data-pv]"))){
+    sesion.prev = sesion.prev || {};
+    sesion.prev[el.dataset.pv] = !sesion.prev[el.dataset.pv];
+    saveSesion(); render();
+    var fold = document.querySelector(".previo");
+    if(fold && fold.closest("details")) fold.closest("details").open = true;
+    return;
+  }
+  if((el = ev.target.closest("[data-prevno]"))){ sesion.prevNo = 1; saveSesion(); render(); return; }
+  if((el = ev.target.closest("[data-tema] button"))){
+    state.tema = el.dataset.v; save(); render();
+    var gr = document.querySelectorAll("details.grupo");
+    if(gr[3]) gr[3].open = true;
+    return;
+  }
   if((el = ev.target.closest("[data-set]"))){
     var a = el.dataset.set.split(","), i = +a[0], j = +a[1];
     var p = state.pos, f = fase(p.f), e = RUT[f.rut][letra(f, p.e)][i];
@@ -3356,6 +3398,7 @@ document.addEventListener("click", function(ev){
     tab = el.dataset.go; render();
     if(el.dataset.go === "aj"){
       var sd = document.getElementById(el.dataset.sect || "sect-dias");
+      if(sd && sd.closest("details")) sd.closest("details").open = true;
       if(sd) sd.scrollIntoView({block:"start"});
     }else window.scrollTo(0, 0);
     return;
@@ -3782,20 +3825,17 @@ document.addEventListener("keydown", function(ev){
 
 /* pestañas */
 var ICON = {
-  hoy:'<path d="M6 4v16M18 4v16M3 8h3M18 8h3M6 12h12M3 16h3M18 16h3"/>',
-  plan:'<path d="M4 6h16M4 12h16M4 18h9"/><circle cx="19" cy="18" r="2"/>',
-  rm:'<path d="M4 17V9M9 20V4M15 20V7M20 17v-6"/>',
-  com:'<path d="M7 3v7a2 2 0 0 0 2 2h0V3M9 3v18M17 3c-1.5 3-1.5 7 0 9v9"/>',
-  cal:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/>' +
-      '<circle cx="8.5" cy="14.5" r="1.2"/><circle cx="12" cy="14.5" r="1.2"/><circle cx="15.5" cy="18" r="1.2"/>',
-  previo:'<circle cx="8" cy="5" r="2"/><path d="M6 21c.5-5 2-8 6-9.5 3-1 5-3 6-6.5M4 13l4-2"/>',
+  hoy:'<path d="M3 9v6M6 6.5v11M18 6.5v11M21 9v6M6 12h12"/>',
+  prog:'<path d="M4 20V11M10 20V5M16 20v-6M2 20h20"/>',
+  rm:'<path d="M3 17l6-6 4 4 8-8M15 7h6v6"/>',
+  com:'<path d="M7 3v8M5 3v4a2 2 0 0 0 4 0V3M7 11v10M17 3c-2 2-2 7 0 9v9"/>',
   aj:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/>'
 };
 document.getElementById("tabs").innerHTML =
-  [["hoy","Hoy","hoy"],["previo","Previo","previo"],["cal","Racha","cal"],["plan","Plan","plan"],["rm","1RM","rm"],["com","Comida","com"],["aj","Ajustes","aj"]]
+  [["hoy","Hoy"],["prog","Progreso"],["rm","Marcas"],["com","Comida"],["aj","Ajustes"]]
   .map(function(t){
     return '<button class="tab" role="tab" data-t="' + t[0] + '" aria-selected="false">' +
-      '<svg viewBox="0 0 24 24">' + ICON[t[2]] + '</svg>' + t[1] + '</button>';
+      '<svg viewBox="0 0 24 24" aria-hidden="true">' + ICON[t[0]] + '</svg>' + t[1] + '</button>';
   }).join("");
 
 /* ============================ ARRANQUE ============================ */
@@ -3859,7 +3899,7 @@ function compruebaVersion(aMano){
   }
   ultimaComprobacion = Date.now();
   if(swReg){ try{ swReg.update()["catch"](function(){}); }catch(e){} }
-  return fetch("index.html", {cache:"no-store"}).then(function(r){ return r.text(); })
+  return fetch(location.pathname.split("/").pop() || "index.html", {cache:"no-store"}).then(function(r){ return r.text(); })
     .then(function(txt){
       var m = /var VERSION = "([^"]+)"/.exec(txt);
       var nueva = !!(m && m[1] !== VERSION);

@@ -6,7 +6,7 @@ y apunta lo que has hecho.
 
 - **App:** https://marcospoolede-coder.github.io/Culturismo-natural/
 - **Panel de administración:** https://marcospoolede-coder.github.io/Culturismo-natural/panel.html
-- **Versión 2 en pruebas:** https://marcospoolede-coder.github.io/Culturismo-natural/v2.html (mismos datos; cambios en `CAMBIOS.md`)
+- **Versión 2:** es la principal desde el 5 de noviembre de 2026; cambios en `CAMBIOS.md`. La anterior queda en `v1.html` por si hay que volver.
 - **Repositorio:** https://github.com/marcospoolede-coder/Culturismo-natural (GitHub Pages sirve la raíz)
 
 Este documento está escrito para que cualquier persona, o cualquier Claude, se ponga al día
