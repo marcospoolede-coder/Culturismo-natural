@@ -386,6 +386,14 @@
   .rpz{display:flex; gap:10px; align-items:flex-end; margin:10px 0 2px; flex-wrap:wrap}
   .rpz .btn{flex:1 1 150px}
   .rpz .campo-s{flex:1 1 130px}
+  /* rest pause y drop: una ronda aparte, con borde de trazos */
+  .srow.extra{border-style:dashed}
+  .srow.extra.ok{border-style:solid}
+  .expl{font-size:15px; color:var(--ink-2); margin:6px 0 0; line-height:1.35}
+  .set.drop{border-style:dashed}
+  .set.drop.on{border-style:solid}
+  .t-fuera{display:block; margin-top:5px; padding:0; border:0; background:none; font:inherit;
+           font-size:12.5px; color:var(--ink-2); text-decoration:underline; text-align:left; cursor:pointer}
 
   /* cronómetro */
   .timer{position:fixed; left:0; right:0; z-index:40;
@@ -718,6 +726,7 @@
     <div class="t-num mono" id="tnum">0:00</div>
     <div class="t-lab"><b id="tlab">Descanso</b><span id="tsub"></span>
       <div class="t-track"><i id="ttrack" style="width:100%"></i></div>
+      <button type="button" class="t-fuera" id="tfuera" data-go="aj" data-sect="sect-aviso" hidden>Fuera de la app no sonará: actívalo en Ajustes</button>
     </div>
     <button class="t-btn" id="tplus" aria-label="Añadir 30 segundos">+30</button>
     <button class="t-btn stop" id="tstop" aria-label="Parar el cronómetro">■</button>
@@ -735,7 +744,7 @@
    del 31 de mayo de 2025 y de las tablas de rutina por microciclo.     */
 
 /* súbela en cada despliegue: la app instalada la compara para avisar de que hay otra */
-var VERSION = "30 de octubre de 2026, 15:32";
+var VERSION = "4 de noviembre de 2026, 23:30";
 var BARRA = 20;
 var PESO_CORP_DEF = 75;   /* peso corporal por defecto, se cambia en Ajustes */
 function pesoCorp(){ return state.peso > 0 ? state.peso : PESO_CORP_DEF; }
@@ -1360,6 +1369,14 @@ function semanaPico(p){
 
 /* ============================ CÁLCULO DE CARGA ============================ */
 function redondea(kg){ return Math.round(kg / 2.5) * 2.5; }
+/* drop: un 15% menos, a discos reales; con pesos pequeños, al medio kilo
+   para que de verdad baje */
+function kgDrop(kg){
+  var d = redondea(kg * 0.85);
+  if(d >= kg || d <= 0) d = Math.round(kg * 0.85 * 2) / 2;
+  return d;
+}
+function conDrop(f, e){ return !!(f.dr && !e.js && e.t !== "b"); }
 /* Conversión Maurice y Rydin: cada repetición vale un 3% del peso.
    Es la tabla del convertidor, factor = 1 + 0,03 x (reps actuales - reps objetivo). */
 function mrFactor(act, obj){ return 1 + 0.03 * (act - obj); }
@@ -1759,8 +1776,7 @@ function vHoy(){
         var val = kgApuntado(i, j, teo), vrep = repsApuntadas(i, j, x.reps);
         h += '<div class="srow' + (ok ? " ok" : "") + '">' +
           '<div class="srow-h"><b>Serie ' + (j + 1) + '</b>' +
-          '<span class="objetivo"><b>' + x.reps + '</b> reps' +
-          (f.rp && j === c.length - 1 ? " más rest pause" : "") + '</span>' +
+          '<span class="objetivo"><b>' + x.reps + '</b> reps</span>' +
           '<span class="teo">teórico <b>' + (teo ? (e.bw ? "+" : "") + nf(teo) : "libre") + '</b> kg</span></div>';
         var pl = discos((!e.bw && (apunte(i, j) || {}).kg) || x.kg, e.bw);
         if(pl){
@@ -1796,31 +1812,43 @@ function vHoy(){
           }).join("") + '</div>' +
           '<p class="avisokg" data-avisokg="' + i + ',' + j + '" hidden></p>' +
           '</div>';
+        h += '</div>';
         if(f.rp && j === c.length - 1){
-          h += '<div class="rpz">' +
-            '<button class="btn sm" type="button" data-rpt="1">Cuenta atrás de 15 segundos</button>' +
+          var kRp = kgApuntado(i, j, teo);
+          h += '<div class="srow extra' + (r.rp2 ? " ok" : "") + '">' +
+            '<div class="srow-h"><b>Rest pause</b>' +
+            '<span class="objetivo"><b>15</b> s y al fallo</span>' +
+            '<span class="teo">' + (kRp ? 'mismo peso <b>' + (e.bw ? "+" : "") + nf(kRp) + '</b> kg' : 'mismo peso') +
+            '</span></div>' +
+            '<p class="expl">Al cerrar la serie ' + (j + 1) + ' arranca sola la cuenta de 15 segundos. ' +
+            'Al cero, sigue hasta el fallo.' + info("restpause") + '</p>' +
+            '<div class="rpz">' +
+            '<button class="btn sm" type="button" data-rpt="1">Contar 15 segundos</button>' +
             '<label class="campo-s"><span>Reps tras la pausa</span><div class="inw">' +
             '<input inputmode="numeric" data-rp2="' + i + ',' + j + '" value="' + (r.rp2 || "") + '" ' +
             'aria-label="Repeticiones tras la pausa de 15 segundos">' +
-            '<span class="u">reps</span></div></label></div>';
+            '<span class="u">reps</span></div></label></div></div>';
         }
-        h += '</div>';
       });
     }else{
       h += '<div class="sets">';
       c.forEach(function(x, j){
         h += '<button class="set' + (sets[j] ? " on" : "") + '" data-set="' + i + ',' + j + '">' +
           '<b>' + (x.kg ? nf(x.kg) : (manual ? nf(manual) : "libre")) + '</b>' +
-          '<small>' + x.reps + ' reps' +
-          (f.dr && !e.js && e.t !== "b" && j === c.length - 1 ? " y drop" : "") + '</small></button>';
+          '<small>' + x.reps + ' reps</small></button>';
       });
+      var hayDrop = conDrop(f, e), pDrop = manual || c[0].kg, kDrop = pDrop ? kgDrop(pDrop) : 0;
+      if(hayDrop){
+        h += '<button class="set drop' + (sets[c.length] ? " on" : "") + '" data-drop="' + i + '">' +
+          '<b data-dropn="' + esc(nombreEj(e)) + '">' + (kDrop ? nf(kDrop) : "−15%") + '</b>' +
+          '<small>drop al fallo</small></button>';
+      }
       h += '</div>';
-      if(f.dr && !e.js && e.t !== "b"){
-        var pDrop = manual || c[0].kg;
-        h += '<p class="note">' + (pDrop
-          ? 'Drop en la última serie: al fallar, baja a <b>' + nf(redondea(pDrop * 0.75)) + ' kg</b> y sigue sin descanso hasta fallar otra vez.'
-          : 'Drop en la última serie: apunta arriba tu peso y te digo a cuánto bajar (un cuarto menos). Al fallar, sigue sin descanso.')
-          + info("drop") + '</p>';
+      if(hayDrop){
+        h += '<p class="expl">Drop: al fallar la última serie, baja a <b data-dropn="' + esc(nombreEj(e)) + '">' +
+          (kDrop ? nf(kDrop) + ' kg' : 'un 15% menos') + '</b> y sigue sin descanso hasta el fallo.' +
+          info("drop") + '</p>';
+        if(!kDrop) h += '<p class="expl">Apunta abajo tu peso y te calculo el del drop.</p>';
       }
       var pl2 = discos(c[0].kg, e.bw);
       if(pl2){
@@ -2341,9 +2369,9 @@ var GLOSARIO = {
   descarga:  {t:"Semana de descarga",
               d:"La última semana de cada ciclo. Haces menos series con el mismo peso. No es perder el tiempo: es lo que te deja llegar entero al ciclo siguiente."},
   restpause: {t:"Rest pause",
-              d:"Llegas al fallo, descansas 15 segundos sin soltar el peso y sigues hasta que no puedas más. Todo cuenta como una sola serie."},
+              d:"Llegas al fallo, descansas 15 segundos y sigues hasta que no puedas más. La app cuenta los 15 segundos sola al cerrar la última serie."},
   drop:      {t:"Drop",
-              d:"Al acabar la última serie, bajas el peso un 20% o 30% y haces más repeticiones sin descansar."},
+              d:"Al fallar la última serie, bajas el peso un 15% y sigues sin descansar hasta el fallo. La app te calcula el peso."},
   ciclo:     {t:"Ciclo",
               d:"Tres semanas con el mismo esquema. Cada ciclo sube un poco el peso y baja las repeticiones. Ocho ciclos son un sistema completo, casi un año."},
   fallo:     {t:"Al fallo",
@@ -2829,7 +2857,7 @@ function vAjustes(){
     '<p class="note" style="margin-bottom:0">En dominadas, el lastre es tu marca menos tu peso.</p>' +
     '</div></div>';
 
-  h += '<div class="sect"><div class="eyebrow">Aviso fuera de la app</div><div class="card">';
+  h += '<div class="sect" id="sect-aviso"><div class="eyebrow">Aviso fuera de la app</div><div class="card">';
   var pOK = ("Notification" in window) && ("PushManager" in window) && ("serviceWorker" in navigator);
   if(pushGuardado() && !pushActivo()){
     h += '<p class="note" style="margin:0 0 10px"><b>Ojo: la vía fina está a medias.</b> ' +
@@ -3180,6 +3208,7 @@ function startTimer(seg, lab, sub){
   document.getElementById("timer").hidden = false;
   document.getElementById("tlab").textContent = T.lab;
   document.getElementById("tsub").textContent = T.sub;
+  document.getElementById("tfuera").hidden = !!(pushActivo() || state.ntfy);
   var v0 = document.getElementById("vivo");
   if(v0) v0.textContent = "";
   if(!actx){ try{ actx = new (window.AudioContext || window.webkitAudioContext)(); }catch(e){} }
@@ -3215,6 +3244,19 @@ function tick(){
   if(q < -600) stopTimer();
 }
 
+/* Al cerrar una serie de básico arranca el descanso. Si es la última y el
+   ciclo lleva rest pause, en su lugar arrancan solos los 15 segundos. */
+function trasSerie(p, e, i, j){
+  var c = cargas(p, e), q = 0;
+  c.forEach(function(x, k){ if(!setHecho(e, i, k, teoDe(e, x.kg), x.reps)) q++; });
+  if(fase(p.f).rp && j === c.length - 1 && !(apunte(i, j) || {}).rp2){
+    startTimer(15, "Rest pause", "Al cero, sigue hasta el fallo y apunta esas reps");
+    return;
+  }
+  startTimer(descansoDe(p, e), e.n,
+    q > 0 ? "Quedan " + q + " serie" + (q > 1 ? "s" : "") : "Ejercicio terminado");
+}
+
 /* ============================ EVENTOS ============================ */
 document.getElementById("tstop").addEventListener("click", stopTimer);
 document.getElementById("tplus").addEventListener("click", function(){
@@ -3235,9 +3277,19 @@ document.addEventListener("click", function(ev){
     saveSesion();
     if(sesion.sets[i][j]){
       var c = cargas(p, e), q = c.filter(function(x, k){ return !sesion.sets[i][k]; }).length;
-      startTimer(descansoDe(p, e), e.n,
+      if(conDrop(f, e) && j === c.length - 1 && !sesion.sets[i][c.length]) stopTimer();
+      else startTimer(descansoDe(p, e), e.n,
         q > 0 ? "Quedan " + q + " serie" + (q > 1 ? "s" : "") : "Ejercicio terminado");
     }
+    render(); return;
+  }
+  if((el = ev.target.closest("[data-drop]"))){
+    var di = +el.dataset.drop, pd = state.pos, fd = fase(pd.f), ed = RUT[fd.rut][letra(fd, pd.e)][di];
+    var nd = cargas(pd, ed).length;
+    sesion.sets[di] = sesion.sets[di] || [];
+    sesion.sets[di][nd] = !sesion.sets[di][nd];
+    saveSesion();
+    if(sesion.sets[di][nd]) startTimer(descansoDe(pd, ed), ed.n, "Ejercicio terminado");
     render(); return;
   }
   if((el = ev.target.closest("[data-alt]"))){
@@ -3265,12 +3317,8 @@ document.addEventListener("click", function(ev){
     lg8[rj8].rir = (String(lg8[rj8].rir) === el.dataset.v) ? "" : el.dataset.v;
     var p8 = state.pos, f8 = fase(p8.f), e8 = RUT[f8.rut][letra(f8, p8.e)][ri8];
     var c8 = cargas(p8, e8);
-    if(setHecho(e8, ri8, rj8, c8[rj8] ? teoDe(e8, c8[rj8].kg) : 0, c8[rj8] ? c8[rj8].reps : 0)){
-      var q8 = 0;
-      c8.forEach(function(x, k){ if(!setHecho(e8, ri8, k, teoDe(e8, x.kg), x.reps)) q8++; });
-      startTimer(descansoDe(p8, e8), e8.n,
-        q8 > 0 ? "Quedan " + q8 + " serie" + (q8 > 1 ? "s" : "") : "Ejercicio terminado");
-    }
+    if(setHecho(e8, ri8, rj8, c8[rj8] ? teoDe(e8, c8[rj8].kg) : 0, c8[rj8] ? c8[rj8].reps : 0))
+      trasSerie(p8, e8, ri8, rj8);
     saveSesion(); render(); return;
   }
   if((el = ev.target.closest("[data-tec]"))){
@@ -3281,12 +3329,8 @@ document.addEventListener("click", function(ev){
     var p4 = state.pos, f4 = fase(p4.f), e4 = RUT[f4.rut][letra(f4, p4.e)][ti];
     var c4 = cargas(p4, e4);
     /* al completar la serie arranca el descanso, como en el resto de la app */
-    if(setHecho(e4, ti, tj, c4[tj] ? teoDe(e4, c4[tj].kg) : 0, c4[tj] ? c4[tj].reps : 0)){
-      var q4 = 0;
-      c4.forEach(function(x, k){ if(!setHecho(e4, ti, k, teoDe(e4, x.kg), x.reps)) q4++; });
-      startTimer(descansoDe(p4, e4), e4.n,
-        q4 > 0 ? "Quedan " + q4 + " serie" + (q4 > 1 ? "s" : "") : "Ejercicio terminado");
-    }
+    if(setHecho(e4, ti, tj, c4[tj] ? teoDe(e4, c4[tj].kg) : 0, c4[tj] ? c4[tj].reps : 0))
+      trasSerie(p4, e4, ti, tj);
     saveSesion(); render(); return;
   }
   if((el = ev.target.closest("[data-teo]"))){
@@ -3311,7 +3355,7 @@ document.addEventListener("click", function(ev){
   if((el = ev.target.closest("[data-go]"))){
     tab = el.dataset.go; render();
     if(el.dataset.go === "aj"){
-      var sd = document.getElementById("sect-dias");
+      var sd = document.getElementById(el.dataset.sect || "sect-dias");
       if(sd) sd.scrollIntoView({block:"start"});
     }else window.scrollTo(0, 0);
     return;
@@ -3556,9 +3600,15 @@ document.addEventListener("input", function(ev){
   if(t.dataset.rp2){
     var pa2 = t.dataset.rp2.split(","), pi2 = +pa2[0], pj2 = +pa2[1];
     var plg = logEx(pi2); plg[pj2] = plg[pj2] || {};
-    var pv2 = parseInt(String(t.value).replace(/[^0-9]/g, ""), 10);
+    var pv2 = parseInt(String(t.value).replace(/[^0-9]/g, ""), 10), antes2 = plg[pj2].rp2;
     plg[pj2].rp2 = (!isNaN(pv2) && pv2 > 0) ? pv2 : null;
     saveSesion();
+    var fila2 = t.closest(".srow");
+    if(fila2) fila2.classList.toggle("ok", !!plg[pj2].rp2);
+    if(plg[pj2].rp2 && !antes2){
+      var pp2 = state.pos, fp2 = fase(pp2.f), ep2 = RUT[fp2.rut][letra(fp2, pp2.e)][pi2];
+      startTimer(descansoDe(pp2, ep2), ep2.n, "Ejercicio terminado");
+    }
     return;
   }
   if(t.dataset.reps){
@@ -3611,7 +3661,13 @@ document.addEventListener("input", function(ev){
   }
   if(t.dataset.peso){
     var w = parseFloat(String(t.value).replace(",", "."));
-    if(!isNaN(w) && w > 0){ state.pesos[t.dataset.peso] = w; save(); }
+    if(!isNaN(w) && w > 0){
+      state.pesos[t.dataset.peso] = w; save();
+      document.querySelectorAll("[data-dropn]").forEach(function(b){
+        if(b.dataset.dropn !== t.dataset.peso) return;
+        b.textContent = nf(kgDrop(w)) + (b.tagName === "B" && b.closest(".expl") ? " kg" : "");
+      });
+    }
     return;
   }
   if(t.id === "cp" || t.id === "cr"){
