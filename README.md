@@ -184,11 +184,12 @@ de dormir). Cada tarjeta explica cómo elegir un producto bueno sin atarse a mar
 
 Desde el 9 de noviembre de 2026 hay una cuarta tarjeta, "Qué comer en cada ciclo"
 (`comidaCicloHTML`), con la base anual y un desplegable por bloque que se abre solo en el que
-toca: superávit del 10 al 20 % y 0,25 a 0,5 % del peso a la semana, proteína 1,6 a 2,2 g/kg en
+toca: superávit del 5 al 20 % y 0,25 a 0,5 % del peso a la semana, los dos escalados por experiencia
+(los avanzados, a la parte baja), y el peso estable de meses como mantenimiento; proteína 1,6 a 2,2 g/kg en
 comidas de 0,4 a 0,55 g/kg, grasa 0,5 a 1,5 g/kg, hidratos el resto con un suelo de 3 a 5 g/kg,
 más hidratos en los ciclos de volumen, mantenimiento o 5 a 10 % en fuerza, cafeína 3 mg/kg y
 gelatina con vitamina C opcionales en fuerza, y nada de dieta en la descarga. Fuentes: Iraki,
-Fitschen, Espinar y Helms 2019 (Sports 7:154), posición de la ISSN sobre creatina (Kreider 2017)
+Fitschen, Espinar y Helms 2019 (Sports 7:154), Helms y otros 2023 (Sports Med Open 9:102), posición de la ISSN sobre creatina (Kreider 2017)
 y Shaw 2017 sobre gelatina y síntesis de colágeno. Las cifras se calculan con el peso de Ajustes.
 
 Los botones de compra llevan la etiqueta de Amazon Afiliados de Marcos, `cuadernofuerz-21`
