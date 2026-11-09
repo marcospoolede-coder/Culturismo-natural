@@ -2376,7 +2376,7 @@ var GLOSARIO = {
   teorico:   {t:"Peso teórico",
               d:"El peso que te toca según tu marca y el ciclo en el que estás. Es una propuesta: si hoy no sale, apunta el que hayas movido de verdad."},
   superavit: {t:"Superávit",
-              d:"Comer algo más de lo que gastas. Es lo que permite construir músculo; si es grande, lo que sobra se guarda como grasa. Un 10 a 20 % por encima de lo que necesitas para mantener el peso basta."},
+              d:"Comer algo más de lo que gastas. Es lo que permite construir músculo; si es grande, lo que sobra se guarda como grasa. Un 5 a 10 % por encima de lo que necesitas para mantener el peso basta si llevas tiempo entrenando."},
   tecnica:   {t:"Técnica A, B o C",
               d:"Cómo ha salido la serie. A, limpia de principio a fin. B, se te ha roto alguna repetición. C, has tenido que hacer trampas para subirla."},
   descarga:  {t:"Semana de descarga",
@@ -2784,7 +2784,8 @@ function vCom(){
 function comidaCicloHTML(kg){
   var pf = fase(state.pos.f), des = pf.tipo === "hip" && micro(state.pos) === 2;
   var cur = des ? 5 : (pf.tipo === "fuerza" ? 4 : (pf.tipo === "final" ? 5 : (state.pos.f <= 2 ? 2 : 3)));
-  var gMin = Math.round(kg * 0.25) * 10, gMax = Math.round(kg * 0.5) * 10;   /* 0,25 a 0,5 % del peso, en decenas de gramos */
+  var gMin = Math.round(kg * 0.5) * 10, gMax = Math.round(kg) * 10;   /* 0,5 a 1 % del peso al mes, en decenas de gramos */
+  var gSemMin = Math.round(kg * 0.5 / 4.3) * 10, gSemMax = Math.round(kg / 4.3) * 10;
   var chMin = Math.round(kg * 3), chMax = Math.round(kg * 5);
   var grMin = Math.round(kg * 0.5), grMax = Math.round(kg * 1.5);
   var pcMin = Math.round(kg * 0.4), pcMax = Math.round(kg * 0.55);
@@ -2798,15 +2799,15 @@ function comidaCicloHTML(kg){
     '<p class="expl">La base es la misma todo el año: comer un poco más de lo que gastas, proteína repartida y dormir. ' +
     'Lo que cambia por ciclo son los hidratos y el margen de calorías. Cifras con tus ' + nf(kg) + ' kg de Ajustes.</p>';
   h += bloque(1, "Todo el año, la base", [
-    "Un poco más de lo que gastas: un 10 a 20 % por encima de mantenimiento. Si llevas años entrenando, 5 a 10 %." + info("superavit"),
-    "La báscula manda: ganar <b>" + gMin + " a " + gMax + " g</b> a la semana. Si sube más, sobra comida; si no sube en dos semanas, falta.",
+    "Un poco más de lo que gastas: un 5 a 10 % por encima de mantenimiento. Solo si acabas de empezar a entrenar, hasta un 15 a 20 %." + info("superavit"),
+    "La báscula manda: ganar <b>" + gMin + " a " + gMax + " g al mes</b>, unos " + gSemMin + " a " + gSemMax + " g a la semana. Mira la media de la semana, no el dato de un día. Si sube más, sobra comida; si no sube en un mes, falta.",
     "Proteína 1,6 a 2,2 g por kilo, en 3 a 6 comidas de <b>" + pcMin + " a " + pcMax + " g</b>. Una en las dos horas de antes o de después de entrenar, y otra sin batido antes de dormir.",
     "Grasa <b>" + grMin + " a " + grMax + " g</b> al día, de 0,5 a 1,5 g por kilo. Ni muy baja ni muy alta.",
     "Hidratos, el resto: al menos <b>" + chMin + " a " + chMax + " g</b> al día, de 3 a 5 g por kilo. Son la gasolina de las series.",
     "Dormir 7 a 9 horas. Ahí se construye el músculo y se reparan los tendones."]);
   h += bloque(2, "Ciclos 1 a 3: volumen alto", [
     "Muchas series y cuatro días: los hidratos arriba de la horquilla, hacia 5 g por kilo, sobre todo los días de entreno.",
-    "Superávit del 10 al 20 %: es el momento de construir.",
+    "Superávit arriba de la horquilla, hacia el 10 %: es el momento de construir.",
     "Una comida con hidratos y proteína 2 o 3 horas antes de entrenar. En ayunas, no: te quedas sin gasolina y te mareas."]);
   h += bloque(3, "Ciclos 4 a 6: más peso, menos reps", [
     "Superávit igual y la proteína cerca de 2 g por kilo: el esfuerzo por serie es mayor.",
