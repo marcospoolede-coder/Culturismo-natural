@@ -704,7 +704,7 @@
    del 31 de mayo de 2025 y de las tablas de rutina por microciclo.     */
 
 /* súbela en cada despliegue: la app instalada la compara para avisar de que hay otra */
-var VERSION = "9 de noviembre de 2026, 21:05";
+var VERSION = "9 de noviembre de 2026, 21:11";
 var BARRA = 20;
 var PESO_CORP_DEF = 75;   /* peso corporal por defecto, se cambia en Ajustes */
 function pesoCorp(){ return state.peso > 0 ? state.peso : PESO_CORP_DEF; }
@@ -2375,6 +2375,8 @@ var GLOSARIO = {
               d:"Los ejercicios de apoyo, normalmente en máquina o con mancuernas. Van después de los básicos y el peso lo eliges tú."},
   teorico:   {t:"Peso teórico",
               d:"El peso que te toca según tu marca y el ciclo en el que estás. Es una propuesta: si hoy no sale, apunta el que hayas movido de verdad."},
+  superavit: {t:"Superávit",
+              d:"Comer algo más de lo que gastas. Es lo que permite construir músculo; si es grande, lo que sobra se guarda como grasa. Un 10 a 20 % por encima de lo que necesitas para mantener el peso basta."},
   tecnica:   {t:"Técnica A, B o C",
               d:"Cómo ha salido la serie. A, limpia de principio a fin. B, se te ha roto alguna repetición. C, has tenido que hacer trampas para subirla."},
   descarga:  {t:"Semana de descarga",
@@ -2562,7 +2564,16 @@ var LOGROS = [
   {id:"s100", n:"100 sesiones",      d:"Cien sesiones cerradas"},
   {id:"ciclo",n:"Ciclo cerrado",     d:"Terminar un ciclo entero del plan"},
   {id:"pr",   n:"Marca nueva",       d:"Subir un maximal"},
-  {id:"pico", n:"Pico de fuerza",    d:"Terminar el bloque de fuerza"}
+  {id:"pico", n:"Pico de fuerza",    d:"Terminar el bloque de fuerza"},
+  /* uno por estrenar cada bloque del plan: se da al cerrar la primera sesión que haces en él */
+  {id:"f_c1", n:"Bautismo de hierro", d:"Estrenar el ciclo 1"},
+  {id:"f_c2", n:"Más chicha",         d:"Estrenar el ciclo 2: sube el peso"},
+  {id:"f_c3", n:"Setenta y subiendo", d:"Estrenar el ciclo 3, al 70 %"},
+  {id:"f_c4", n:"Abecedario",         d:"Estrenar la rutina A, B y C"},
+  {id:"f_c5", n:"Zona pesada",        d:"Estrenar el ciclo 5, al 80 %"},
+  {id:"f_c6", n:"Pausa dramática",    d:"Estrenar el ciclo 6: rest pause y drop"},
+  {id:"f_f",  n:"Modo Hulk",          d:"Estrenar el bloque de fuerza"},
+  {id:"f_fin",n:"Hércules",           d:"Estrenar el cierre, con el pico de fuerza"}
 ];
 function daLogro(id){
   state.logros = state.logros || {};
@@ -2570,7 +2581,7 @@ function daLogro(id){
   state.logros[id] = hoy();
   return true;
 }
-function revisaLogros(cerroFase, eraFuerza){
+function revisaLogros(cerroFase, eraFuerza, fId){
   var tot = (state.hechas || []).length, r = racha(), nuevos = [];
   function mira(c, id){ if(c && daLogro(id)) nuevos.push(id); }
   mira(tot >= 1, "s1");
@@ -2583,6 +2594,7 @@ function revisaLogros(cerroFase, eraFuerza){
   mira(r >= 24, "w24");
   mira(cerroFase, "ciclo");
   mira(cerroFase && eraFuerza, "pico");
+  mira(!!fId, "f_" + fId);
   return nuevos;
 }
 
@@ -2758,11 +2770,64 @@ function vCom(){
       "Sin mezclas con diez cosas más. El óxido de magnesio, ni gratis: se absorbe mal."]) +
     botonCompra("magnesio bisglicinato quelado elemental", "Ver magnesio en Amazon") + '</div></div>';
 
+  h += comidaCicloHTML(kg);
+
   h += '<div class="sect"><p class="expl" style="margin:0"><b>Lo demás, no lo necesitas.</b> ' +
     'Quemagrasas, aminoácidos y boosters son dinero tirado para un natural.</p></div>';
   h += '<div class="sect"><div class="banner"><b>Ojo</b><span>No es consejo médico. Con el riñón delicado, ' +
     'medicación o embarazo, pregunta antes a tu médico.</span></div></div>';
   view.innerHTML = h;
+}
+
+/* qué comer según el bloque del plan: la base es la misma todo el año y lo
+   que cambia son los hidratos y el margen de calorías. Fuentes al pie. */
+function comidaCicloHTML(kg){
+  var pf = fase(state.pos.f), des = pf.tipo === "hip" && micro(state.pos) === 2;
+  var cur = des ? 5 : (pf.tipo === "fuerza" ? 4 : (pf.tipo === "final" ? 5 : (state.pos.f <= 2 ? 2 : 3)));
+  var gMin = Math.round(kg * 0.25) * 10, gMax = Math.round(kg * 0.5) * 10;   /* 0,25 a 0,5 % del peso, en decenas de gramos */
+  var chMin = Math.round(kg * 3), chMax = Math.round(kg * 5);
+  var grMin = Math.round(kg * 0.5), grMax = Math.round(kg * 1.5);
+  var pcMin = Math.round(kg * 0.4), pcMax = Math.round(kg * 0.55);
+  function bloque(k, t, items){
+    return '<details class="fold"' + (cur === k ? ' open' : '') + '><summary>' + t +
+      (cur === k ? '<span class="chip" style="margin-left:auto">Ahora</span>' : '') + '</summary><div class="in"><ul>' +
+      items.map(function(x){ return '<li>' + x + '</li>'; }).join("") + '</ul></div></details>';
+  }
+  var h = '<div class="sect"><div class="card"><div class="com-h"><div><b>Qué comer en cada ciclo</b>' +
+    '<small>Para crecer, recuperarte antes y no lesionarte</small></div></div>' +
+    '<p class="expl">La base es la misma todo el año: comer un poco más de lo que gastas, proteína repartida y dormir. ' +
+    'Lo que cambia por ciclo son los hidratos y el margen de calorías. Cifras con tus ' + nf(kg) + ' kg de Ajustes.</p>';
+  h += bloque(1, "Todo el año, la base", [
+    "Un poco más de lo que gastas: un 10 a 20 % por encima de mantenimiento. Si llevas años entrenando, 5 a 10 %." + info("superavit"),
+    "La báscula manda: ganar <b>" + gMin + " a " + gMax + " g</b> a la semana. Si sube más, sobra comida; si no sube en dos semanas, falta.",
+    "Proteína 1,6 a 2,2 g por kilo, en 3 a 6 comidas de <b>" + pcMin + " a " + pcMax + " g</b>. Una en las dos horas de antes o de después de entrenar, y otra sin batido antes de dormir.",
+    "Grasa <b>" + grMin + " a " + grMax + " g</b> al día, de 0,5 a 1,5 g por kilo. Ni muy baja ni muy alta.",
+    "Hidratos, el resto: al menos <b>" + chMin + " a " + chMax + " g</b> al día, de 3 a 5 g por kilo. Son la gasolina de las series.",
+    "Dormir 7 a 9 horas. Ahí se construye el músculo y se reparan los tendones."]);
+  h += bloque(2, "Ciclos 1 a 3: volumen alto", [
+    "Muchas series y cuatro días: los hidratos arriba de la horquilla, hacia 5 g por kilo, sobre todo los días de entreno.",
+    "Superávit del 10 al 20 %: es el momento de construir.",
+    "Una comida con hidratos y proteína 2 o 3 horas antes de entrenar. En ayunas, no: te quedas sin gasolina y te mareas."]);
+  h += bloque(3, "Ciclos 4 a 6: más peso, menos reps", [
+    "Superávit igual y la proteína cerca de 2 g por kilo: el esfuerzo por serie es mayor.",
+    "Hidratos de 4 a 5 g por kilo los días de entreno; los de descanso puedes bajar a 3.",
+    "Rest pause y drop castigan más: cuida la comida de después de entrenar y la noche de sueño."]);
+  h += bloque(4, "Bloque de fuerza: 80 a 95 %", [
+    "Menos series totales pero máxima intensidad: no hace falta más comida, sí la misma. Mantenimiento o un 5 a 10 % por encima.",
+    "Hidratos de 3 a 5 g por kilo, con una comida completa 2 o 3 horas antes del entreno. El sistema nervioso tira de azúcar.",
+    "Cafeína opcional: 3 mg por kilo una hora antes, unos <b>" + Math.round(kg * 3) + " mg</b>, un café largo o dos cortos. Si entrenas de noche, no.",
+    "Para los tendones: 15 g de gelatina o colágeno con vitamina C una hora antes de entrenar. Evidencia preliminar, pero barata e inocua.",
+    "Aquí es donde más se lesiona la gente: si una articulación duele, baja el peso. Ni la comida ni el calentamiento lo tapan."]);
+  h += bloque(5, "Semana de descarga y cierre", [
+    "No hagas dieta en la descarga: mantén la proteína y baja un poco los hidratos si tienes menos hambre. La descarga es para recuperar, no para compensar.",
+    "El cierre al 80 % vuelve a ser volumen: hidratos otra vez a 4 o 5 g por kilo."]);
+  h += '<p class="expl" style="margin:10px 0 0; font-size:12.5px">Fuentes: ' +
+    '<a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6680710/" target="_blank" rel="noopener">Iraki y Helms 2019</a>, ' +
+    'nutrición fuera de temporada para culturistas; ' +
+    '<a href="https://pubmed.ncbi.nlm.nih.gov/28615996/" target="_blank" rel="noopener">posición de la ISSN sobre creatina</a>; ' +
+    '<a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC5183725/" target="_blank" rel="noopener">Shaw 2017</a>, gelatina y colágeno.</p>' +
+    '</div></div>';
+  return h;
 }
 
 function cuentaHTML(){
@@ -3521,7 +3586,7 @@ document.addEventListener("click", function(ev){
     var sig = avanzar(p2), cerroFase = sig.f !== p2.f;
     var eraFuerza = f2.tipo === "fuerza";
     if(cerroFase && !state.ejemplo) fotoDelCiclo(f2, "cierre de ciclo");
-    var nuevos = revisaLogros(cerroFase, eraFuerza);
+    var nuevos = revisaLogros(cerroFase, eraFuerza, f2.id);
     state.pos = sig;
     sesion = {}; saveSesion(); save(); stopTimer(); render();
     felicita(f2, L2, nAp, cerroFase, {meta:cierraMeta, escudo:escudo, salvada:salvada, logros:nuevos});

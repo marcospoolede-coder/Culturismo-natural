@@ -86,6 +86,10 @@ Reglas que aplica la app:
   incluida. En dominadas el lastre es la marca menos el peso corporal.
 - **Complementarios**: al fallo, 2 minutos entre series, el peso lo elige la persona.
 - **Jump sets**: dos o tres ejercicios alternando cada 30 segundos, por vueltas.
+- **Entre ejercicios**: ni el cuaderno ni el curso fijan un descanso. La app arranca el
+  cronómetro al apuntar la última serie con el descanso del ejercicio que acaba, así que del
+  básico al complementario se descansa lo del básico (3:00 en fuerza) y entre complementarios
+  2:00.
 - **Convertidor Maurice y Rydin**: cada repetición vale un 3%. Factor = 1 + 0,03 × (reps − objetivo).
   Validado contra Nuzzo 2024: error menor del 2,5% en tren superior hasta 15 reps; sobreestima
   un 8 a 12% en tren inferior.
@@ -165,6 +169,10 @@ Adaptación del modelo de Duolingo a 3 sesiones por semana (investigación de se
   solo y la racha sigue.
 - **Puntos y logros**: se mantienen porque Marcos lo quiso, aunque la evidencia avisa de que los
   puntos pueden restar motivación intrínseca.
+- **Premio por estrenar cada bloque** (9 de noviembre de 2026): al cerrar la primera sesión
+  que haces en un bloque cae un logro con nombre propio: Bautismo de hierro, Más chicha,
+  Setenta y subiendo, Abecedario, Zona pesada, Pausa dramática, Modo Hulk y Hércules. Ids
+  `f_` más el id de la fase, concedidos en `revisaLogros()`.
 - Pendiente con mejor evidencia: preguntar al cerrar la sesión qué día y a qué hora será la
   siguiente (intenciones de implementación).
 
@@ -173,6 +181,15 @@ Adaptación del modelo de Duolingo a 3 sesiones por semana (investigación de se
 La pestaña Comida habla solo de tres cosas: proteína (1,6 a 2 g por kg), creatina monohidrato
 (5 g, mejor Creapure) y magnesio bisglicinato para el descanso (200 a 300 mg elementales antes
 de dormir). Cada tarjeta explica cómo elegir un producto bueno sin atarse a marcas.
+
+Desde el 9 de noviembre de 2026 hay una cuarta tarjeta, "Qué comer en cada ciclo"
+(`comidaCicloHTML`), con la base anual y un desplegable por bloque que se abre solo en el que
+toca: superávit del 10 al 20 % y 0,25 a 0,5 % del peso a la semana, proteína 1,6 a 2,2 g/kg en
+comidas de 0,4 a 0,55 g/kg, grasa 0,5 a 1,5 g/kg, hidratos el resto con un suelo de 3 a 5 g/kg,
+más hidratos en los ciclos de volumen, mantenimiento o 5 a 10 % en fuerza, cafeína 3 mg/kg y
+gelatina con vitamina C opcionales en fuerza, y nada de dieta en la descarga. Fuentes: Iraki,
+Fitschen, Espinar y Helms 2019 (Sports 7:154), posición de la ISSN sobre creatina (Kreider 2017)
+y Shaw 2017 sobre gelatina y síntesis de colágeno. Las cifras se calculan con el peso de Ajustes.
 
 Los botones de compra llevan la etiqueta de Amazon Afiliados de Marcos, `cuadernofuerz-21`
 (constante `AFILIADO`, cuenta creada el 6 de octubre de 2026). Con la etiqueta puesta aparece
