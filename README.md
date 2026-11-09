@@ -192,6 +192,35 @@ gelatina con vitamina C opcionales en fuerza, y nada de dieta en la descarga. Fu
 Fitschen, Espinar y Helms 2019 (Sports 7:154), Helms y otros 2023 (Sports Med Open 9:102), posición de la ISSN sobre creatina (Kreider 2017)
 y Shaw 2017 sobre gelatina y síntesis de colágeno. Las cifras se calculan con el peso de Ajustes.
 
+### Lo que comes frente a lo que gastas (10 de noviembre de 2026)
+
+Arriba de la pestaña Comida hay un registro de comidas con semáforo. Vive en Supabase
+(`nutricion.sql`): tablas `comidas`, `gasto_diario`, `peso_corporal`, `integraciones`,
+`whoop_tokens` y `whoop_estados`, el bucket privado `comidas` para las fotos y la columna
+`plan` de `acceso`.
+
+- Planes, en `acceso.plan`:
+  - `gratis`: comidas a mano y repetir comidas de días anteriores.
+  - `pago`: foto y descripción con IA por la API de Claude, en la Edge Function
+    `analiza-comida` (secreto `ANTHROPIC_API_KEY`, modelo `claude-opus-5-5` con esfuerzo bajo,
+    tope de 15 al día). Sin la clave, la función contesta `sin_clave` y la app lo explica.
+  - `propio`: lo mismo, pero lo calcula el Mac de Marcos con su suscripción de Claude
+    (`trabajador/comidas_suscripcion.py`, launchd cada minuto, `trabajador/instala.sh`). Si la
+    suscripción está en su límite de uso, la comida espera y sale sola después.
+- Gasto, por orden de preferencia: WHOOP (Edge Function `whoop`, OAuth con refresco y reloj
+  cada hora), Apple Salud (Edge Function `salud`, que recibe un atajo del iPhone con un código
+  personal), a mano, el mantenimiento que ponga la persona o una estimación con Mifflin-St Jeor.
+  WHOOP solo deja guardar copias el tiempo justo: se guarda el total de kcal por día y se borra
+  a los 30 días.
+- Semáforo: verde si la media de 7 días cae en la horquilla de superávit (Helms 2023: 10 a 20 %
+  con menos de un año entrenando, 7 a 15 % de uno a tres, 5 a 10 % con más de tres; mitad baja
+  en la descarga), naranja hasta 7 puntos fuera y rojo más allá. Con tres semanas de pesos
+  manda la báscula (0,25 a 0,5 %, 0,25 a 0,4 % o 0,1 a 0,25 % del peso a la semana), porque los
+  relojes fallan un 10 a 40 % en el gasto.
+- Recomendaciones: kcal que faltan o sobran con ejemplos de comida, proteína corta frente a
+  1,6 g/kg y aviso de comidas de más de 900 kcal si luego hay que rendir trabajando.
+- Despliegue sin panel: `bash supabase/despliega.sh` (tablas, funciones, secretos y reloj).
+
 Los botones de compra llevan la etiqueta de Amazon Afiliados de Marcos, `cuadernofuerz-21`
 (constante `AFILIADO`, cuenta creada el 6 de octubre de 2026). Con la etiqueta puesta aparece
 sola la línea de aviso de afiliado que exige Amazon. Pendiente de Marcos: datos de pago en la

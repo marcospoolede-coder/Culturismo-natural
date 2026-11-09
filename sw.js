@@ -2,7 +2,7 @@
    Sirve para dos cosas: que la aplicación se instale en el móvil como una app
    y que funcione sin cobertura, que en un sótano de gimnasio es lo normal.
    Sube VERSION en cada despliegue para que el móvil recoja los cambios. */
-var VERSION = "cuaderno-v6";
+var VERSION = "cuaderno-v7";
 var BASE = new URL("./", self.location).pathname;
 /* La página no se precachea a propósito: si se guarda en la instalación, la
    primera visita tras un cambio sirve la copia vieja. Se guarda sola al
