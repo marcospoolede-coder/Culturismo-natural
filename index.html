@@ -701,7 +701,7 @@
    del 31 de mayo de 2025 y de las tablas de rutina por microciclo.     */
 
 /* súbela en cada despliegue: la app instalada la compara para avisar de que hay otra */
-var VERSION = "5 de noviembre de 2026, 00:12";
+var VERSION = "9 de noviembre de 2026, 20:00";
 var BARRA = 20;
 var PESO_CORP_DEF = 75;   /* peso corporal por defecto, se cambia en Ajustes */
 function pesoCorp(){ return state.peso > 0 ? state.peso : PESO_CORP_DEF; }
@@ -1756,7 +1756,7 @@ function vHoy(){
       h += loopHTML(e, '<b>' + c.length + ' series</b> de ' + c.map(function(x){ return x.reps; }).join(", ") +
         '<br>Descanso ' + mmss(descansoDe(p, e)) + info("basico"));
       h += aproxHTML(e, c);
-      h += '<div class="sgrid"><div class="shead"><span></span><span>Anterior</span><span>kg</span><span>reps</span><span></span></div>';
+      h += '<div class="sgrid"><div class="shead"><span></span><span>Última vez</span><span>kg</span><span>reps</span><span></span></div>';
       var libre = -1;
       c.forEach(function(x, j){
         var teo = teoDe(e, x.kg);
@@ -1766,8 +1766,8 @@ function vHoy(){
         h += '<div class="srow' + (ok ? " ok" : (j === libre ? " act" : "")) + '">' +
           '<span class="sn">' + (j + 1) + '</span>' +
           (an ? '<button class="prev" type="button" data-prev="' + i + ',' + j + '" data-kg="' + an.kg + '" data-reps="' + an.reps + '" ' +
-                'aria-label="Copiar lo de la última vez">' + nf(an.kg) + ' x ' + an.reps + '<small>toca y copia</small></button>'
-              : '<span class="prev"><small>sin datos</small></span>') +
+                'aria-label="Copiar lo de la última vez">' + nf(an.kg) + ' x ' + an.reps + '</button>'
+              : '<span class="prev"></span>') +
           '<input inputmode="decimal" data-real="' + i + ',' + j + '" data-teo="' + (teo || 0) + '" value="' +
           (val ? nf(val) : "") + '" aria-label="Peso de la serie ' + (j + 1) + '">' +
           '<input inputmode="numeric" data-reps="' + i + ',' + j + '" value="' + (vrep ? vrep : "") + '" ' +
