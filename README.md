@@ -219,6 +219,13 @@ Arriba de la pestaña Comida hay un registro de comidas con semáforo. Vive en S
   relojes fallan un 10 a 40 % en el gasto.
 - Recomendaciones: kcal que faltan o sobran con ejemplos de comida, proteína corta frente a
   1,6 g/kg y aviso de comidas de más de 900 kcal si luego hay que rendir trabajando.
+- Pantalla (13 de noviembre de 2026): la pestaña tiene tres apartados, Comidas, Suplementos y Guía.
+  Comidas abre con un calendario del mes: cada día con comidas lleva su balance, lo comido menos lo
+  gastado, y el color del semáforo. Debajo, el día elegido con Comido, Gastado y Superávit o Déficit,
+  la proteína y cinco cajitas (desayuno, media mañana, comida, merienda y cena) que se rellenan con
+  foto, descripción, a mano o repitiendo una comida. La cajita sale de la hora de la comida (`N_MOM`),
+  sin columna nueva. Después, la tarjeta de Gasto de calorías y la semana. Se cargan 62 días (`N_HIST`).
+- Imágenes pendientes y sus encargos: `IMAGENES.md`. Las que existan se apuntan en `ILUS`.
 - Despliegue sin panel: `bash supabase/despliega.sh` (tablas, funciones, secretos y reloj). Pide
   `supabase login` hecho antes y que `aprobacion.sql` y `panel.sql` ya estén ejecutados. Las órdenes
   que cambian producción llevan `--yes`, porque la CLI 3 no pregunta cuando la lanza un agente.

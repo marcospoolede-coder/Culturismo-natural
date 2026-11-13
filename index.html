@@ -688,6 +688,56 @@
   .nit em{font-style:normal; color:var(--ink-3); font-size:13px}
   .nrep{margin-bottom:12px}
   .nrep .chip{cursor:pointer}
+  /* alimentación por días: calendario, balance, cajitas y gasto */
+  .nut .expl b{font-size:inherit}
+  .cal-nav button[disabled]{opacity:.3}
+  .cal-d.nd{cursor:pointer; gap:1px; padding:0; font-family:inherit}
+  .cal-d.nd small{font-size:10px; font-weight:800; line-height:1; letter-spacing:-.02em}
+  .cal-d.nd.verde{background:#46A758; color:#fff}
+  .cal-d.nd.naranja{background:#F2A33A; color:#1E2126}
+  .cal-d.nd.rojo{background:#E5484D; color:#fff}
+  .cal-d.nd.curso{background:var(--accent-soft); color:var(--accent)}
+  .cal-d.nd.sel{border-color:var(--ink); box-shadow:0 0 0 1.5px var(--ink)}
+  .cal-d.fut{opacity:.45}
+  .cal-g.nc .cal-d{aspect-ratio:auto; height:42px}
+  .nbal{display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-top:14px}
+  .nbal div{background:var(--surface-2); border-radius:12px; padding:10px 6px; text-align:center; min-width:0}
+  .nbal small{display:block; font-size:11.5px; font-weight:800; color:var(--ink-3); text-transform:uppercase; letter-spacing:.06em}
+  .nbal b{display:block; font-size:22px; font-weight:800; letter-spacing:-.02em; line-height:1.15; margin-top:2px}
+  .nbal em{display:block; font-style:normal; font-size:12px; color:var(--ink-2); margin-top:1px}
+  .nbal .verde{background:#46A758; color:#fff}
+  .nbal .naranja{background:#F2A33A; color:#1E2126}
+  .nbal .rojo{background:#E5484D; color:#fff}
+  .nbal .curso{background:var(--accent-soft); color:var(--accent)}
+  .nbal .verde small,.nbal .verde em,.nbal .naranja small,.nbal .naranja em,
+  .nbal .rojo small,.nbal .rojo em,.nbal .curso small,.nbal .curso em{color:inherit; opacity:.9}
+  .ncajas{display:grid; gap:8px; margin-top:14px}
+  .ncaja{border:1px solid var(--line); border-radius:14px; padding:10px 12px; background:var(--surface)}
+  .ncaja.vacia{border-style:dashed; background:transparent}
+  .ncaja-h{display:flex; align-items:center; gap:10px}
+  .ncaja-ic{width:36px; height:36px; border-radius:11px; background:var(--accent-soft); display:grid; place-items:center; flex:none}
+  .ncaja-ic svg,.nop svg{width:21px; height:21px; stroke:var(--accent); fill:none; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round}
+  .ncaja-h b{flex:1; font-size:15.5px; font-weight:800; min-width:0; line-height:1.2}
+  .ncaja-h b small{display:block; font-size:12.5px; font-weight:600; color:var(--ink-3); margin-top:1px}
+  .ncaja-h .mas{width:42px; height:42px; border-radius:13px; background:var(--fill); color:#fff; font-size:24px; font-weight:600;
+                line-height:1; display:grid; place-items:center; flex:none}
+  .ncaja .nlist{margin-top:8px}
+  .ngas{display:flex; align-items:flex-end; gap:16px}
+  .nbars{display:flex; align-items:flex-end; gap:5px; flex:1; min-width:0}
+  .nbars div{flex:1; display:flex; flex-direction:column; align-items:center; gap:3px}
+  .nbars i{display:block; width:100%; max-width:22px; border-radius:5px 5px 2px 2px; background:var(--line-2); min-height:3px}
+  .nbars .s i{background:var(--accent)}
+  .nbars .p i{opacity:.55}
+  .nbars small{font-size:10.5px; font-weight:800; color:var(--ink-3)}
+  .nbars .s small{color:var(--accent)}
+  .nops{display:grid; gap:8px; margin:4px 0 14px}
+  .nop{display:flex; align-items:center; gap:12px; width:100%; text-align:left; padding:12px; border-radius:14px;
+       border:1px solid var(--line-2); background:var(--surface-2)}
+  .nop[disabled]{opacity:.45}
+  .nop svg{width:24px; height:24px; flex:none}
+  .nop b{display:block; font-size:16px}
+  .nop small{display:block; font-size:13px; color:var(--ink-2); line-height:1.3}
+  .sup-img{display:block; width:100%; aspect-ratio:16/9; object-fit:cover; border-radius:12px; margin-bottom:10px; background:var(--surface-2)}
 
   /* felicitación y diálogos */
   .fel{position:fixed; inset:0; z-index:95; display:grid; place-items:center; padding:20px;
@@ -757,7 +807,7 @@
    del 31 de mayo de 2025 y de las tablas de rutina por microciclo.     */
 
 /* súbela en cada despliegue: la app instalada la compara para avisar de que hay otra */
-var VERSION = "10 de noviembre de 2026, 00:40";
+var VERSION = "13 de noviembre de 2026, 23:07";
 var BARRA = 20;
 var PESO_CORP_DEF = 75;   /* peso corporal por defecto, se cambia en Ajustes */
 function pesoCorp(){ return state.peso > 0 ? state.peso : PESO_CORP_DEF; }
@@ -2430,6 +2480,10 @@ var GLOSARIO = {
               d:"El peso que te toca según tu marca y el ciclo en el que estás. Es una propuesta: si hoy no sale, apunta el que hayas movido de verdad."},
   superavit: {t:"Superávit",
               d:"Comer algo más de lo que gastas. Es lo que permite construir músculo; si es grande, lo que sobra se guarda como grasa. Un 5 a 20 % por encima de lo que necesitas para mantener el peso basta, y menos cuanto más tiempo lleves entrenando."},
+  balance:   {t:"Balance del día",
+              d:"Lo que comes menos lo que gastas. Si sale con más, es superávit: comes más de lo que gastas, que es lo que hace falta para construir músculo. Si sale con menos, es déficit: comes menos de lo que gastas, que sirve para perder grasa pero frena el músculo. El color dice lo cerca que estás de tu objetivo: verde si estás dentro, naranja si te quedas algo lejos y rojo si te vas mucho, por arriba o por abajo."},
+  gasto:     {t:"Gasto de calorías",
+              d:"Todo lo que quema tu cuerpo en un día: lo que gasta solo por estar vivo, más lo que te mueves y lo que entrenas. Con WHOOP o Apple Salud sale del aparato; sin ellos, se estima con tu peso, tu altura y tu edad. Los relojes y las pulseras fallan un 10 a 40 %, por eso con tres semanas de pesos manda la báscula."},
   tecnica:   {t:"Técnica A, B o C",
               d:"Cómo ha salido la serie. A, limpia de principio a fin. B, se te ha roto alguna repetición. C, has tenido que hacer trampas para subirla."},
   descarga:  {t:"Semana de descarga",
@@ -2759,7 +2813,8 @@ function dibujoCom(cual){
   var d = {
     prote: '<path d="M9 3h6M10 3v3M14 3v3M8 6h8l-1 4h-6zM9 10l-1 11h8l-1-11"/><path d="M9.5 14h5"/>',
     crea:  '<rect x="6" y="8" width="12" height="13" rx="1.5"/><path d="M7 8V6.5A1.5 1.5 0 0 1 8.5 5h7A1.5 1.5 0 0 1 17 6.5V8M9 12h6M12 15v3"/>',
-    magne: '<ellipse cx="9" cy="14" rx="3.2" ry="5" transform="rotate(-30 9 14)"/><ellipse cx="15.5" cy="10.5" rx="3.2" ry="5" transform="rotate(-30 15.5 10.5)"/><path d="M13 13.8l5 2.9"/>'
+    magne: '<ellipse cx="9" cy="14" rx="3.2" ry="5" transform="rotate(-30 9 14)"/><ellipse cx="15.5" cy="10.5" rx="3.2" ry="5" transform="rotate(-30 15.5 10.5)"/><path d="M13 13.8l5 2.9"/>',
+    gasto: '<path d="M12 3c.6 3 4.5 4.6 4.5 9a4.5 4.5 0 0 1-9 0c0-1.700.700-2.900 1.500-3.800.200 1.500.900 2.400 1.800 2.700-.400-2.800.300-5.600 1.200-7.900z"/><path d="M7 21h10"/>'
   }[cual];
   return '<div class="comdib"><svg viewBox="0 0 24 24">' + d + '</svg></div>';
 }
@@ -2779,11 +2834,42 @@ function dibujoCom(cual){
    Con tres semanas de pesos manda la báscula, porque el gasto de los relojes
    falla un 10 a 40 %. */
 var nut = {cargado:false, cargando:false, falta:false, plan:"gratis", comidas:[], gasto:[], pesos:[],
-           integ:{}, aviso:"", sondeo:null, ultSync:0};
+           integ:{}, aviso:"", sondeo:null, ultSync:0, vista:"", dia:null, mes:null, mom:null};
 
 function fISO(d){ return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10); }
 function nHoy(){ return fISO(new Date()); }
 function nDia(n){ return fISO(new Date(Date.now() - n * 864e5)); }
+/* días que se cargan: el mes en curso y el anterior, para el calendario */
+var N_HIST = 62;
+/* las cajitas del día. La cajita de una comida sale de su hora, así no hace
+   falta guardar nada más: `hasta` es donde acaba su franja */
+var N_MOM = [
+  {k:"desayuno", t:"Desayuno",     h:"08:00", hasta:"11:00"},
+  {k:"media",    t:"Media mañana", h:"11:30", hasta:"13:00"},
+  {k:"comida",   t:"Comida",       h:"14:30", hasta:"16:30"},
+  {k:"merienda", t:"Merienda",     h:"18:00", hasta:"20:00"},
+  {k:"cena",     t:"Cena",         h:"21:30", hasta:"24:00"}
+];
+function nMom(k){ for(var i = 0; i < N_MOM.length; i++) if(N_MOM[i].k === k) return N_MOM[i]; return N_MOM[2]; }
+function nMomDeHora(h){
+  if(!h || !/^\d\d:\d\d/.test(h)) return "comida";
+  if(h < "05:00") return "cena";          /* de madrugada sigue siendo la cena */
+  for(var i = 0; i < N_MOM.length; i++) if(h < N_MOM[i].hasta) return N_MOM[i].k;
+  return "cena";
+}
+/* hora con la que se guarda: la de ahora si es hoy y cae en esa cajita; si no, la de referencia */
+function nHoraPara(k, f){
+  var ahora = nHora();
+  return (f === nHoy() && nMomDeHora(ahora) === k) ? ahora : nMom(k).h;
+}
+/* el día que se está mirando: hoy, salvo que se toque otro en el calendario */
+function nSel(){ return nut.dia || nHoy(); }
+function nMil(n){ return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, "."); }
+function nSigno(n){ n = Math.round(n); return (n > 0 ? "+" : n < 0 ? "−" : "") + nMil(Math.abs(n)); }
+function nFechaLarga(f){
+  var t = new Date(f + "T12:00:00").toLocaleDateString("es-ES", {weekday:"long", day:"numeric", month:"long"});
+  return t.charAt(0).toUpperCase() + t.slice(1);
+}
 
 function nCfg(){
   var c = state.nutri || {};
@@ -2863,6 +2949,42 @@ function nTendencia(){
   return {kgSem:kgSem, pct:kgSem / media * 100, dias:Math.round(span), n:n};
 }
 
+/* gasto con el que se compara un día. El de hoy va a medias hasta la noche,
+   así que se usa la media de los días completos de la última semana */
+function nGastoRef(f){
+  var g = nGasto(f);
+  if(f === nHoy() && g.parcial){
+    var ant = [], k;
+    for(k = 1; k <= 7; k++){ var gk = nGasto(nDia(k)); if(!gk.fijo && !gk.parcial) ant.push(gk.kcal); }
+    if(ant.length) return {kcal:Math.round(ant.reduce(function(x, y){ return x + y; }, 0) / ant.length),
+      fuente:g.fuente + ", media de " + ant.length + " días", parcial:false, media:true, real:g.kcal, base:g.fuente};
+  }
+  return g;
+}
+/* un día entero: lo comido, lo gastado, el balance (comido menos gastado) y su color.
+   Sin comidas apuntadas no hay balance ni color */
+function nDiaInfo(f){
+  var s = nSuma(f), g = nGastoRef(f), b = nBanda(), hoy = f === nHoy();
+  var d = {f:f, s:s, g:g, hoy:hoy, bal:null, col:null, bajo:false,
+           obj:{lo:Math.round(g.kcal * b.lo / 10) * 10, hi:Math.round(g.kcal * b.hi / 10) * 10}};
+  if(s.n > 0 && g.kcal > 0){
+    var x = s.kcal / g.kcal - 1, c = nColor(s.kcal / g.kcal).c;
+    d.bal = s.kcal - g.kcal;
+    d.bajo = x < b.lo;
+    /* hoy, mientras falte por comer, no se juzga: el día sigue */
+    if(hoy && d.bajo) d.col = {c:"curso", t:"El día sigue, aún te queda por comer"};
+    else d.col = {c:c, t:c === "verde" ? "En tu objetivo"
+      : c === "naranja" ? (d.bajo ? "Te quedaste algo corto" : "Te pasaste un poco")
+      : (d.bajo ? "Muy por debajo de tu objetivo" : "Muy por encima de tu objetivo")};
+  }
+  return d;
+}
+function nObjTxt(o){
+  if(o.lo >= 0) return "superávit de " + nMil(o.lo) + " a " + nMil(o.hi) + " kcal";
+  if(o.hi <= 0) return "déficit de " + nMil(-o.hi) + " a " + nMil(-o.lo) + " kcal";
+  return "quedarte entre " + nSigno(o.lo) + " y " + nSigno(o.hi) + " kcal";
+}
+
 /* todo el cálculo del semáforo y las recomendaciones */
 function nAnalisis(){
   var hoy = nHoy(), b = nBanda(), kg = pesoCorp(), c = nCfg();
@@ -2879,13 +3001,7 @@ function nAnalisis(){
            prot:Math.round(tp / dias.length), n:dias.length};
     sem.col = nColor(sem.kcal / sem.gasto);
   }
-  var sh = nSuma(hoy), gh = nGasto(hoy);
-  /* el gasto de hoy va a medias hasta la noche: el objetivo sale de la media de los días completos */
-  if(gh.parcial){
-    var ant = [], k;
-    for(k = 1; k <= 7; k++){ var gk = nGasto(nDia(k)); if(!gk.fijo && !gk.parcial) ant.push(gk.kcal); }
-    if(ant.length) gh = {kcal:Math.round(ant.reduce(function(x, y){ return x + y; }, 0) / ant.length), fuente:gh.fuente + ", media de " + ant.length + " días", parcial:false};
-  }
+  var sh = nSuma(hoy), gh = nGastoRef(hoy);
   var obj = {lo:Math.round(gh.kcal * (1 + b.lo) / 10) * 10, hi:Math.round(gh.kcal * (1 + b.hi) / 10) * 10};
   var tend = nTendencia(), rit = nRitmo(), bas = null;
   if(tend){
@@ -2946,8 +3062,8 @@ function nCarga(forzar){
   var u = sesionNube.user.id;
   return Promise.all([
     nube.rpc("mi_plan"),
-    nube.from("comidas").select("*").gte("fecha", nDia(13)).order("creado", {ascending:true}),
-    nube.from("gasto_diario").select("*").gte("fecha", nDia(13)),
+    nube.from("comidas").select("*").gte("fecha", nDia(N_HIST)).order("creado", {ascending:true}),
+    nube.from("gasto_diario").select("*").gte("fecha", nDia(N_HIST)),
     nube.from("peso_corporal").select("fecha,kg,fuente").gte("fecha", nDia(41)).order("fecha", {ascending:true}),
     nube.from("integraciones").select("proveedor,token,ultima_sync,detalle").eq("user_id", u)
   ]).then(function(r){
@@ -2972,7 +3088,7 @@ function nSondea(){
   if(!hay) return;
   nut.sondeo = setTimeout(function(){
     if(tab !== "com"){ nSondea(); return; }
-    nube.from("comidas").select("*").gte("fecha", nDia(13)).order("creado", {ascending:true}).then(function(r){
+    nube.from("comidas").select("*").gte("fecha", nDia(N_HIST)).order("creado", {ascending:true}).then(function(r){
       if(r.data){ nut.comidas = r.data; nPinta(); }
       nSondea();
     });
@@ -2981,7 +3097,7 @@ function nSondea(){
 function nSyncWhoop(){
   nut.ultSync = Date.now();
   return nube.functions.invoke("whoop/sincroniza", {body:{}}).then(function(){
-    return nube.from("gasto_diario").select("*").gte("fecha", nDia(13));
+    return nube.from("gasto_diario").select("*").gte("fecha", nDia(N_HIST));
   }).then(function(r){ if(r && r.data){ nut.gasto = r.data; nPinta(); } })["catch"](function(){});
 }
 
@@ -2996,75 +3112,179 @@ function nNombre(c){
 function nutHTML(){
   if(!nube || !sesionNube){
     return '<div class="sect"><div class="card nut"><b>Lo que comes frente a lo que gastas</b>' +
-      '<p class="expl">Entra en tu cuenta, en Ajustes, para apuntar comidas y ver el semáforo.</p></div></div>';
+      '<p class="expl">Entra en tu cuenta, en Ajustes, para apuntar comidas y ver el semáforo. ' +
+      'La guía y los suplementos los tienes arriba.</p></div></div>';
   }
-  if(!aprobado()) return "";
+  if(!aprobado()){
+    return '<div class="sect"><div class="card nut"><b>Registro de comidas</b>' +
+      '<p class="expl">Se activa cuando aprueben tu cuenta. Mientras, tienes la guía y los suplementos arriba.</p></div></div>';
+  }
   if(!nut.cargado){ nCarga().then(nPinta); return '<div class="sect"><div class="card nut"><p class="expl" style="margin:0">Cargando tus comidas…</p></div></div>'; }
   if(nut.falta) return '<div class="sect"><div class="card nut"><b>Registro de comidas</b><p class="expl">Se está activando. Vuelve en un rato.</p></div></div>';
 
-  var a = nAnalisis(), h = '<div class="sect"><div class="eyebrow">Lo que comes frente a lo que gastas</div>';
+  var h = '<div class="sect">';
   if(nut.aviso) h += '<div class="banner" style="margin-bottom:10px"><b>Aviso</b><span>' + nut.aviso + '</span></div>';
+  h += nCalHTML() + nDiaHTML() + nGastoHTML() + '</div>';
 
-  /* semáforo */
-  h += '<div class="card nut">';
+  /* la semana: el semáforo de fondo y qué hacer */
+  var a = nAnalisis();
+  h += '<div class="sect"><div class="eyebrow">Tu semana</div><div class="card nut">';
   if(a.principal){
     var col = a.principal.col;
     h += '<div class="sema">' + nLuz(col.c, true) + '<div><b>' + col.t + '</b><small>' +
       (a.principal.por === "bascula"
         ? (a.tend.kgSem >= 0 ? "+" : "") + Math.round(a.tend.kgSem * 1000) + " g a la semana en " + a.tend.dias + " días. Manda la báscula."
-        : "Media de " + a.sem.n + " días: " + a.sem.kcal + " kcal comidas frente a " + a.sem.gasto + " gastadas.") +
+        : "Media de " + a.sem.n + " días: " + nMil(a.sem.kcal) + " kcal comidas frente a " + nMil(a.sem.gasto) + " gastadas.") +
       '</small></div></div>';
     if(a.principal.por === "bascula" && a.sem){
-      h += '<p class="expl">Comida de la semana: ' + a.sem.kcal + ' kcal de media, ' + a.sem.prot + ' g de proteína.</p>';
+      h += '<p class="expl">Comida de la semana: ' + nMil(a.sem.kcal) + ' kcal de media, ' + a.sem.prot + ' g de proteína.</p>';
     }
   }else{
     h += '<div class="sema">' + nLuz("off", true) + '<div><b>Semáforo en espera</b><small>Con 3 días apuntados se enciende.</small></div></div>';
   }
-
-  /* hoy */
-  var s = a.hoy, pct = Math.min(100, Math.round(s.kcal / Math.max(1, a.obj.hi) * 100));
-  var lo = Math.round(a.obj.lo / a.obj.hi * 100);
-  var hc = s.kcal > a.obj.hi * 1.07 ? "rojo" : s.kcal > a.obj.hi ? "naranja" : s.kcal >= a.obj.lo ? "verde" : "curso";
-  h += '<div class="hoy-n"><div class="hoy-t"><b>Hoy ' + s.kcal + ' kcal</b><span>objetivo ' + a.obj.lo + ' a ' + a.obj.hi + '</span></div>' +
-    '<div class="nbar ' + hc + '"><i style="width:' + pct + '%"></i><em style="left:' + lo + '%"></em></div>' +
-    '<small>' + s.prot + ' g de proteína de ' + Math.round(pesoCorp() * 1.6) + ' g. Gasto: ' + a.gh.kcal + ' kcal (' + a.gh.fuente +
-    (a.gh.parcial ? ', el día sigue' : '') + ').</small></div>';
-
-  /* botones */
-  h += '<div class="nbtns">' +
-    '<button class="btn primary sm" data-n="foto"' + (nPuede() ? '' : ' disabled') + '>Foto</button>' +
-    '<button class="btn sm" data-n="texto"' + (nPuede() ? '' : ' disabled') + '>Describir</button>' +
-    '<button class="btn sm" data-n="mano">A mano</button></div>';
-  if(!nPuede()) h += '<p class="expl">La foto y la descripción con IA son de la versión de pago. A mano funciona siempre.</p>';
-  h += '<input type="file" id="n-file" accept="image/*" capture="environment" hidden>';
-
-  /* lista de hoy */
-  var lista = nComidas(nHoy());
-  if(lista.length){
-    h += '<ul class="nlist">' + lista.map(function(c){
-      var est = c.estado === "hecha" ? '<b>' + (c.kcal || 0) + '</b><small>' + (c.prot || 0) + ' g prot</small>'
-        : c.estado === "error" ? '<b class="err">Error</b>'
-        : '<b class="pend">Calculando</b><small>' + (c.via === "suscripcion" || nut.plan === "propio" ? "en tu Mac" : "") + '</small>';
-      return '<li data-nc="' + c.id + '"><span>' + esc(nNombre(c)) + (c.hora ? '<small>' + esc(c.hora) + '</small>' : '') +
-        (c.estado === "hecha" && c.pregunta ? '<small class="preg">' + esc(c.pregunta) + '</small>' : '') +
-        (c.estado !== "hecha" && c.nota ? '<small>' + esc(c.nota) + '</small>' : '') +
-        '</span><span class="k">' + est + '</span></li>';
-    }).join("") + '</ul>';
-  }
-
-  /* peso */
-  var ult = nut.pesos.length ? nut.pesos[nut.pesos.length - 1] : null;
-  h += '<div class="npeso"><label for="n-peso">Peso de hoy</label><input id="n-peso" inputmode="decimal" placeholder="' +
-    (ult ? nf(+ult.kg) : nf(pesoCorp())) + '" value="' + (ult && ult.fecha === nHoy() ? nf(+ult.kg) : "") + '"><span>kg</span></div>';
   h += '</div>';
-
-  /* recomendaciones */
   if(a.rec.length){
     h += '<div class="card" style="margin-top:10px"><b>Qué hacer</b><ul class="nrec">' +
       a.rec.map(function(r){ return '<li>' + r + '</li>'; }).join("") + '</ul></div>';
   }
+  h += '</div><div class="sect">' + nAjustesHTML() + '</div>';
+  return h;
+}
 
-  h += nAjustesHTML();
+/* calendario del mes: cada día con comidas lleva su balance y el color del semáforo */
+function nCalHTML(){
+  var hoy = nHoy(), sel = nSel(), min = nDia(N_HIST), ahora = new Date();
+  var ref = nut.mes ? new Date(+nut.mes.slice(0, 4), +nut.mes.slice(5, 7) - 1, 1) : new Date(sel + "T12:00:00");
+  var y = ref.getFullYear(), mo = ref.getMonth();
+  var titulo = ref.toLocaleDateString("es-ES", {month:"long", year:"numeric"});
+  var puedeAnt = fISO(new Date(y, mo, 0)) >= min;
+  var puedeSig = y < ahora.getFullYear() || (y === ahora.getFullYear() && mo < ahora.getMonth());
+  var h = '<div class="card"><div class="cal-nav">' +
+    '<button data-n="mes" data-d="-1" aria-label="Mes anterior"' + (puedeAnt ? '' : ' disabled') + '>‹</button>' +
+    '<b>' + esc(titulo.charAt(0).toUpperCase() + titulo.slice(1)) + '</b>' +
+    '<button data-n="mes" data-d="1" aria-label="Mes siguiente"' + (puedeSig ? '' : ' disabled') + '>›</button></div><div class="cal-g nc">';
+  ["L","M","X","J","V","S","D"].forEach(function(d){ h += '<div class="dow">' + d + '</div>'; });
+  var ini = lunes(new Date(y, mo, 1));
+  var hueco = Math.round((new Date(y, mo, 1) - ini) / 864e5), diasMes = new Date(y, mo + 1, 0).getDate();
+  var total = Math.ceil((hueco + diasMes) / 7) * 7;
+  /* en el mes en curso no se pintan las semanas que aún no han llegado: así el día de hoy queda a la vista */
+  if(y === ahora.getFullYear() && mo === ahora.getMonth()) total = Math.ceil((hueco + ahora.getDate()) / 7) * 7;
+  for(var i = 0; i < total; i++){
+    var d = new Date(ini.getFullYear(), ini.getMonth(), ini.getDate() + i), f = fISO(d);
+    if(d.getMonth() !== mo){ h += '<div class="cal-d out">' + d.getDate() + '</div>'; continue; }
+    if(f > hoy || f < min){ h += '<div class="cal-d fut">' + d.getDate() + '</div>'; continue; }
+    var x = nDiaInfo(f);
+    h += '<button class="cal-d nd' + (f === hoy ? " hoy" : "") + (f === sel ? " sel" : "") + (x.col ? " " + x.col.c : "") +
+      '" data-n="dia" data-f="' + f + '" aria-label="' + esc(nFechaLarga(f) +
+        (x.bal === null ? ", sin comidas apuntadas" : ", " + (x.bal >= 0 ? "superávit" : "déficit") + " de " + nMil(Math.abs(x.bal)) + " kcal, " + x.col.t.toLowerCase())) +
+      '"' + (f === sel ? ' aria-pressed="true"' : '') + '>' + d.getDate() +
+      (x.bal === null ? '' : '<small>' + nSigno(x.bal) + '</small>') + '</button>';
+  }
+  h += '</div><div class="cal-k">' +
+    '<span><i style="background:#46A758"></i>En tu objetivo</span>' +
+    '<span><i style="background:#F2A33A"></i>Algo lejos</span>' +
+    '<span><i style="background:#E5484D"></i>Muy lejos</span></div>' +
+    '<p class="expl">El número es lo comido menos lo gastado. Toca un día para verlo.' + info("balance") + '</p></div>';
+  return h;
+}
+
+function nFilaComida(c){
+  var est = c.estado === "hecha" ? '<b>' + nMil(c.kcal || 0) + '</b><small>' + (c.prot || 0) + ' g prot</small>'
+    : c.estado === "error" ? '<b class="err">Error</b>'
+    : '<b class="pend">Calculando</b><small>' + (c.via === "suscripcion" || nut.plan === "propio" ? "en tu Mac" : "") + '</small>';
+  return '<li data-nc="' + c.id + '"><span>' + esc(nNombre(c)) +
+    (c.estado === "hecha" && c.pregunta ? '<small class="preg">' + esc(c.pregunta) + '</small>' : '') +
+    (c.estado !== "hecha" && c.nota ? '<small>' + esc(c.nota) + '</small>' : '') +
+    '</span><span class="k">' + est + '</span></li>';
+}
+function nIcoMom(k){
+  return '<svg viewBox="0 0 24 24" aria-hidden="true">' + ({
+    desayuno: '<path d="M5 10h11v4a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5z"/><path d="M16 11h1.500a2.500 2.500 0 0 1 0 5H16"/><path d="M8.500 4v2.500M12 4v2.500"/>',
+    media:    '<path d="M12 8c-1.500-1.600-5.500-1.400-5.500 3.200 0 3.600 2.300 7.300 4.200 7.300.700 0 .900-.400 1.300-.400s.600.400 1.300.400c1.900 0 4.200-3.700 4.200-7.300C17.500 6.600 13.500 6.400 12 8z"/><path d="M12 8c0-2 1-3.500 2.500-4"/>',
+    comida:   '<circle cx="13.500" cy="12" r="6"/><circle cx="13.500" cy="12" r="2.500"/><path d="M4.500 4v16M2.500 4v4a2 2 0 0 0 4 0V4"/>',
+    merienda: '<path d="M5 8a3 3 0 0 1 3-3h8a3 3 0 0 1 3 3c0 1-.600 1.800-1.500 2.200V18a1 1 0 0 1-1 1h-9a1 1 0 0 1-1-1v-7.800C5.600 9.800 5 9 5 8z"/>',
+    cena:     '<path d="M4 13h16a8 8 0 0 1-16 0z"/><path d="M9 21h6"/><path d="M15.500 3.500a3.200 3.200 0 1 0 3.800 3.900 2.600 2.600 0 0 1-3.800-3.900z"/>'
+  }[k] || '') + '</svg>';
+}
+
+/* el día elegido: balance con su color, proteína y las cinco cajitas */
+function nDiaHTML(){
+  var f = nSel(), d = nDiaInfo(f), hoy = d.hoy;
+  var h = '<div class="card nut" style="margin-top:10px">';
+  h += '<div class="sema">' + nLuz(d.col && d.col.c !== "curso" ? d.col.c : "off", true) + '<div><b>' +
+    esc(hoy ? "Hoy, " + nFechaLarga(f).toLowerCase() : nFechaLarga(f)) + '</b><small>' +
+    (d.col ? d.col.t : (hoy ? "Apunta lo que vayas comiendo en su cajita." : "Sin comidas apuntadas.")) + '</small></div></div>';
+
+  var fuente = d.g.media ? "tu media" : d.g.fuente === "Apple Salud y tu basal" ? "Apple Salud" : d.g.fuente;
+  h += '<div class="nbal">' +
+    '<div><small>Comido</small><b>' + nMil(d.s.kcal) + '</b><em>kcal</em></div>' +
+    '<div><small>Gastado</small><b>' + nMil(d.g.kcal) + '</b><em>' + esc(fuente) + '</em></div>' +
+    '<div class="' + (d.col ? d.col.c : "") + '"><small>' + (d.bal === null ? "Balance" : d.bal >= 0 ? "Superávit" : "Déficit") +
+    '</small><b>' + (d.bal === null ? "–" : nSigno(d.bal)) + '</b><em>kcal</em></div></div>';
+
+  var inLo = Math.round((d.g.kcal + d.obj.lo) / 10) * 10, inHi = Math.round((d.g.kcal + d.obj.hi) / 10) * 10;
+  h += '<p class="expl">Tu objetivo: ' + nObjTxt(d.obj) + ', es decir, comer de <b>' + nMil(inLo) + ' a ' + nMil(inHi) + ' kcal</b>.' +
+    (hoy && d.s.kcal < inLo ? ' Te faltan unas <b>' + nMil(inLo - d.s.kcal) + ' kcal</b>.' : '') + info("balance") + '</p>';
+  if(d.g.media){
+    h += '<p class="expl">Hoy ' + esc(d.g.base) + ' lleva ' + nMil(d.g.real) + ' kcal y el día sigue. Para el balance uso la media de tus últimos días completos.</p>';
+  }
+
+  var pObj = Math.round(pesoCorp() * 1.6), pp = Math.min(100, Math.round(d.s.prot / Math.max(1, pObj) * 100));
+  h += '<div class="hoy-n"><div class="hoy-t"><b>Proteína ' + d.s.prot + ' g</b><span>objetivo ' + pObj + ' g</span></div>' +
+    '<div class="nbar' + (d.s.prot >= pObj ? " verde" : "") + '"><i style="width:' + pp + '%"></i></div></div>';
+
+  var lista = nComidas(f);
+  h += '<div class="ncajas">';
+  N_MOM.forEach(function(m){
+    var mias = lista.filter(function(c){ return nMomDeHora(c.hora) === m.k; }), kc = 0, hechas = 0;
+    mias.forEach(function(c){ if(c.estado === "hecha"){ kc += c.kcal || 0; hechas++; } });
+    h += '<div class="ncaja' + (mias.length ? '' : ' vacia') + '"><div class="ncaja-h"><span class="ncaja-ic">' + nIcoMom(m.k) + '</span>' +
+      '<b>' + m.t + '<small>' + (!mias.length ? 'Vacío' : hechas ? nMil(kc) + ' kcal' : 'Calculando') + '</small></b>' +
+      '<button class="mas" data-n="add" data-mom="' + m.k + '" aria-label="Añadir a ' + m.t + '">+</button></div>' +
+      (mias.length ? '<ul class="nlist">' + mias.map(nFilaComida).join("") + '</ul>' : '') + '</div>';
+  });
+  h += '</div><input type="file" id="n-file" accept="image/*" capture="environment" hidden>';
+
+  if(hoy){
+    var ult = nut.pesos.length ? nut.pesos[nut.pesos.length - 1] : null;
+    h += '<div class="npeso"><label for="n-peso">Peso de hoy</label><input id="n-peso" inputmode="decimal" placeholder="' +
+      (ult ? nf(+ult.kg) : nf(pesoCorp())) + '" value="' + (ult && ult.fecha === nHoy() ? nf(+ult.kg) : "") + '"><span>kg</span></div>';
+  }
+  return h + '</div>';
+}
+
+/* el gasto, a la vista: el del día elegido, de dónde sale y la última semana */
+function nGastoHTML(){
+  var f = nSel(), hoy = f === nHoy(), g = nGasto(f), w = nut.integ.whoop;
+  var fila = nut.gasto.filter(function(x){ return x.fecha === f && x.pasos; })[0];
+  var h = '<div class="card" style="margin-top:10px"><div class="com-h">' + dibujoCom("gasto").replace("comdib", "com-ic") +
+    '<div><b>Gasto de calorías</b><small>' + (hoy ? "Hoy" : esc(nFechaLarga(f))) + ', lo que quema tu cuerpo</small></div></div>';
+  var dias = [], max = 0, suma = 0, n = 0, i;
+  for(i = 6; i >= 0; i--){
+    var fi = nDia(i), gi = nGasto(fi);
+    dias.push({f:fi, g:gi});
+    if(!gi.fijo) max = Math.max(max, gi.kcal);
+  }
+  /* la misma media que usa el balance de hoy: los días completos de la última semana */
+  for(i = 1; i <= 7; i++){ var gm = nGasto(nDia(i)); if(!gm.fijo && !gm.parcial){ suma += gm.kcal; n++; } }
+  h += '<div class="ngas"><div class="gran"><b>' + nMil(g.kcal) + '</b><span>kcal</span></div><div class="nbars">';
+  dias.forEach(function(x){
+    var real = !x.g.fijo;
+    h += '<div class="' + (x.f === f ? "s" : "") + (real && x.g.parcial ? " p" : "") + '" title="' + (real ? nMil(x.g.kcal) + " kcal" : "sin dato") +
+      '"><i style="height:' + (real && max ? Math.max(5, Math.round(x.g.kcal / max * 56)) : 3) + 'px"></i><small>' +
+      "DLMXJVS".charAt(new Date(x.f + "T12:00:00").getDay()) + '</small></div>';
+  });
+  h += '</div></div>';
+  h += '<p class="expl">' + (g.fijo
+    ? "Es una estimación con tu peso, tu altura y tu edad. Conecta WHOOP o Apple Salud más abajo, en Tus datos y conexiones, para tener el dato real."
+    : "Fuente: " + esc(g.fuente) + (g.parcial ? ". El día sigue y la cifra irá subiendo" : "") + "." + (fila ? " " + nMil(fila.pasos) + " pasos." : "")) +
+    info("gasto") + '</p>';
+  if(n >= 2) h += '<p class="expl">Media de tus últimos ' + n + ' días completos: <b>' + nMil(suma / n) + ' kcal</b>.</p>';
+  if(w){
+    h += '<div class="nbtns"><button class="btn sm" data-n="whoop-sync">Actualizar WHOOP</button></div>' +
+      (w.ultima_sync ? '<p class="expl" style="font-size:12.5px">Último dato de WHOOP: ' +
+        esc(new Date(w.ultima_sync).toLocaleString("es-ES", {day:"numeric", month:"short", hour:"2-digit", minute:"2-digit"})) + '.</p>' : '');
+  }
   return h + '</div>';
 }
 
@@ -3149,7 +3369,8 @@ function nEnvia(fila, blob){
     });
   }
   return paso.then(function(ruta){
-    fila.user_id = u; fila.fecha = nHoy(); fila.hora = nHora();
+    var f = nSel(), k = nut.mom || nMomDeHora(nHora());
+    fila.user_id = u; fila.fecha = f; fila.hora = nHoraPara(k, f);
     if(ruta) fila.foto = ruta;
     return nube.from("comidas").insert(fila).select().single();
   }).then(function(r){
@@ -3208,16 +3429,32 @@ function nRecientes(){
   }
   return r;
 }
-function nAbreMano(){
-  var rec = nRecientes();
-  nHoja('<h2>Apuntar a mano</h2>' +
-    (rec.length ? '<p class="frase">Repetir una comida de estos días:</p><div class="chips nrep">' + rec.map(function(c, i){
-      return '<button class="chip" data-rep="' + i + '">' + esc(nNombre(c)) + ', ' + c.kcal + '</button>'; }).join("") + '</div>' : '') +
-    '<div class="campo" style="text-align:left"><label for="n-nom">Qué</label><input id="n-nom" placeholder="Ej.: batido de proteína"></div>' +
-    '<div class="campo" style="text-align:left"><label for="n-kc">Kcal</label><input id="n-kc" inputmode="numeric"></div>' +
-    '<div class="campo" style="text-align:left"><label for="n-pr">Proteína, g (opcional)</label><input id="n-pr" inputmode="numeric"></div>' +
-    '<div class="stack"><button class="btn primary" id="n-ok">Guardar</button><button class="btn ghost" data-cierra>Cancelar</button></div>',
+/* el + de cada cajita: cómo se apunta, o repetir una comida de estos días */
+function nAbreAnadir(k){
+  var m = nMom(k), rec = nRecientes(), puede = nPuede();
+  nut.mom = k;
+  function op(id, ico, t, sub, activo){
+    return '<button class="nop" data-op="' + id + '"' + (activo ? '' : ' disabled') + '><svg viewBox="0 0 24 24" aria-hidden="true">' + ico +
+      '</svg><span><b>' + t + '</b><small>' + sub + '</small></span></button>';
+  }
+  nHoja('<h2>' + m.t + '</h2><p class="frase">' + esc(nSel() === nHoy() ? "Hoy" : nFechaLarga(nSel())) + '. ¿Cómo lo apuntas?</p><div class="nops">' +
+    op("foto", '<path d="M4 8h3l1.500-2h7L17 8h3v11H4z"/><circle cx="12" cy="13.500" r="3.500"/>', "Foto", "Haz una foto al plato y se calcula sola.", puede) +
+    op("texto", '<path d="M4 20h4l10-10-4-4L4 16z"/><path d="M13 7l4 4"/>', "Describir", "Escribe lo que has comido y se calcula solo.", puede) +
+    op("mano", '<path d="M6 4h12v16H6z"/><path d="M9 8h6M9 12h6M9 16h3"/>', "A mano", "Pones tú las calorías y la proteína.", true) + '</div>' +
+    (puede ? '' : '<p class="frase">La foto y la descripción con IA son de la versión de pago. A mano funciona siempre.</p>') +
+    (rec.length ? '<p class="frase" style="margin-bottom:8px">O repite una de estos días:</p><div class="chips nrep">' + rec.map(function(c, i){
+      return '<button class="chip" data-rep="' + i + '">' + esc(nNombre(c)) + ', ' + nMil(c.kcal) + '</button>'; }).join("") + '</div>' : '') +
+    '<div class="stack"><button class="btn ghost" data-cierra>Cancelar</button></div>',
     function(el, cierra){
+      el.querySelectorAll("[data-op]").forEach(function(b){
+        b.addEventListener("click", function(){
+          var q = b.dataset.op;
+          cierra();
+          if(q === "foto"){ var fi = document.getElementById("n-file"); if(fi) fi.click(); }
+          else if(q === "texto") nAbreTexto();
+          else nAbreMano();
+        });
+      });
       el.querySelectorAll("[data-rep]").forEach(function(b){
         b.addEventListener("click", function(){
           var c = rec[+b.dataset.rep];
@@ -3226,6 +3463,15 @@ function nAbreMano(){
             .then(cierra)["catch"](cierra);
         });
       });
+    });
+}
+function nAbreMano(){
+  nHoja('<h2>Apuntar a mano</h2>' +
+    '<div class="campo" style="text-align:left"><label for="n-nom">Qué</label><input id="n-nom" placeholder="Ej.: batido de proteína"></div>' +
+    '<div class="campo" style="text-align:left"><label for="n-kc">Kcal</label><input id="n-kc" inputmode="numeric"></div>' +
+    '<div class="campo" style="text-align:left"><label for="n-pr">Proteína, g (opcional)</label><input id="n-pr" inputmode="numeric"></div>' +
+    '<div class="stack"><button class="btn primary" id="n-ok">Guardar</button><button class="btn ghost" data-cierra>Cancelar</button></div>',
+    function(el, cierra){
       el.querySelector("#n-ok").addEventListener("click", function(){
         var nom = el.querySelector("#n-nom").value.trim(), kc = parseInt(el.querySelector("#n-kc").value, 10),
             pr = parseInt(el.querySelector("#n-pr").value, 10);
@@ -3251,9 +3497,17 @@ function nAbreComida(id){
     (filas ? '<div class="nits">' + filas + '</div>' : '') +
     (c.nota && c.estado === "hecha" ? '<p class="frase">' + esc(c.nota) + '</p>' : '') +
     (c.pregunta && nPuede() ? '<div class="campo" style="text-align:left"><label for="n-resp">' + esc(c.pregunta) + '</label><input id="n-resp" placeholder="Tu respuesta"></div>' : '') +
+    '<p class="frase" style="margin:0 0 6px">Cajita:</p><div class="chips nrep">' + N_MOM.map(function(m){
+      return '<button class="chip' + (m.k === nMomDeHora(c.hora) ? ' now' : '') + '" data-mueve="' + m.k + '">' + m.t + '</button>'; }).join("") + '</div>' +
     '<div class="stack">' + (filas || c.pregunta ? '<button class="btn primary" id="n-ok">Guardar</button>' : '') +
     '<button class="btn ghost" id="n-del">Borrar</button><button class="btn ghost" data-cierra>Cerrar</button></div>',
     function(el, cierra){
+      el.querySelectorAll("[data-mueve]").forEach(function(b){
+        b.addEventListener("click", function(){
+          var hNueva = nMom(b.dataset.mueve).h;
+          nube.from("comidas").update({hora:hNueva}).eq("id", c.id).then(function(){ c.hora = hNueva; nPinta(); cierra(); });
+        });
+      });
       var ok = el.querySelector("#n-ok");
       if(ok) ok.addEventListener("click", function(){
         var resp = el.querySelector("#n-resp"), r = resp ? resp.value.trim() : "";
@@ -3294,6 +3548,19 @@ document.addEventListener("click", function(ev){
     if(q === "foto"){ var f = document.getElementById("n-file"); if(f) f.click(); }
     else if(q === "texto") nAbreTexto();
     else if(q === "mano") nAbreMano();
+    else if(q === "add") nAbreAnadir(el.dataset.mom);
+    else if(q === "vista"){ nut.vista = el.dataset.v; render(); }
+    else if(q === "dia"){ nut.dia = el.dataset.f === nHoy() ? null : el.dataset.f; nPinta(); }
+    else if(q === "mes"){
+      var rm = nut.mes ? new Date(+nut.mes.slice(0, 4), +nut.mes.slice(5, 7) - 1, 1) : new Date(nSel() + "T12:00:00");
+      rm = new Date(rm.getFullYear(), rm.getMonth() + (+el.dataset.d), 1);
+      nut.mes = rm.getFullYear() + "-" + ("0" + (rm.getMonth() + 1)).slice(-2);
+      nPinta();
+    }
+    else if(q === "whoop-sync"){
+      el.disabled = true; el.textContent = "Actualizando…";
+      nSyncWhoop().then(function(){ return nCarga(); }).then(nPinta);
+    }
     else if(q === "whoop-on"){
       el.disabled = true; el.textContent = "Abriendo WHOOP…";
       nube.functions.invoke("whoop/inicio", {body:{}}).then(function(r){
@@ -3355,68 +3622,99 @@ document.addEventListener("change", function(ev){
   try{ history.replaceState(null, "", location.pathname); }catch(e){}
 })();
 
+/* imágenes generadas que ya están en img/, clave y ruta. Mientras una no
+   exista, su tarjeta sale sin foto. Los encargos están en IMAGENES.md */
+var ILUS = {};
+function ilus(k){
+  return ILUS[k] ? '<img class="sup-img" src="' + ILUS[k] + '" alt="" loading="lazy">' : "";
+}
+function comCab(ic, t, sub){
+  return '<div class="com-h">' + dibujoCom(ic).replace("comdib", "com-ic") +
+    '<div><b>' + t + '</b><small>' + sub + '</small></div></div>';
+}
+function comPlegable(t, items){
+  return '<details class="fold"><summary>' + t + '</summary><div class="in"><ul>' +
+    items.map(function(x){ return '<li>' + x + '</li>'; }).join("") + '</ul></div></details>';
+}
+/* tres apartados: el registro del día, los suplementos (aparte) y la guía de qué comer */
 function vCom(){
   var kg = pesoCorp();
-  var pMin = Math.round(kg * 1.6), pMax = Math.round(kg * 2);
-  function cab(ic, t, sub){
-    return '<div class="com-h">' + dibujoCom(ic).replace("comdib", "com-ic") +
-      '<div><b>' + t + '</b><small>' + sub + '</small></div></div>';
-  }
-  function plegable(t, items){
-    return '<details class="fold"><summary>' + t + '</summary><div class="in"><ul>' +
-      items.map(function(x){ return '<li>' + x + '</li>'; }).join("") + '</ul></div></details>';
-  }
-  var h = nutHTML() + '<div class="sect"><div class="eyebrow">Comer construye lo que el entreno rompe</div>';
+  var v = nut.vista || ((nube && sesionNube && aprobado()) ? "dia" : "guia");
+  var h = '<div class="sect"><div class="seg">' + [["dia", "Comidas"], ["sup", "Suplementos"], ["guia", "Guía"]].map(function(o){
+    return '<button data-n="vista" data-v="' + o[0] + '" aria-pressed="' + (v === o[0] ? "true" : "false") + '">' + o[1] + '</button>';
+  }).join("") + '</div></div>';
+  h += v === "sup" ? supHTML(kg) : v === "guia" ? guiaHTML(kg) : nutHTML();
+  view.innerHTML = h;
+}
 
-  h += '<div class="card">' + cab("prote", "Proteína", "La base, lo único obligatorio") +
+function guiaHTML(kg){
+  var pMin = Math.round(kg * 1.6), pMax = Math.round(kg * 2);
+  var h = '<div class="sect"><div class="eyebrow">Comer construye lo que el entreno rompe</div>';
+  h += '<div class="card">' + ilus("proteina_comida") + comCab("prote", "Proteína", "La base, lo único obligatorio") +
     '<div class="gran"><b>' + pMin + ' a ' + pMax + '</b><span>g al día</span></div>' +
     '<p class="expl">1,6 a 2 g por kilo, con tus ' + nf(kg) + ' kg de Ajustes.</p>' +
     '<div class="chips" style="margin-top:10px"><span class="chip">Pechuga, 30 g</span><span class="chip">3 huevos, 20 g</span>' +
     '<span class="chip">Yogur griego, 10 g</span><span class="chip">Legumbres</span></div>' +
-    plegable("Cuándo y el batido", [
+    comPlegable("Cuándo tomarla", [
       "Da igual la hora: repártela en 3 o 4 comidas.",
       "La media hora tras entrenar es un mito.",
-      "El batido vale si no llegas con comida. Uno al día como mucho."]) +
-    plegable("Cómo elegir un batido", [
-      "Suero de leche, whey. Aislada si la leche te sienta pesada.",
-      "Al menos 20 g de proteína por cada 30 g de producto.",
-      "Ingredientes, cuantos menos mejor. Las marcas blancas de tiendas de suplementos salen mejor de precio."]) +
-    botonCompra("proteina whey aislada 20g", "Ver proteínas en Amazon") + '</div>';
+      "Si no llegas con comida, mira la proteína en polvo en Suplementos."]) + '</div></div>';
+  h += comidaCicloHTML(kg);
+  h += '<div class="sect"><div class="banner"><b>Ojo</b><span>No es consejo médico. Con el riñón delicado, ' +
+    'medicación o embarazo, pregunta antes a tu médico.</span></div></div>';
+  return h;
+}
 
-  h += '<div class="card" style="margin-top:10px">' + cab("crea", "Creatina", "La única que compensa") +
+function supHTML(kg){
+  var h = '<div class="sect"><div class="eyebrow">Suplementos, aparte de la comida</div>' +
+    '<p class="expl" style="margin:0 0 10px">No sustituyen a comer bien. Solo estos compensan, y por este orden.</p>';
+
+  h += '<div class="card">' + ilus("creatina") + comCab("crea", "Creatina", "La única que compensa") +
     '<div class="gran"><b>5 g</b><span>al día</span></div>' +
     '<p class="expl">Monohidrato, todos los días, entrenes o no.</p>' +
-    plegable("Qué esperar", [
+    comPlegable("Qué esperar", [
       "Unas repeticiones más con el mismo peso y algo más de músculo con los meses.",
       "Hasta 1 kg más las primeras semanas: es agua en el músculo, no grasa.",
       "Funciona por acumulación, no por tomarla antes de entrenar."]) +
-    plegable("Cómo elegir una buena", [
+    comPlegable("Cómo elegir una buena", [
       "Un solo ingrediente: creatina monohidrato.",
       "Si pone <b>Creapure</b>, mejor: es la materia prima alemana de referencia.",
       "En polvo sale más barata que en cápsulas y es lo mismo. Nada de mezclas con cafeína."]) +
     botonCompra("creatina monohidrato creapure polvo", "Ver creatinas en Amazon") + '</div>';
 
-  h += '<div class="card" style="margin-top:10px">' + cab("magne", "Magnesio bisglicinato", "Para dormir mejor") +
+  h += '<div class="card" style="margin-top:10px">' + ilus("proteina_polvo") + comCab("prote", "Proteína en polvo", "Solo si no llegas con comida") +
+    '<div class="gran"><b>1 batido</b><span>al día como mucho</span></div>' +
+    '<p class="expl">Es comida en polvo, no magia. Sirve para llegar a tu proteína del día cuando con el plato no alcanzas.</p>' +
+    comPlegable("Cómo elegir un batido", [
+      "Suero de leche, whey. Aislada si la leche te sienta pesada.",
+      "Al menos 20 g de proteína por cada 30 g de producto.",
+      "Ingredientes, cuantos menos mejor. Las marcas blancas de tiendas de suplementos salen mejor de precio."]) +
+    botonCompra("proteina whey aislada 20g", "Ver proteínas en Amazon") + '</div>';
+
+  h += '<div class="card" style="margin-top:10px">' + ilus("magnesio") + comCab("magne", "Magnesio bisglicinato", "Para dormir mejor") +
     '<div class="gran"><b>200 a 300</b><span>mg al día</span></div>' +
     '<p class="expl">De magnesio elemental, de media a una hora antes de acostarte.</p>' +
-    plegable("Por qué y qué esperar", [
+    comPlegable("Por qué y qué esperar", [
       "Dormir es donde el músculo se construye.",
       "El bisglicinato se absorbe bien, no revuelve la tripa y la glicina relaja.",
       "Coger el sueño antes y menos calambres.",
       "No es un somnífero: si duermes mal, mira antes horario y pantallas."]) +
-    plegable("Cómo elegir uno bueno", [
+    comPlegable("Cómo elegir uno bueno", [
       "Que diga bisglicinato o glicinato quelado.",
       "Que indique los mg de <b>magnesio elemental</b> por dosis, no los de la cápsula.",
       "Sin mezclas con diez cosas más. El óxido de magnesio, ni gratis: se absorbe mal."]) +
-    botonCompra("magnesio bisglicinato quelado elemental", "Ver magnesio en Amazon") + '</div></div>';
+    botonCompra("magnesio bisglicinato quelado elemental", "Ver magnesio en Amazon") + '</div>';
 
-  h += comidaCicloHTML(kg);
+  h += '<div class="card" style="margin-top:10px">' + ilus("fuerza_opcionales") + '<div class="com-h"><div><b>Solo en el bloque de fuerza</b>' +
+    '<small>Opcionales, no hacen falta el resto del año</small></div></div><ul class="nrec">' +
+    '<li>Cafeína: 3 mg por kilo una hora antes, unos <b>' + Math.round(kg * 3) + ' mg</b>, un café largo o dos cortos. Si entrenas de noche, no.</li>' +
+    '<li>Para los tendones: 15 g de gelatina o colágeno con vitamina C una hora antes de entrenar. Evidencia preliminar, pero barata e inocua.</li></ul></div></div>';
 
   h += '<div class="sect"><p class="expl" style="margin:0"><b>Lo demás, no lo necesitas.</b> ' +
     'Quemagrasas, aminoácidos y boosters son dinero tirado para un natural.</p></div>';
   h += '<div class="sect"><div class="banner"><b>Ojo</b><span>No es consejo médico. Con el riñón delicado, ' +
     'medicación o embarazo, pregunta antes a tu médico.</span></div></div>';
-  view.innerHTML = h;
+  return h;
 }
 
 /* qué comer según el bloque del plan: la base es la misma todo el año y lo
