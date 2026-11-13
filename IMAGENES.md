@@ -158,6 +158,28 @@ Greek museum still life, soft light from the upper left, deep charcoal
 background (#101214), photorealistic, no text, no letters, no logos, 1200x630.
 ```
 
+## Formato y peso
+
+Las fotos de ejercicios pesan unos 28 KB de media. Las nuevas tienen que ir en esa línea.
+
+| Tipo | Tamaño final | Formato | Peso máximo |
+|---|---|---|---|
+| 16:9, tarjetas y bloques | 960 x 540 | WebP | 60 KB |
+| 1:1, cajitas, vacías y medallas | 512 x 512 | WebP | 30 KB |
+| 4:5, bienvenida | 800 x 1000 | WebP | 70 KB |
+| Vista previa al compartir | 1200 x 630 | JPG | 150 KB |
+
+Los generadores suelen entregar PNG de 1 a 2 MB aunque se les pida otra cosa. No pasa nada:
+se convierten y se reducen al meterlas en el repositorio, con Pillow. Para pegar en el encargo:
+
+```
+FORMATO DE ENTREGA: fondo liso y pocas texturas finas, para que la imagen
+comprima bien. Si puedes exportar, entrega cada imagen en WebP con calidad 80:
+960x540 las de 16:9, 512x512 las de 1:1, 800x1000 las de 4:5, y la de
+compartir en JPG de 1200x630. Si no puedes, entrega PNG y no reduzcas nada:
+se convierte después.
+```
+
 ## Cómo se conectan
 
 Las de suplementos y `proteina_comida` ya tienen hueco: basta apuntar la ruta en `ILUS`.
