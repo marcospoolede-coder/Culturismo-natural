@@ -165,12 +165,14 @@ Las fotos de ejercicios pesan unos 28 KB de media. Las nuevas tienen que ir en e
 | Tipo | Tamaño final | Formato | Peso máximo |
 |---|---|---|---|
 | 16:9, tarjetas y bloques | 960 x 540 | WebP | 60 KB |
-| 1:1, cajitas, vacías y medallas | 512 x 512 | WebP | 30 KB |
+| 1:1, cajitas y vacías | 512 x 512 | WebP | 30 KB |
+| 1:1, medallas | 256 x 256 | WebP | 15 KB |
 | 4:5, bienvenida | 800 x 1000 | WebP | 70 KB |
 | Vista previa al compartir | 1200 x 630 | JPG | 150 KB |
 
 Los generadores suelen entregar PNG de 1 a 2 MB aunque se les pida otra cosa. No pasa nada:
-se convierten y se reducen al meterlas en el repositorio, con Pillow. Para pegar en el encargo:
+se convierten y se reducen con `python3 scripts/optimiza_imagenes.py <carpeta>`, que recorta,
+reduce y guarda cada una en su sitio sin borrar los originales. Para pegar en el encargo:
 
 ```
 FORMATO DE ENTREGA: fondo liso y pocas texturas finas, para que la imagen
@@ -184,4 +186,4 @@ se convierte después.
 
 Las de suplementos y `proteina_comida` ya tienen hueco: basta apuntar la ruta en `ILUS`.
 El resto necesita un cambio pequeño en `index.html` cuando las imágenes existan.
-Todas en WebP, menos de 150 KB cada una.
+Formato y peso: ver la sección anterior.
