@@ -15,9 +15,9 @@ echo "1. Tablas y permisos"
 supabase db query --remote="$REF" --yes -f nutricion.sql >/dev/null
 
 echo "2. Funciones"
-supabase functions deploy analiza-comida --project-ref "$REF" --use-api
-supabase functions deploy whoop  --project-ref "$REF" --use-api --no-verify-jwt
-supabase functions deploy salud  --project-ref "$REF" --use-api --no-verify-jwt
+supabase functions deploy analiza-comida --project-ref "$REF" --use-api --yes
+supabase functions deploy whoop  --project-ref "$REF" --use-api --yes --no-verify-jwt
+supabase functions deploy salud  --project-ref "$REF" --use-api --yes --no-verify-jwt
 
 echo "3. Secretos"
 SEC=()
@@ -36,5 +36,5 @@ if ! supabase secrets list --project-ref "$REF" 2>/dev/null | grep -q RELOJ_WHOO
       headers := '{\"Content-Type\":\"application/json\",\"x-reloj\":\"$RELOJ\"}'::jsonb,
       body := '{}'::jsonb)\$\$);" >/dev/null
 fi
-[ ${#SEC[@]} -gt 0 ] && supabase secrets set --project-ref "$REF" "${SEC[@]}" >/dev/null
+[ ${#SEC[@]} -gt 0 ] && supabase secrets set --project-ref "$REF" --yes "${SEC[@]}" >/dev/null
 echo "Hecho."

@@ -133,7 +133,7 @@ cuenta, llama a `panel()` y muestra nombre, correo, alta, estado, último acceso
 semana y mes, sesiones y último entreno, con botones de aprobar y denegar.
 
 Orden para montarlo en un proyecto nuevo, en SQL Editor: `supabase.sql`, `aprobacion.sql`,
-`panel.sql`. Si el panel dice "Could not find the function public.panel", es que falta
+`panel.sql` y `nutricion.sql`, que necesita los dos anteriores. Si el panel dice "Could not find the function public.panel", es que falta
 ejecutar `panel.sql`.
 
 ## 5. App instalable y actualizaciones
@@ -219,7 +219,12 @@ Arriba de la pestaña Comida hay un registro de comidas con semáforo. Vive en S
   relojes fallan un 10 a 40 % en el gasto.
 - Recomendaciones: kcal que faltan o sobran con ejemplos de comida, proteína corta frente a
   1,6 g/kg y aviso de comidas de más de 900 kcal si luego hay que rendir trabajando.
-- Despliegue sin panel: `bash supabase/despliega.sh` (tablas, funciones, secretos y reloj).
+- Despliegue sin panel: `bash supabase/despliega.sh` (tablas, funciones, secretos y reloj). Pide
+  `supabase login` hecho antes y que `aprobacion.sql` y `panel.sql` ya estén ejecutados. Las órdenes
+  que cambian producción llevan `--yes`, porque la CLI 3 no pregunta cuando la lanza un agente.
+- Estado a 13 de noviembre de 2026: los cuatro SQL ejecutados, las tres funciones desplegadas, el
+  reloj de WHOOP programado y el trabajador instalado en el Mac de Marcos, con su cuenta en el plan
+  `propio`. Faltan las claves de WHOOP y `ANTHROPIC_API_KEY`, que solo hace falta para el plan `pago`.
 
 Los botones de compra llevan la etiqueta de Amazon Afiliados de Marcos, `cuadernofuerz-21`
 (constante `AFILIADO`, cuenta creada el 6 de octubre de 2026). Con la etiqueta puesta aparece
