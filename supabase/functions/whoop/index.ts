@@ -40,7 +40,9 @@ const responde = (cuerpo: unknown, estado = 200) =>
     headers: { ...CORS, "Content-Type": "application/json" },
   });
 
-const env = (k: string) => Deno.env.get(k) ?? "";
+// trim: al pegar una clave en el panel se cuela a veces un salto de linea al final
+// y WHOOP la rechaza con invalid_client
+const env = (k: string) => (Deno.env.get(k) ?? "").trim();
 const vuelta = () => env("SUPABASE_URL") + "/functions/v1/whoop/vuelta";
 const appUrl = () => env("APP_URL") || "https://marcospoolede-coder.github.io/Culturismo-natural/";
 
