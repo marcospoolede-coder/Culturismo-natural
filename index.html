@@ -829,7 +829,7 @@
    del 31 de mayo de 2025 y de las tablas de rutina por microciclo.     */
 
 /* súbela en cada despliegue: la app instalada la compara para avisar de que hay otra */
-var VERSION = "14 de noviembre de 2026, 12:30";
+var VERSION = "14 de noviembre de 2026, 12:50";
 var BARRA = 20;
 var PESO_CORP_DEF = 75;   /* peso corporal por defecto, se cambia en Ajustes */
 function pesoCorp(){ return state.peso > 0 ? state.peso : PESO_CORP_DEF; }
@@ -1874,8 +1874,12 @@ function vHoy(){
     '<span>' + nh + ' de ' + lista.length + '</span></div>';
   if(f.tipo === "fuerza"){
     var w = FUERZA_SEM[Math.min(p.s, 6)];
-    h += '<div class="banner"><b>' + w.int + '</b><span>Coeficiente ' + nf(w.coef) + ', ' + w.reps +
-      ' reps por serie. Calienta de 5 en 5 kg.</span></div>';
+    /* la intensidad y el coeficiente no se enseñan de golpe: van en la i */
+    GLOSARIO.semfz = {t:"Semana " + (Math.min(p.s, 6) + 1) + " de 7, al " + w.int,
+      d:"Es la intensidad del plan para esta semana. El peso sale de multiplicar tu maximal por " + nf2(w.coef) +
+        ", así que cargas el " + Math.round(w.coef * 100) + "% de tu maximal. Cada semana sube el peso y bajan las repeticiones hasta el pico de la semana 7."};
+    h += '<div class="banner"><b>' + w.reps + (w.reps === 1 ? ' rep' : ' reps') + '</b><span>por serie esta semana. Calienta de 5 en 5 kg.' +
+      info("semfz") + '</span></div>';
   }
   if(state.ejemplo){
     h += '<div class="banner"><b>Ejemplo</b><span>Estos pesos no son tuyos: mete tus marcas.</span></div>';
