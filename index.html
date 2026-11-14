@@ -205,7 +205,11 @@
   .ex.done{background:var(--ok-soft); border-color:transparent}
   .ex.lock{opacity:.6}
   .ex-head{display:flex; align-items:center; gap:11px; padding:13px 14px; width:100%; text-align:left; min-height:58px}
-  .ex.lock .ex-head{cursor:default}
+  .ex.lock .ex-head{cursor:pointer}
+  .ex.lock:has(> .ex-body:not([hidden])){opacity:1}
+  .ex-body .lockmsg{display:flex; align-items:center; gap:8px; margin-top:12px; padding:10px 12px; border-radius:12px;
+       background:var(--surface-2); font-size:13.5px; font-weight:700; color:var(--ink-2)}
+  .ex-body .lockmsg svg{width:16px; height:16px; stroke:currentColor; fill:none; stroke-width:2; flex:0 0 auto}
   .tag{flex:0 0 auto; font-size:11.5px; letter-spacing:.08em; text-transform:uppercase; font-weight:800;
        padding:3px 7px; border-radius:7px; background:var(--surface-2); color:var(--ink-2)}
   .tag.b{background:var(--accent-soft); color:var(--accent)}
@@ -549,6 +553,24 @@
   .ph-t b{font-size:15.5px; display:block}
   .ph-t small{font-size:13px; color:var(--ink-2); display:block; margin-top:1px}
   .ph-t .chip{margin-top:5px; margin-right:4px}
+  button.ph{width:100%; text-align:left; background:none; border:0; font:inherit; color:inherit; cursor:pointer}
+  button.ph + .ph{border-top:1px solid var(--line)}
+  .ph-ver{flex:0 0 auto; align-self:center; width:8px; height:8px; margin-right:4px;
+          border-right:2px solid var(--ink-3); border-bottom:2px solid var(--ink-3); transform:rotate(-45deg)}
+  .fel-c.bq{text-align:left}
+  .fel-c.bq h2{margin-bottom:4px; text-align:left}
+  .bq .chips{display:flex; flex-wrap:wrap; gap:6px; margin:10px 0 4px}
+  .bq-hl{font-size:12.5px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); margin:16px 0 4px}
+  .bq-ej{display:flex; justify-content:space-between; align-items:baseline; gap:12px; padding:8px 0; font-size:14.5px}
+  .bq-ej + .bq-ej{border-top:1px solid var(--line)}
+  .bq-ej b{font-weight:700}
+  .bq-ej b small{display:block; font-weight:500; font-size:12px; color:var(--ink-3)}
+  .bq-ej span{text-align:right; color:var(--ink-2); font-size:13.5px; flex:0 0 auto; max-width:58%}
+  .bq-ej span em{font-style:normal; color:var(--accent); font-weight:700}
+  .bq table{width:100%; border-collapse:collapse; font-size:14px}
+  .bq th, .bq td{padding:6px 4px; border-top:1px solid var(--line); text-align:left}
+  .bq th{font-size:12px; color:var(--ink-3); font-weight:700; border-top:0}
+  .bq td.n, .bq th.n{text-align:right; font-variant-numeric:tabular-nums}
 
   /* formularios */
   .campo{display:flex; flex-direction:column; gap:5px; margin-bottom:10px}
@@ -807,7 +829,7 @@
    del 31 de mayo de 2025 y de las tablas de rutina por microciclo.     */
 
 /* súbela en cada despliegue: la app instalada la compara para avisar de que hay otra */
-var VERSION = "14 de noviembre de 2026, 11:20";
+var VERSION = "14 de noviembre de 2026, 12:30";
 var BARRA = 20;
 var PESO_CORP_DEF = 75;   /* peso corporal por defecto, se cambia en Ajustes */
 function pesoCorp(){ return state.peso > 0 ? state.peso : PESO_CORP_DEF; }
@@ -1352,6 +1374,30 @@ function guiaHTML(e, c, i){
 }
 
 /* las dos fotos del ejercicio alternando, como un vídeo corto */
+/* Vista previa de un ejercicio bloqueado: se puede abrir para ver qué toca,
+   pero no se apunta nada hasta terminar el anterior. */
+var LOCKMSG = '<div class="lockmsg"><svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Para apuntar, termina antes el anterior.</div>';
+function kgVista(e, x, manual){
+  if(x.kg) return e.bw ? "+" + nf(Math.max(0, x.kg - pesoCorp())) + " kg" : nf(x.kg) + " kg";
+  return manual ? nf(manual) + " kg" : "";
+}
+function vistaPrevia(p, e, c){
+  var manual = state.pesos[nombreEj(e)], t;
+  if(esBasico(e)){
+    var iguales = c.every(function(x){ return x.kg === c[0].kg && x.reps === c[0].reps; });
+    var k0 = kgVista(e, c[0], manual);
+    t = iguales
+      ? '<b>' + c.length + ' series de ' + c[0].reps + '</b>' + (k0 ? ' con ' + k0 : '')
+      : '<b>' + c.length + ' series</b>: ' + c.map(function(x){
+          var k = kgVista(e, x, manual); return (k ? k + " × " : "") + x.reps;
+        }).join(", ");
+  }else{
+    var k = kgVista(e, c[0], manual);
+    t = '<b>' + c.length + ' series al fallo</b>' + (k ? ', ' + k : ', a tu peso');
+  }
+  return loopHTML(e, t + '<br>Descanso ' + mmss(descansoDe(p, e)));
+}
+
 function loopHTML(e, texto){
   var ft = fotoDe(e);
   return '<div class="loopw">' + (ft
@@ -1716,15 +1762,18 @@ function bloqueJS(p, f, lista, ini, fin, act){
     : nombres[0];
 
   var h = '<div class="ex js-bloque' + (done ? " done" : "") + (lock ? " lock" : "") + '">' +
-    '<button class="ex-head"' + (lock ? " disabled" : ' data-open="js' + ini + '"') + '>' +
+    '<button class="ex-head" data-open="js' + ini + '">' +
     '<span class="tag js">jump set</span>' +
     '<span class="ex-name">' + esc(titulo) + '</span>' +
     '<span class="ex-load"><b>' + vueltas + '</b><small>vueltas</small></span></button>';
 
   if(lock){
-    h += '<div class="lockmsg"><svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="10" rx="2"/>' +
-      '<path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>' +
-      'Termina el anterior y se abre.' + info("jumpset") + '</div></div>';
+    h += '<div class="ex-body" hidden><p class="expl">Una serie de cada uno, cambiando cada 30 segundos.' + info("jumpset") + '</p>';
+    ejs.forEach(function(q){
+      var k = kgVista(q.e, q.c[0], state.pesos[nombreEj(q.e)]);
+      h += loopHTML(q.e, '<b>' + esc(nombreEj(q.e)) + '</b><br>' + q.c.length + ' series de ' + q.c[0].reps + ' reps' + (k ? ', ' + k : ''));
+    });
+    h += LOCKMSG + '</div></div>';
     return h;
   }
 
@@ -1859,11 +1908,11 @@ function vHoy(){
     var esquema = esBasico(e) ? c.length + " x " + c.map(function(x){ return x.reps; }).join("-")
                               : c.length + " al fallo";
     h += '<div class="ex' + (done ? " done" : "") + (lock ? " lock" : "") + '" data-ex="' + i + '">' +
-      '<button class="ex-head"' + (lock ? " disabled" : ' data-open="' + i + '"') + '>' + tag +
+      '<button class="ex-head" data-open="' + i + '" aria-label="' + esc(nombreEj(e)) + (lock ? ', bloqueado hasta terminar el anterior' : '') + '">' + tag +
       '<span class="ex-name">' + esc(nombreEj(e)) + (esAlt(e) ? ' <i class="altmark">alt</i>' : '') + '</span>' +
-      (lock ? '<svg class="exico" viewBox="0 0 24 24" aria-label="Se abre al terminar el anterior"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>' : '') +
+      (lock ? '<svg class="exico" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>' : '') +
       '<span class="ex-load"><b>' + esc(carga) + '</b><small>' + esquema + '</small></span></button>';
-    if(lock){ h += '</div>'; return; }
+    if(lock){ h += '<div class="ex-body" hidden>' + vistaPrevia(p, e, c) + LOCKMSG + '</div></div>'; return; }
 
     /* con rest pause pendiente el ejercicio sigue abierto: ahí se apuntan esas reps */
     var rpPend = !!(f.rp && esBasico(e) && done && !(apunte(i, c.length - 1) || {}).rp2);
@@ -2021,7 +2070,8 @@ function abreHoja(i, j){
 
 function vPlan(){
   var p = state.pos;
-  var h = '<div class="sect"><div class="eyebrow">Macrociclo</div><div class="card">';
+  var h = '<div class="sect"><div class="eyebrow">Macrociclo</div>' +
+    '<p class="note" style="margin:0 0 8px">Toca un bloque para ver de qué va, qué ejercicios lleva y a qué porcentaje de tu maximal.</p><div class="card">';
   FASES.forEach(function(f, i){
     var cls = i === p.f ? "now" : (i < p.f ? "past" : "");
     var det = f.tipo === "fuerza"
@@ -2029,13 +2079,14 @@ function vPlan(){
       : f.int + ", coef " + f.coef.map(nf2).join(" a ") +
         (f.reps ? ", " + f.reps.join("/") + " reps" : ", 8 y 12 reps") +
         ", descanso " + mmss(f.desc);
-    h += '<div class="ph ' + cls + '"><div class="ph-dot">' + (i + 1) + '</div><div class="ph-t">' +
+    h += '<button class="ph ' + cls + '" data-bloque="' + i + '" aria-label="Ver el ' + esc(f.n) + '">' +
+      '<div class="ph-dot">' + (i + 1) + '</div><div class="ph-t">' +
       '<b>' + esc(f.n) + ', ' + esc(f.nota) + '</b>' +
       '<small>' + esc(det) + ', entrenos ' + (f.rut === "AB" ? "A y B" : "A, B y C") +
       ', ' + f.sem + ' semanas</small>';
     if(f.test) h += '<span class="chip test">' + (state.tests[f.id] ? "test hecho" : "test de maximales") + '</span>';
     if(i === p.f) h += '<span class="chip now">semana ' + (p.s + 1) + '</span>';
-    h += '</div></div>';
+    h += '</div><i class="ph-ver" aria-hidden="true"></i></button>';
   });
   h += '</div></div>';
 
@@ -2064,6 +2115,95 @@ function vPlan(){
     'En los primeros ciclos paras antes de fallar. En el bloque de fuerza vas al límite.</p></div>' +
     '</div></div>';
   return h;
+}
+
+/* ============================ FICHA DE UN BLOQUE ============================
+   Vista de pájaro: de qué va, cuánto dura y, entreno por entreno, qué
+   ejercicios lleva y a qué porcentaje del maximal. Sale de las mismas
+   funciones que calculan la sesión, así que no puede desfasarse del plan. */
+var BLOQUE_TXT = {
+  c1:  "Arrancas ligero y con mucho margen. Aprendes la técnica de los básicos y preparas tendones y articulaciones para lo que viene.",
+  c2:  "Mismo esquema, algo más de peso. El músculo crece porque cada semana le pides un poco más que la anterior.",
+  c3:  "Sube el peso y bajan las repeticiones. Es el último ciclo con solo dos entrenos distintos.",
+  c4:  "Pasas a tres entrenos distintos. Cada músculo recibe menos series por sesión, pero de más calidad y con más peso.",
+  c5:  "Pesos cerca del 80% y series más cortas. Es el puente entre el volumen y la fuerza.",
+  c6:  "El ciclo más duro de volumen. Los básicos acaban con rest pause y los complementarios con una serie descendente.",
+  f:   "Siete semanas subiendo el peso y bajando repeticiones hasta rozar tu máximo en la última. Pocas series, descansos largos y cada serie al límite.",
+  fin: "Vuelves a volumen moderado para asentar lo ganado y recuperar el cuerpo después del pico de fuerza."
+};
+var BLOQUE_TIPO = {hip:"Hipertrofia", fuerza:"Fuerza", "final":"Cierre"};
+
+/* "1×12 al 58%, 2×10 al 67%": agrupa las series iguales seguidas */
+function bqSeries(p, e){
+  var n = seriesDe(p, e), reps = repsDe(p, e), g = [];
+  if(!e.rm) return e.js ? n + "×" + reps[0] : n + " al fallo, unas " + reps[0] + " reps";
+  var pcs = reps.map(function(_, i){ return Math.round(coefSerie(p, e, i, n) * 100); });
+  if(pcs.every(function(x){ return x === pcs[0]; }) && reps.some(function(r){ return r !== reps[0]; })){
+    var kg1 = (!state.ejemplo && !e.bw && state.rms[e.rm]) ? redondea(state.rms[e.rm] * coefSerie(p, e, 0, n)) : null;
+    return n + " series de " + reps.slice(0, -1).join(", ") + " y " + reps[reps.length - 1] +
+      " al <em>" + pcs[0] + "%</em>" + (kg1 ? " (" + nf(kg1) + " kg)" : "");
+  }
+  for(var i = 0; i < n; i++){
+    var pc = e.rm ? Math.round(coefSerie(p, e, i, n) * 100) : null;
+    var u = g[g.length - 1];
+    if(u && u.r === reps[i] && u.pc === pc) u.n++;
+    else g.push({n:1, r:reps[i], pc:pc, i:i});
+  }
+  return g.map(function(x){
+    var t = x.n + "×" + x.r;
+    if(x.pc === null) return t;
+    var kg = (!state.ejemplo && !e.bw && state.rms[e.rm]) ? redondea(state.rms[e.rm] * coefSerie(p, e, x.i, n)) : null;
+    return t + " al <em>" + x.pc + "%</em>" + (kg ? " (" + nf(kg) + " kg)" : "");
+  }).join(", ");
+}
+
+function bloqueHTML(i){
+  var f = FASES[i], p0 = {f:i, s:0, e:0}, rut = RUT[f.rut], fz = f.tipo === "fuerza";
+  var h = '<div class="eyebrow">' + esc(BLOQUE_TIPO[f.tipo] || "") + ', bloque ' + (i + 1) + ' de ' + FASES.length + '</div>' +
+    '<h2>' + esc(f.n) + '</h2>' +
+    '<p class="frase" style="margin:0">' + esc(BLOQUE_TXT[f.id] || f.nota) + '</p>';
+  h += '<div class="chips">' +
+    '<span class="chip">' + f.sem + ' semanas</span>' +
+    '<span class="chip">' + porSemana(f) + ' entrenos a la semana, ' + (f.rut === "AB" ? "A y B" : "A, B y C") + '</span>' +
+    '<span class="chip">descanso ' + mmss(f.desc) + ' en básicos</span>' +
+    (f.test ? '<span class="chip test">empieza con test de maximales</span>' : '') + '</div>';
+
+  rut.letras.forEach(function(L){
+    h += '<div class="bq-hl">Entreno ' + L + '</div>';
+    rut[L].forEach(function(e){
+      var tag = esBasico(e) ? "básico" : (e.js ? "complementario, en jump set" : "complementario");
+      var det;
+      if(fz && esBasico(e)) det = seriesDe(p0, e) + " series, el % sube cada semana (tabla de abajo)";
+      else det = bqSeries(p0, e) + (e.rm ? "" : ", con tu peso");
+      if(f.rp && esBasico(e) && !fz) det += ", la última en rest pause";
+      if(conDrop(f, e)) det += ", la última con drop";
+      h += '<div class="bq-ej"><b>' + esc(nombreEj(e)) + '<small>' + tag + '</small></b><span>' + det + '</span></div>';
+    });
+  });
+
+  if(fz){
+    var bas = [];
+    rut.letras.forEach(function(L){ rut[L].forEach(function(e){ if(esBasico(e) && bas.indexOf(e.rm) < 0) bas.push(e.rm); }); });
+    h += '<div class="bq-hl">Básicos, semana a semana</div><table><thead><tr><th>Semana</th><th class="n">Reps</th><th class="n">% maximal</th></tr></thead><tbody>';
+    FUERZA_SEM.forEach(function(w, k){
+      h += '<tr><td>' + (k + 1) + (k === FUERZA_SEM.length - 1 ? ', pico' : '') + '</td><td class="n">4×' + w.reps +
+        '</td><td class="n">' + Math.round(w.coef * 100) + '%</td></tr>';
+    });
+    h += '</tbody></table>';
+  }
+
+  h += '<p class="note" style="margin-top:14px">El porcentaje es sobre tu maximal de cada básico' + info("maximal") + '. ' +
+    (fz ? 'Los complementarios no llevan porcentaje: el peso lo eliges tú.'
+        : f.tipo === "hip" ? 'Arriba está la semana 1. En la semana 2 los complementarios bajan una serie, y la ' + f.sem + ' es de descarga: mismo peso, menos series.'
+        : 'Todas las semanas iguales.') +
+    (state.ejemplo ? ' Cuando metas tus marcas verás aquí también los kilos.' : '') + '</p>';
+  h += '<button class="btn primary" data-cierra style="margin-top:12px">Cerrar</button>';
+  return h;
+}
+function abreBloque(i){
+  if(!FASES[i]) return;
+  var el = nHoja(bloqueHTML(i));
+  el.querySelector(".fel-c").classList.add("bq");
 }
 
 function vProgreso(){
@@ -2448,7 +2588,8 @@ function vCal(){
   h += '</div></div></div>';
 
   var ultimas = (state.hechas || []).slice(-10).reverse();
-  h += '<div class="sect"><div class="eyebrow">Últimas sesiones</div><div class="card">';
+  h += '<div class="sect"><details class="fold cardf"><summary>Últimas sesiones' +
+    (ultimas.length ? ', ' + ultimas.length : '') + '</summary><div class="in">';
   if(!ultimas.length){
     h += '<p class="note" style="margin:0">Todavía no has cerrado ninguna sesión. ' +
       'En cuanto cierres la primera se enciende su día en el calendario.</p>';
@@ -2458,7 +2599,7 @@ function vCal(){
       ', semana ' + s.w + '</small></div><div class="mono" style="color:var(--ink-2); font-size:13px">' +
       esc(s.d) + '</div></div>';
   });
-  h += '</div></div>';
+  h += '</div></details></div>';
   return h;
 }
 
@@ -4423,6 +4564,7 @@ document.addEventListener("click", function(ev){
   if((el = ev.target.closest("[data-timer]"))){ startTimer(+el.dataset.timer, "Descanso", ""); return; }
   if((el = ev.target.closest(".tab"))){ tab = el.dataset.t; render(); return; }
   if((el = ev.target.closest("[data-info]"))){ abreInfo(el.dataset.info); return; }
+  if((el = ev.target.closest("[data-bloque]"))){ abreBloque(+el.dataset.bloque); return; }
   if(ev.target.id === "b-sig"){
     if(pasoAct < PASOS.length - 1){ pasoAct++; render(); }
     else { state.visto = 1; pasoAct = 0; save(); render(); }
