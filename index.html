@@ -23,6 +23,14 @@
   [hidden]{display:none !important}
 </style>
 <title>Cuaderno de Fuerza</title>
+<meta property="og:type" content="website">
+<meta property="og:title" content="Cuaderno de Fuerza">
+<meta property="og:description" content="Tu plan de fuerza por ciclos: qué toca cada día, con qué peso y cuánto descansar.">
+<meta property="og:url" content="https://marcospoolede-coder.github.io/Culturismo-natural/">
+<meta property="og:image" content="https://marcospoolede-coder.github.io/Culturismo-natural/img/compartir.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Figtree:wght@400;500;600;700;800&display=swap">
@@ -746,7 +754,10 @@
   .ncaja .nlist{margin-top:8px}
   .ngas{display:flex; align-items:flex-end; gap:16px}
   .nbars{display:flex; align-items:flex-end; gap:5px; flex:1; min-width:0}
-  .nbars div{flex:1; display:flex; flex-direction:column; align-items:center; gap:3px}
+  .nbars > *{flex:1; display:flex; flex-direction:column; align-items:center; gap:3px}
+  .nbars button{background:none; border:0; padding:4px 0 0; font:inherit; cursor:pointer; border-radius:8px}
+  .nbars button:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+  .nbars .e i{opacity:.5}
   .nbars i{display:block; width:100%; max-width:22px; border-radius:5px 5px 2px 2px; background:var(--line-2); min-height:3px}
   .nbars .s i{background:var(--accent)}
   .nbars .p i{opacity:.55}
@@ -829,7 +840,7 @@
    del 31 de mayo de 2025 y de las tablas de rutina por microciclo.     */
 
 /* súbela en cada despliegue: la app instalada la compara para avisar de que hay otra */
-var VERSION = "14 de noviembre de 2026, 12:50";
+var VERSION = "14 de noviembre de 2026, 13:30";
 var BARRA = 20;
 var PESO_CORP_DEF = 75;   /* peso corporal por defecto, se cambia en Ajustes */
 function pesoCorp(){ return state.peso > 0 ? state.peso : PESO_CORP_DEF; }
@@ -2628,7 +2639,7 @@ var GLOSARIO = {
   balance:   {t:"Balance del día",
               d:"Lo que comes menos lo que gastas. Si sale con más, es superávit: comes más de lo que gastas, que es lo que hace falta para construir músculo. Si sale con menos, es déficit: comes menos de lo que gastas, que sirve para perder grasa pero frena el músculo. El color dice lo cerca que estás de tu objetivo: verde si estás dentro, naranja si te quedas algo lejos y rojo si te vas mucho, por arriba o por abajo."},
   gasto:     {t:"Gasto de calorías",
-              d:"Todo lo que quema tu cuerpo en un día: lo que gasta solo por estar vivo, más lo que te mueves y lo que entrenas. Con WHOOP o Apple Salud sale del aparato; sin ellos, se estima con tu peso, tu altura y tu edad. Los relojes y las pulseras fallan un 10 a 40 %, por eso con tres semanas de pesos manda la báscula."},
+              d:"Todo lo que quema tu cuerpo en un día: lo que gasta solo por estar vivo, más lo que te mueves y lo que entrenas. Con WHOOP o Apple Salud sale del aparato; sin ellos, se estima con tu sexo, edad, altura y peso, y se le suma lo que cuesta cada entreno que cierras. Los relojes y las pulseras fallan un 10 a 40 %, por eso con tres semanas de pesos manda la báscula."},
   tecnica:   {t:"Técnica A, B o C",
               d:"Cómo ha salido la serie. A, limpia de principio a fin. B, se te ha roto alguna repetición. C, has tenido que hacer trampas para subirla."},
   descarga:  {t:"Semana de descarga",
@@ -2979,7 +2990,7 @@ function dibujoCom(cual){
    Con tres semanas de pesos manda la báscula, porque el gasto de los relojes
    falla un 10 a 40 %. */
 var nut = {cargado:false, cargando:false, falta:false, plan:"gratis", comidas:[], gasto:[], pesos:[],
-           integ:{}, aviso:"", sondeo:null, ultSync:0, vista:"", dia:null, mes:null, mom:null};
+           integ:{}, aviso:"", sondeo:null, ultSync:0, vista:"", dia:null, mes:null, mom:null, gdia:null};
 
 function fISO(d){ return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10); }
 function nHoy(){ return fISO(new Date()); }
@@ -3055,9 +3066,29 @@ function nGasto(f){
   if(m && m.total) return {kcal:m.total, fuente:"a mano", parcial:false};
   var c = nCfg();
   if(c.mant) return {kcal:c.mant, fuente:"tu mantenimiento", parcial:false, fijo:true};
-  var dias = (state.dias || []).length || 3;
-  return {kcal:Math.round(nBasal() * (dias >= 4 ? 1.6 : dias >= 2 ? 1.5 : 1.35) / 10) * 10,
-          fuente:"estimado", parcial:false, fijo:true};
+  /* sin pulsera: un día normal sin contar el gimnasio, más lo que cuesta
+     cada entreno cerrado ese día */
+  var base = Math.round(nBasal() * N_VIDA / 10) * 10, ent = nEntrenoKcal(f);
+  return {kcal:base + ent, fuente:ent ? "estimado, con tu entreno" : "estimado",
+          parcial:false, fijo:true, est:true, base:base, ent:ent};
+}
+/* basal por 1,3: vida diaria ligera, trabajo sentado y algo de paseo */
+var N_VIDA = 1.3;
+/* Coste de los entrenos cerrados un día. Fuerza con descansos largos: unos
+   4 MET de media, 3 por encima de estar sentado, durante lo que dura la sesión */
+function nEntrenoKcal(f){
+  var t = 0;
+  (state.hechas || []).forEach(function(s){
+    if(s.iso !== f) return;
+    var i = -1, min = 60;
+    FASES.forEach(function(x, k){ if(i < 0 && x.n === s.f) i = k; });
+    if(i >= 0){
+      var lista = (RUT[FASES[i].rut] || {})[s.r];
+      if(lista) min = duracion({f:i, s:Math.max(0, (s.w || 1) - 1), e:0}, lista);
+    }
+    t += pesoCorp() * 3 * min / 60;
+  });
+  return Math.round(t / 10) * 10;
 }
 function nComidas(f){
   return nut.comidas.filter(function(c){ return c.fecha === f; });
@@ -3400,7 +3431,7 @@ function nDiaHTML(){
 
 /* el gasto, a la vista: el del día elegido, de dónde sale y la última semana */
 function nGastoHTML(){
-  var f = nSel(), hoy = f === nHoy(), g = nGasto(f), w = nut.integ.whoop;
+  var f = nut.gdia || nSel(), hoy = f === nHoy(), g = nGasto(f), w = nut.integ.whoop;
   var fila = nut.gasto.filter(function(x){ return x.fecha === f && x.pasos; })[0];
   var h = '<div class="card" style="margin-top:10px"><div class="com-h">' + dibujoCom("gasto").replace("comdib", "com-ic") +
     '<div><b>Gasto de calorías</b><small>' + (hoy ? "Hoy" : esc(nFechaLarga(f))) + ', lo que quema tu cuerpo</small></div></div>';
@@ -3408,20 +3439,29 @@ function nGastoHTML(){
   for(i = 6; i >= 0; i--){
     var fi = nDia(i), gi = nGasto(fi);
     dias.push({f:fi, g:gi});
-    if(!gi.fijo) max = Math.max(max, gi.kcal);
+    if(!gi.fijo || gi.est) max = Math.max(max, gi.kcal);
   }
   /* la misma media que usa el balance de hoy: los días completos de la última semana */
   for(i = 1; i <= 7; i++){ var gm = nGasto(nDia(i)); if(!gm.fijo && !gm.parcial){ suma += gm.kcal; n++; } }
   h += '<div class="ngas"><div class="gran"><b>' + nMil(g.kcal) + '</b><span>kcal</span></div><div class="nbars">';
   dias.forEach(function(x){
-    var real = !x.g.fijo;
-    h += '<div class="' + (x.f === f ? "s" : "") + (real && x.g.parcial ? " p" : "") + '" title="' + (real ? nMil(x.g.kcal) + " kcal" : "sin dato") +
-      '"><i style="height:' + (real && max ? Math.max(5, Math.round(x.g.kcal / max * 56)) : 3) + 'px"></i><small>' +
-      "DLMXJVS".charAt(new Date(x.f + "T12:00:00").getDay()) + '</small></div>';
+    var vale = !x.g.fijo || x.g.est;
+    h += '<button type="button" data-n="gdia" data-f="' + x.f + '" class="' + (x.f === f ? "s" : "") +
+      (!x.g.fijo && x.g.parcial ? " p" : "") + (x.g.est ? " e" : "") + '" aria-label="' +
+      esc(nFechaLarga(x.f) + ": " + nMil(x.g.kcal) + " kcal" + (x.g.fijo ? ", estimado" : "")) + '"' +
+      (x.f === f ? ' aria-pressed="true"' : '') +
+      '><i style="height:' + (vale && max ? Math.max(5, Math.round(x.g.kcal / max * 56)) : 3) + 'px"></i><small>' +
+      "DLMXJVS".charAt(new Date(x.f + "T12:00:00").getDay()) + '</small></button>';
   });
-  h += '</div></div>';
+  h += '</div></div><p class="expl" style="font-size:12.5px; margin-top:4px">Toca un día de la semana para ver lo que gastaste.</p>';
+  if(g.est){
+    h += '<p class="expl">Un día normal tuyo: <b>' + nMil(g.base) + ' kcal</b>' +
+      (g.ent ? '. El entreno: <b>+' + nMil(g.ent) + ' kcal</b>' : (hoy ? '. El entreno se suma al cerrarlo' : '. Ese día no cerraste entreno')) + '.</p>';
+  }
   h += '<p class="expl">' + (g.fijo
-    ? "Es una estimación con tu peso, tu altura y tu edad. Conecta WHOOP o Apple Salud más abajo, en Tus datos y conexiones, para tener el dato real."
+    ? (g.est
+        ? "Sin pulsera lo estimo con tu sexo, edad, altura y peso (ponlos bien en Tus datos), más lo que cuesta cada entreno que cierras. Si conectas WHOOP o Apple Salud, manda su dato."
+        : "Usas el mantenimiento que pusiste en Tus datos. Conecta WHOOP o Apple Salud para tener el dato real.")
     : "Fuente: " + esc(g.fuente) + (g.parcial ? ". El día sigue y la cifra irá subiendo" : "") + "." + (fila ? " " + nMil(fila.pasos) + " pasos." : "")) +
     info("gasto") + '</p>';
   if(n >= 2) h += '<p class="expl">Media de tus últimos ' + n + ' días completos: <b>' + nMil(suma / n) + ' kcal</b>.</p>';
@@ -3695,7 +3735,8 @@ document.addEventListener("click", function(ev){
     else if(q === "mano") nAbreMano();
     else if(q === "add") nAbreAnadir(el.dataset.mom);
     else if(q === "vista"){ nut.vista = el.dataset.v; render(); }
-    else if(q === "dia"){ nut.dia = el.dataset.f === nHoy() ? null : el.dataset.f; nPinta(); }
+    else if(q === "dia"){ nut.dia = el.dataset.f === nHoy() ? null : el.dataset.f; nut.gdia = null; nPinta(); }
+    else if(q === "gdia"){ nut.gdia = el.dataset.f; nPinta(); }
     else if(q === "mes"){
       var rm = nut.mes ? new Date(+nut.mes.slice(0, 4), +nut.mes.slice(5, 7) - 1, 1) : new Date(nSel() + "T12:00:00");
       rm = new Date(rm.getFullYear(), rm.getMonth() + (+el.dataset.d), 1);
