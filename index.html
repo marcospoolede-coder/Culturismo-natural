@@ -807,7 +807,7 @@
    del 31 de mayo de 2025 y de las tablas de rutina por microciclo.     */
 
 /* súbela en cada despliegue: la app instalada la compara para avisar de que hay otra */
-var VERSION = "13 de noviembre de 2026, 23:07";
+var VERSION = "14 de noviembre de 2026, 11:20";
 var BARRA = 20;
 var PESO_CORP_DEF = 75;   /* peso corporal por defecto, se cambia en Ajustes */
 function pesoCorp(){ return state.peso > 0 ? state.peso : PESO_CORP_DEF; }
@@ -3624,7 +3624,13 @@ document.addEventListener("change", function(ev){
 
 /* imágenes generadas que ya están en img/, clave y ruta. Mientras una no
    exista, su tarjeta sale sin foto. Los encargos están en IMAGENES.md */
-var ILUS = {};
+var ILUS = {
+  creatina: "img/sup/creatina.webp",
+  proteina_polvo: "img/sup/proteina_polvo.webp",
+  magnesio: "img/sup/magnesio.webp",
+  fuerza_opcionales: "img/sup/fuerza_opcionales.webp",
+  proteina_comida: "img/guia/proteina_comida.webp"
+};
 function ilus(k){
   return ILUS[k] ? '<img class="sup-img" src="' + ILUS[k] + '" alt="" loading="lazy">' : "";
 }

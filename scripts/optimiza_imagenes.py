@@ -8,6 +8,7 @@ Recorta al formato, reduce al tamaño de la app y guarda en img/<grupo>/ en WebP
 (la de compartir en JPG). Baja la calidad hasta quedar por debajo del peso máximo.
 No borra nada: los originales se quedan donde estaban.
 """
+import re
 import sys
 from pathlib import Path
 from PIL import Image
@@ -55,14 +56,23 @@ def main(carpeta):
     for f in sorted(Path(carpeta).expanduser().iterdir()):
         if f.suffix.lower() not in (".png", ".jpg", ".jpeg", ".webp"):
             continue
-        d = DESTINO.get(f.stem.lower())
+        nombre = re.sub(r"^\d+-", "", f.stem.lower())  # "02-magnesio" -> "magnesio"
+        d = DESTINO.get(nombre)
         if not d:
             raras.append(f.name); continue
+        try:
+            im = Image.open(f).convert("RGB")
+        except Exception:
+            raras.append(f.name + " (no es una imagen)"); continue
         grupo, sub, w, h, kb = d
         jpg = grupo == "compartir"
-        out = RAIZ / sub / (f.stem.lower() + (".jpg" if jpg else ".webp"))
+        out = RAIZ / sub / (nombre + (".jpg" if jpg else ".webp"))
         out.parent.mkdir(parents=True, exist_ok=True)
-        im = recorta(Image.open(f).convert("RGB"), w, h)
+        if grupo == "logros":  # la moneda sale pequeña: se recorta el centro para agrandarla
+            c = round(min(im.size) * 0.62)
+            x, y = (im.width - c) // 2, (im.height - c) // 2
+            im = im.crop((x, y, x + c, y + c))
+        im = recorta(im, w, h)
         q, peso = guarda(im, out, kb, jpg)
         aviso = "" if peso <= kb else "  (pasa del máximo, simplifica la imagen)"
         print(f"{f.name:28} -> {out.relative_to(RAIZ)}  {w}x{h}  q{q}  {peso:.0f} KB{aviso}")
