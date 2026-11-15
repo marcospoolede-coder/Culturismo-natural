@@ -849,7 +849,7 @@
    del 31 de mayo de 2025 y de las tablas de rutina por microciclo.     */
 
 /* súbela en cada despliegue: la app instalada la compara para avisar de que hay otra */
-var VERSION = "15 de noviembre de 2026, 13:40";
+var VERSION = "15 de noviembre de 2026, 14:00";
 var BARRA = 20;
 var PESO_CORP_DEF = 75;   /* peso corporal por defecto, se cambia en Ajustes */
 function pesoCorp(){ return state.peso > 0 ? state.peso : PESO_CORP_DEF; }
@@ -3851,11 +3851,11 @@ function vCom(){
   var h = '<div class="sect"><div class="seg">' + [["dia", "Comidas"], ["sup", "Suplementos"], ["guia", "Guía"]].map(function(o){
     return '<button data-n="vista" data-v="' + o[0] + '" aria-pressed="' + (v === o[0] ? "true" : "false") + '">' + o[1] + '</button>';
   }).join("") + '</div></div>';
-  h += v === "sup" ? supHTML(kg) : v === "guia" ? guiaHTML(kg) : nutHTML();
+  h += v === "sup" ? supHTML(kg) : v === "guia" ? guiaComHTML(kg) : nutHTML();
   view.innerHTML = h;
 }
 
-function guiaHTML(kg){
+function guiaComHTML(kg){
   var pMin = Math.round(kg * 1.6), pMax = Math.round(kg * 2);
   var h = '<div class="sect"><div class="eyebrow">Comer construye lo que el entreno rompe</div>';
   h += '<div class="card">' + ilus("proteina_comida") + comCab("prote", "Proteína", "La base, lo único obligatorio") +
