@@ -445,6 +445,7 @@
   .bpuntos{display:flex; gap:7px; margin-bottom:28px}
   .bpuntos i{width:7px; height:7px; border-radius:50%; background:var(--line-2); display:block; transition:width .2s ease}
   .bpuntos i.on{background:var(--accent); width:22px; border-radius:99px}
+  .bimg{display:block; width:min(68vw, 260px); aspect-ratio:4/5; object-fit:cover; border-radius:20px; margin-bottom:20px; background:var(--surface-2)}
   .bicono{width:78px; height:78px; border-radius:24px; background:var(--accent-soft); display:grid; place-items:center; margin-bottom:22px}
   .bicono svg{width:38px; height:38px; stroke:var(--accent); fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round}
   .bienv h1{font-size:28px; line-height:1.15; margin:0 0 10px; max-width:16ch}
@@ -494,6 +495,10 @@
   .camino-t span:last-child{color:var(--ink-2); font-weight:600}
   .logros{display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:8px}
   .logro{border-radius:12px; padding:9px 11px; background:var(--surface-2); opacity:.6}
+  .logro-img{display:block; width:56px; height:56px; border-radius:50%; margin-bottom:6px; filter:grayscale(1) brightness(.75)}
+  .logro.on .logro-img{filter:none}
+  .logrosfel .logro-img{width:64px; height:64px; margin:0 auto 4px}
+  .logrosfel .logropill{display:inline-flex; flex-direction:column; align-items:center; border-radius:14px; padding:8px 12px 7px}
   .logro.on{opacity:1; background:var(--ok-soft)}
   .logro-n{font-weight:700; font-size:14.5px; line-height:1.2}
   .logro.on .logro-n{color:var(--ok)}
@@ -745,6 +750,10 @@
   .ncaja{border:1px solid var(--line); border-radius:14px; padding:10px 12px; background:var(--surface)}
   .ncaja.vacia{border-style:dashed; background:transparent}
   .ncaja-h{display:flex; align-items:center; gap:10px}
+  .ncaja-ic.foto{width:46px; height:46px; background:var(--surface-2); overflow:hidden}
+  .ncaja-ic.foto img{width:100%; height:100%; object-fit:cover; display:block; transform:scale(1.8); transform-origin:50% 33%}
+  .vacio-img{display:block; width:128px; height:128px; object-fit:cover; border-radius:18px; margin:6px auto 10px; background:var(--surface-2)}
+  .ilu-169{display:block; width:100%; aspect-ratio:16/9; object-fit:cover; border-radius:12px; margin:2px 0 10px; background:var(--surface-2)}
   .ncaja-ic{width:36px; height:36px; border-radius:11px; background:var(--accent-soft); display:grid; place-items:center; flex:none}
   .ncaja-ic svg,.nop svg{width:21px; height:21px; stroke:var(--accent); fill:none; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round}
   .ncaja-h b{flex:1; font-size:15.5px; font-weight:800; min-width:0; line-height:1.2}
@@ -840,7 +849,7 @@
    del 31 de mayo de 2025 y de las tablas de rutina por microciclo.     */
 
 /* súbela en cada despliegue: la app instalada la compara para avisar de que hay otra */
-var VERSION = "14 de noviembre de 2026, 13:30";
+var VERSION = "15 de noviembre de 2026, 13:40";
 var BARRA = 20;
 var PESO_CORP_DEF = 75;   /* peso corporal por defecto, se cambia en Ajustes */
 function pesoCorp(){ return state.peso > 0 ? state.peso : PESO_CORP_DEF; }
@@ -2174,7 +2183,8 @@ function bqSeries(p, e){
 
 function bloqueHTML(i){
   var f = FASES[i], p0 = {f:i, s:0, e:0}, rut = RUT[f.rut], fz = f.tipo === "fuerza";
-  var h = '<div class="eyebrow">' + esc(BLOQUE_TIPO[f.tipo] || "") + ', bloque ' + (i + 1) + ' de ' + FASES.length + '</div>' +
+  var h = '<img class="ilu-169" src="img/bloques/' + f.id + '.webp" alt="">' +
+    '<div class="eyebrow">' + esc(BLOQUE_TIPO[f.tipo] || "") + ', bloque ' + (i + 1) + ' de ' + FASES.length + '</div>' +
     '<h2>' + esc(f.n) + '</h2>' +
     '<p class="frase" style="margin:0">' + esc(BLOQUE_TXT[f.id] || f.nota) + '</p>';
   h += '<div class="chips">' +
@@ -2224,6 +2234,8 @@ function abreBloque(i){
 function vProgreso(){
   var p = state.pos, f = fase(p.f), sig = fase(p.f + 1 < FASES.length ? p.f + 1 : 0);
   var h = '<div class="sect"><div class="card">' +
+    '<button type="button" data-bloque="' + p.f + '" style="display:block; width:100%; padding:0; border:0; background:none; cursor:pointer" aria-label="Ver el ' + esc(f.n) + '">' +
+    '<img class="ilu-169" src="img/bloques/' + f.id + '.webp" alt=""></button>' +
     '<div class="camino-t"><span>' + esc(f.n) + ' de ' + FASES.length + ' bloques</span>' +
     '<span>semana ' + (p.s + 1) + ' de ' + f.sem + '</span></div>' +
     '<div class="camino" aria-hidden="true">' + FASES.map(function(x, k){
@@ -2265,7 +2277,8 @@ function evoHTML(){
   var m = state.marcas || [];
   var h = '<div class="sect"><div class="eyebrow">Evolución por ciclo</div><div class="card">';
   if(!m.length){
-    return h + '<p class="expl" style="margin:0">Aún no hay marcas guardadas: se guardan al cambiar un maximal o cerrar un ciclo.</p></div></div>';
+    return h + '<img class="vacio-img" src="img/vacio/marcas.webp" alt="" loading="lazy">' +
+      '<p class="expl" style="margin:0; text-align:center">Aún no hay marcas guardadas: se guardan al cambiar un maximal o cerrar un ciclo.</p></div></div>';
   }
   var alguno = false;
   LIFTS.forEach(function(l){
@@ -2597,6 +2610,7 @@ function vCal(){
   LOGROS.forEach(function(l){
     var f = (state.logros || {})[l.id];
     h += '<div class="logro' + (f ? " on" : "") + '">' +
+      '<img class="logro-img" src="img/logros/' + l.id + '.webp" alt="" loading="lazy">' +
       '<div class="logro-n">' + esc(l.n) + '</div>' +
       '<div class="logro-d">' + (f ? "conseguido el " + esc(f) : esc(l.d)) + '</div></div>';
   });
@@ -2606,7 +2620,8 @@ function vCal(){
   h += '<div class="sect"><details class="fold cardf"><summary>Últimas sesiones' +
     (ultimas.length ? ', ' + ultimas.length : '') + '</summary><div class="in">';
   if(!ultimas.length){
-    h += '<p class="note" style="margin:0">Todavía no has cerrado ninguna sesión. ' +
+    h += '<img class="vacio-img" src="img/vacio/sesiones.webp" alt="" loading="lazy">' +
+      '<p class="note" style="margin:0; text-align:center">Todavía no has cerrado ninguna sesión. ' +
       'En cuanto cierres la primera se enciende su día en el calendario.</p>';
   }
   ultimas.forEach(function(s){
@@ -2750,7 +2765,7 @@ function vBienvenida(){
     '<div class="bpuntos">' + PASOS.map(function(_, k){
       return '<i class="' + (k === pasoAct ? "on" : "") + '"></i>';
     }).join("") + '</div>' +
-    '<div class="bicono"><svg viewBox="0 0 24 24">' + ICONOB[x.i] + '</svg></div>' +
+    '<img class="bimg" src="img/bienvenida/' + (pasoAct + 1) + '.webp" alt="">' +
     '<h1>' + esc(x.t) + '</h1>' +
     '<p class="bgrande">' + esc(x.p) + '</p>' +
     '<p class="bchico">' + esc(x.c) + '</p>' +
@@ -2895,7 +2910,7 @@ function felicita(f, L, nApuntes, cerroFase, extra){
     ((extra.logros || []).length ? '<div class="logrosfel">' +
       extra.logros.map(function(id){
         var l = LOGROS.filter(function(x){ return x.id === id; })[0];
-        return l ? '<span class="logropill">' + esc(l.n) + '</span>' : "";
+        return l ? '<span class="logropill"><img class="logro-img" src="img/logros/' + l.id + '.webp" alt="">' + esc(l.n) + '</span>' : "";
       }).join("") + '</div>' : "") +
     (nApuntes ? '<p class="expl" style="margin:0 0 14px">' + nApuntes +
       ' series apuntadas, ' + (10 + nApuntes + (extra.meta ? 25 : 0)) + ' puntos.</p>' : '') +
@@ -3410,11 +3425,12 @@ function nDiaHTML(){
     '<div class="nbar' + (d.s.prot >= pObj ? " verde" : "") + '"><i style="width:' + pp + '%"></i></div></div>';
 
   var lista = nComidas(f);
+  if(!hoy && !lista.length) h += '<img class="vacio-img" src="img/vacio/comidas.webp" alt="" loading="lazy">';
   h += '<div class="ncajas">';
   N_MOM.forEach(function(m){
     var mias = lista.filter(function(c){ return nMomDeHora(c.hora) === m.k; }), kc = 0, hechas = 0;
     mias.forEach(function(c){ if(c.estado === "hecha"){ kc += c.kcal || 0; hechas++; } });
-    h += '<div class="ncaja' + (mias.length ? '' : ' vacia') + '"><div class="ncaja-h"><span class="ncaja-ic">' + nIcoMom(m.k) + '</span>' +
+    h += '<div class="ncaja' + (mias.length ? '' : ' vacia') + '"><div class="ncaja-h"><span class="ncaja-ic foto"><img src="img/com/' + m.k + '.webp" alt="" loading="lazy" decoding="async"></span>' +
       '<b>' + m.t + '<small>' + (!mias.length ? 'Vacío' : hechas ? nMil(kc) + ' kcal' : 'Calculando') + '</small></b>' +
       '<button class="mas" data-n="add" data-mom="' + m.k + '" aria-label="Añadir a ' + m.t + '">+</button></div>' +
       (mias.length ? '<ul class="nlist">' + mias.map(nFilaComida).join("") + '</ul>' : '') + '</div>';
@@ -3919,9 +3935,11 @@ function comidaCicloHTML(kg){
   var chMin = Math.round(kg * 3), chMax = Math.round(kg * 5);
   var grMin = Math.round(kg * 0.5), grMax = Math.round(kg * 1.5);
   var pcMin = Math.round(kg * 0.4), pcMax = Math.round(kg * 0.55);
+  var GIMG = {1:"base", 2:"volumen", 3:"mas_peso", 4:"fuerza", 5:"descarga"};
   function bloque(k, t, items){
     return '<details class="fold"' + (cur === k ? ' open' : '') + '><summary>' + t +
-      (cur === k ? '<span class="chip" style="margin-left:auto">Ahora</span>' : '') + '</summary><div class="in"><ul>' +
+      (cur === k ? '<span class="chip" style="margin-left:auto">Ahora</span>' : '') + '</summary><div class="in">' +
+      (GIMG[k] ? '<img class="ilu-169" src="img/guia/' + GIMG[k] + '.webp" alt="" loading="lazy">' : '') + '<ul>' +
       items.map(function(x){ return '<li>' + x + '</li>'; }).join("") + '</ul></div></details>';
   }
   var h = '<div class="sect"><div class="card"><div class="com-h"><div><b>Qué comer en cada ciclo</b>' +
