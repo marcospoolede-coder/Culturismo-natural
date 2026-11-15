@@ -640,6 +640,7 @@
 
   .banner{background:var(--deload-soft); color:var(--deload-ink); border-radius:12px; padding:10px 12px;
           font-size:14px; line-height:1.4; display:flex; gap:9px; align-items:flex-start}
+  .pie-nota{margin:14px 0 0; font-size:12.5px; color:var(--ink-3); text-align:center}
   .foot{margin-top:26px; font-size:12.5px; color:var(--ink-3); line-height:1.5}
 
   /* comida */
@@ -653,7 +654,7 @@
   /* calendario */
   .cal-nav{display:flex; align-items:center; gap:10px; margin-bottom:10px}
   .cal-nav b{flex:1 1 auto; font-size:18px; font-weight:800}
-  .cal-nav button{width:44px; height:44px; border-radius:12px; background:var(--surface-2); display:grid; place-items:center; font-size:18px; flex:0 0 auto}
+  .cal-nav > button{width:44px; height:44px; border-radius:12px; background:var(--surface-2); display:grid; place-items:center; font-size:18px; flex:0 0 auto}
   .cal-g{display:grid; grid-template-columns:repeat(7,1fr); gap:4px}
   .cal-g .dow{text-align:center; font-size:12px; font-weight:800; color:var(--ink-3); padding-bottom:3px}
   .cal-d{aspect-ratio:1/1; border-radius:10px; display:flex; flex-direction:column; align-items:center; justify-content:center;
@@ -725,7 +726,7 @@
   .nrep .chip{cursor:pointer}
   /* alimentación por días: calendario, balance, cajitas y gasto */
   .nut .expl b{font-size:inherit}
-  .cal-nav button[disabled]{opacity:.3}
+  .cal-nav > button[disabled]{opacity:.3}
   .cal-d.nd{cursor:pointer; gap:1px; padding:0; font-family:inherit}
   .cal-d.nd small{font-size:10px; font-weight:800; line-height:1; letter-spacing:-.02em}
   .cal-d.nd.verde{background:#46A758; color:#fff}
@@ -762,6 +763,11 @@
                 line-height:1; display:grid; place-items:center; flex:none}
   .ncaja .nlist{margin-top:8px}
   .ngas{display:flex; align-items:flex-end; gap:16px}
+  .ngas-meta{display:flex; flex-wrap:wrap; justify-content:space-between; gap:4px 12px; margin-top:10px; font-size:13px; color:var(--ink-2)}
+  .ngas-meta b{color:var(--ink)}
+  .nsync{margin-left:auto; display:flex; align-items:center; gap:5px; height:34px; padding:0 10px; border-radius:10px;
+         background:var(--surface-2); color:var(--ink-2); font:inherit; font-size:12.5px; font-weight:700; border:0; cursor:pointer; flex:none}
+  .nsync svg{width:15px; height:15px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round}
   .nbars{display:flex; align-items:flex-end; gap:5px; flex:1; min-width:0}
   .nbars > *{flex:1; display:flex; flex-direction:column; align-items:center; gap:3px}
   .nbars button{background:none; border:0; padding:4px 0 0; font:inherit; cursor:pointer; border-radius:8px}
@@ -849,7 +855,7 @@
    del 31 de mayo de 2025 y de las tablas de rutina por microciclo.     */
 
 /* súbela en cada despliegue: la app instalada la compara para avisar de que hay otra */
-var VERSION = "15 de noviembre de 2026, 14:00";
+var VERSION = "15 de noviembre de 2026, 15:00";
 var BARRA = 20;
 var PESO_CORP_DEF = 75;   /* peso corporal por defecto, se cambia en Ajustes */
 function pesoCorp(){ return state.peso > 0 ? state.peso : PESO_CORP_DEF; }
@@ -1852,7 +1858,7 @@ function previoHTML(empezado){
   var pv = sesion.prev || {}, n = 0;
   PREVIO.forEach(function(_, k){ if(pv[k]) n++; });
   var todo = n === PREVIO.length || sesion.prevNo;
-  var h = '<div class="sect"><details class="fold cardf"' + (todo || empezado ? "" : " open") + '>' +
+  var h = '<div class="sect"><details class="fold cardf">' +
     '<summary>Movilidad, 5 min<span class="chip' + (todo ? " ok" : "") + '" style="margin-left:6px">' +
     (sesion.prevNo && n < PREVIO.length ? "saltada" : n + " de " + PREVIO.length) + '</span></summary>' +
     '<div class="in"><div class="previo">';
@@ -2095,7 +2101,7 @@ function abreHoja(i, j){
 function vPlan(){
   var p = state.pos;
   var h = '<div class="sect"><div class="eyebrow">Macrociclo</div>' +
-    '<p class="note" style="margin:0 0 8px">Toca un bloque para ver de qué va, qué ejercicios lleva y a qué porcentaje de tu maximal.</p><div class="card">';
+    '<div class="card">';
   FASES.forEach(function(f, i){
     var cls = i === p.f ? "now" : (i < p.f ? "past" : "");
     var det = f.tipo === "fuerza"
@@ -2309,8 +2315,8 @@ function evoHTML(){
 function convHTML(pk, rp){
   if(!(pk > 0) || !(rp > 0) || rp > 20) return '<p class="expl" style="margin:0">Mete un peso y de 1 a 20 repeticiones.</p>';
   var rm = rmDesde(pk, rp), h = "";
-  h += '<div class="conv-rm"><b>' + nf(redondea(rm)) + '</b><span>kg de marca</span></div>' +
-    '<p class="expl" style="margin:0">Cada repetición vale un 3%, fórmula de Maurice y Rydin.</p>';
+  h += '<div class="conv-rm"><b>' + nf(redondea(rm)) + '</b><span>kg de marca' + info("conversor") + '</span></div>' +
+    '';
   h += '<details class="fold"><summary>Tabla por repeticiones</summary><div class="in scroll"><table><thead><tr><th>Objetivo</th><th class="n">Peso</th>' +
        '<th class="n">Factor</th></tr></thead><tbody>';
   [1,2,3,4,5,6,8,10,12,15].forEach(function(o){
@@ -2339,7 +2345,7 @@ function vRM(){
 
   h += '<div class="sect"><div class="eyebrow">Tus maximales' + info("maximal") + '</div><div class="card">' +
     '<div class="rmgrid">' +
-    '<span class="th">Ejercicio</span><span class="th n">Teórico</span><span class="th n">Tu marca</span>';
+    '<span class="th">Ejercicio</span><span class="th n">Teórico' + info("teorico") + '</span><span class="th n">Tu marca</span>';
   var hayTeo = false;
   LIFTS.forEach(function(l, i){
     var t = rmTeorico(l.k), act = state.rms[l.k] || 0, sp = i ? " sep" : "";
@@ -2359,9 +2365,7 @@ function vRM(){
       '<span class="u">kg</span></div>';
   });
   h += '</div>';
-  h += '<p class="expl">' + (hayTeo
-    ? 'El teórico sale de tus series del último ciclo. Toca la diferencia y lo adopto.'
-    : 'El teórico se llena solo cuando apuntes unas cuantas series.') + '</p>';
+
   h += '</div></div>';
 
   h += '<div class="sect"><div class="eyebrow">Calculadora</div><div class="card">' +
@@ -2651,6 +2655,20 @@ var GLOSARIO = {
               d:"El peso que te toca según tu marca y el ciclo en el que estás. Es una propuesta: si hoy no sale, apunta el que hayas movido de verdad."},
   superavit: {t:"Superávit",
               d:"Comer algo más de lo que gastas. Es lo que permite construir músculo; si es grande, lo que sobra se guarda como grasa. Un 5 a 20 % por encima de lo que necesitas para mantener el peso basta, y menos cuanto más tiempo lleves entrenando."},
+  suple:     {t:"Suplementos",
+              d:"No sustituyen a comer bien. Solo estos compensan, y van por orden de importancia: si solo tomas uno, que sea el primero."},
+  medico:    {t:"No es consejo médico",
+              d:"Con el riñón delicado, medicación o embarazo, pregunta antes a tu médico."},
+  suplepie:  {t:"Antes de comprar",
+              d:"No es consejo médico: con el riñón delicado, medicación o embarazo, pregunta antes a tu médico. Los botones de compra son enlaces de afiliado de Amazon: me llevo una comisión y a ti te cuesta lo mismo."},
+  guiacom:   {t:"Qué comer en cada ciclo",
+              d:"La base es la misma todo el año: comer un poco más de lo que gastas, proteína repartida y dormir. Lo que cambia por ciclo son los hidratos y el margen de calorías. Las cifras salen de tu peso de Ajustes."},
+  teorico:   {t:"Maximal teórico",
+              d:"Sale solo de las series que apuntas en el último ciclo. Cuando lo tengas y sea distinto de tu marca, toca la diferencia y lo adopto."},
+  conversor: {t:"Cómo se calcula",
+              d:"Cada repetición vale un 3% del peso, con la fórmula de Maurice y Rydin. Con 100 kg a 5 repeticiones, tu marca sale en unos 112,5 kg."},
+  calcom:    {t:"El calendario",
+              d:"Cada día con comidas apuntadas lleva su balance: lo comido menos lo gastado. Verde, dentro de tu objetivo. Naranja, algo lejos. Rojo, muy lejos, por arriba o por abajo. Azul, el día de hoy, que aún sigue. Toca un día para verlo abajo."},
   balance:   {t:"Balance del día",
               d:"Lo que comes menos lo que gastas. Si sale con más, es superávit: comes más de lo que gastas, que es lo que hace falta para construir músculo. Si sale con menos, es déficit: comes menos de lo que gastas, que sirve para perder grasa pero frena el músculo. El color dice lo cerca que estás de tu objetivo: verde si estás dentro, naranja si te quedas algo lejos y rojo si te vas mucho, por arriba o por abajo."},
   gasto:     {t:"Gasto de calorías",
@@ -2976,7 +2994,7 @@ function botonCompra(busqueda, texto){
   return '<a class="btn compra" href="' + enlaceCompra(busqueda) + '" target="_blank" rel="noopener sponsored">' +
     '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 7h12l1 13H5zM9 7a3 3 0 0 1 6 0"/></svg>' +
     esc(texto) + '</a>' +
-    (AFILIADO ? '<p class="afil">Enlace de afiliado: me llevo una comisión y a ti te cuesta lo mismo.</p>' : "");
+    "";
 }
 
 /* las ilustraciones, dibujadas aquí para no depender de fotos de nadie */
@@ -3155,15 +3173,17 @@ function nGastoRef(f){
 /* un día entero: lo comido, lo gastado, el balance (comido menos gastado) y su color.
    Sin comidas apuntadas no hay balance ni color */
 function nDiaInfo(f){
-  var s = nSuma(f), g = nGastoRef(f), b = nBanda(), hoy = f === nHoy();
+  /* lo gastado es lo que dice la pulsera ese día, también hoy aunque vaya a medias:
+     así se compara con lo comido hasta ahora */
+  var s = nSuma(f), g = nGasto(f), b = nBanda(), hoy = f === nHoy();
   var d = {f:f, s:s, g:g, hoy:hoy, bal:null, col:null, bajo:false,
            obj:{lo:Math.round(g.kcal * b.lo / 10) * 10, hi:Math.round(g.kcal * b.hi / 10) * 10}};
   if(s.n > 0 && g.kcal > 0){
     var x = s.kcal / g.kcal - 1, c = nColor(s.kcal / g.kcal).c;
     d.bal = s.kcal - g.kcal;
     d.bajo = x < b.lo;
-    /* hoy, mientras falte por comer, no se juzga: el día sigue */
-    if(hoy && d.bajo) d.col = {c:"curso", t:"El día sigue, aún te queda por comer"};
+    /* hoy, mientras el día siga abierto o falte por comer, no se juzga */
+    if(hoy && (d.bajo || g.parcial)) d.col = {c:"curso", t:"El día sigue"};
     else d.col = {c:c, t:c === "verde" ? "En tu objetivo"
       : c === "naranja" ? (d.bajo ? "Te quedaste algo corto" : "Te pasaste un poco")
       : (d.bajo ? "Muy por debajo de tu objetivo" : "Muy por encima de tu objetivo")};
@@ -3325,18 +3345,16 @@ function nutHTML(){
     h += '<div class="sema">' + nLuz(col.c, true) + '<div><b>' + col.t + '</b><small>' +
       (a.principal.por === "bascula"
         ? (a.tend.kgSem >= 0 ? "+" : "") + Math.round(a.tend.kgSem * 1000) + " g a la semana en " + a.tend.dias + " días. Manda la báscula."
-        : "Media de " + a.sem.n + " días: " + nMil(a.sem.kcal) + " kcal comidas frente a " + nMil(a.sem.gasto) + " gastadas.") +
+        : "Media de " + a.sem.n + " días: " + nMil(a.sem.kcal) + " comidas, " + nMil(a.sem.gasto) + " gastadas") +
       '</small></div></div>';
-    if(a.principal.por === "bascula" && a.sem){
-      h += '<p class="expl">Comida de la semana: ' + nMil(a.sem.kcal) + ' kcal de media, ' + a.sem.prot + ' g de proteína.</p>';
-    }
+
   }else{
     h += '<div class="sema">' + nLuz("off", true) + '<div><b>Semáforo en espera</b><small>Con 3 días apuntados se enciende.</small></div></div>';
   }
   h += '</div>';
   if(a.rec.length){
-    h += '<div class="card" style="margin-top:10px"><b>Qué hacer</b><ul class="nrec">' +
-      a.rec.map(function(r){ return '<li>' + r + '</li>'; }).join("") + '</ul></div>';
+    h += '<details class="fold cardf" style="margin-top:10px"><summary>Qué hacer<span class="chip" style="margin-left:6px">' + a.rec.length + '</span></summary>' +
+      '<div class="in"><ul class="nrec">' + a.rec.map(function(r){ return '<li>' + r + '</li>'; }).join("") + '</ul></div></details>';
   }
   h += '</div><div class="sect">' + nAjustesHTML() + '</div>';
   return h;
@@ -3352,7 +3370,7 @@ function nCalHTML(){
   var puedeSig = y < ahora.getFullYear() || (y === ahora.getFullYear() && mo < ahora.getMonth());
   var h = '<div class="card"><div class="cal-nav">' +
     '<button data-n="mes" data-d="-1" aria-label="Mes anterior"' + (puedeAnt ? '' : ' disabled') + '>‹</button>' +
-    '<b>' + esc(titulo.charAt(0).toUpperCase() + titulo.slice(1)) + '</b>' +
+    '<b>' + esc(titulo.charAt(0).toUpperCase() + titulo.slice(1)) + info("calcom") + '</b>' +
     '<button data-n="mes" data-d="1" aria-label="Mes siguiente"' + (puedeSig ? '' : ' disabled') + '>›</button></div><div class="cal-g nc">';
   ["L","M","X","J","V","S","D"].forEach(function(d){ h += '<div class="dow">' + d + '</div>'; });
   var ini = lunes(new Date(y, mo, 1));
@@ -3371,11 +3389,7 @@ function nCalHTML(){
       '"' + (f === sel ? ' aria-pressed="true"' : '') + '>' + d.getDate() +
       (x.bal === null ? '' : '<small>' + nSigno(x.bal) + '</small>') + '</button>';
   }
-  h += '</div><div class="cal-k">' +
-    '<span><i style="background:#46A758"></i>En tu objetivo</span>' +
-    '<span><i style="background:#F2A33A"></i>Algo lejos</span>' +
-    '<span><i style="background:#E5484D"></i>Muy lejos</span></div>' +
-    '<p class="expl">El número es lo comido menos lo gastado. Toca un día para verlo.' + info("balance") + '</p></div>';
+  h += '</div></div>';
   return h;
 }
 
@@ -3404,19 +3418,26 @@ function nDiaHTML(){
   var h = '<div class="card nut" style="margin-top:10px">';
   h += '<div class="sema">' + nLuz(d.col && d.col.c !== "curso" ? d.col.c : "off", true) + '<div><b>' +
     esc(hoy ? "Hoy, " + nFechaLarga(f).toLowerCase() : nFechaLarga(f)) + '</b><small>' +
-    (d.col ? d.col.t : (hoy ? "Apunta lo que vayas comiendo en su cajita." : "Sin comidas apuntadas.")) + '</small></div></div>';
+    (d.col ? d.col.t : (hoy ? "Apunta lo que vayas comiendo en su cajita." : "Sin comidas apuntadas.")) + info("objdia") + '</small></div></div>';
 
-  var fuente = d.g.media ? "tu media" : d.g.fuente === "Apple Salud y tu basal" ? "Apple Salud" : d.g.fuente;
+  var fuente = d.g.fuente === "Apple Salud y tu basal" ? "Apple Salud" : d.g.fuente.replace(", con tu entreno", "");
+  /* el objetivo va en la i: con el gasto de ese día o, hoy, con tu gasto medio */
+  var gr = nGastoRef(f), bo = nBanda();
+  var oLo = Math.round(gr.kcal * (1 + bo.lo) / 10) * 10, oHi = Math.round(gr.kcal * (1 + bo.hi) / 10) * 10;
+  GLOSARIO.objdia = {t:"Tu objetivo del día",
+    d:"Buscas un " + nObjTxt({lo:Math.round(gr.kcal * bo.lo / 10) * 10, hi:Math.round(gr.kcal * bo.hi / 10) * 10}) +
+      " sobre lo que gastas. " + (hoy && gr.media ? "Con tu gasto medio de " + nMil(gr.kcal) + " kcal" : "Con " + nMil(gr.kcal) + " kcal gastadas") +
+      ", es comer de " + nMil(oLo) + " a " + nMil(oHi) + " kcal." +
+      (hoy && d.s.kcal < oLo ? " Te faltan unas " + nMil(oLo - d.s.kcal) + " kcal." : "") +
+      (hoy && d.g.parcial ? " Hoy el gasto va subiendo hasta que te duermes: el color se pone al cerrar el día." : "") +
+      " El número de la derecha es lo comido menos lo gastado."};
   h += '<div class="nbal">' +
     '<div><small>Comido</small><b>' + nMil(d.s.kcal) + '</b><em>kcal</em></div>' +
     '<div><small>Gastado</small><b>' + nMil(d.g.kcal) + '</b><em>' + esc(fuente) + '</em></div>' +
     '<div class="' + (d.col ? d.col.c : "") + '"><small>' + (d.bal === null ? "Balance" : d.bal >= 0 ? "Superávit" : "Déficit") +
     '</small><b>' + (d.bal === null ? "–" : nSigno(d.bal)) + '</b><em>kcal</em></div></div>';
 
-  var inLo = Math.round((d.g.kcal + d.obj.lo) / 10) * 10, inHi = Math.round((d.g.kcal + d.obj.hi) / 10) * 10;
-  h += '<p class="expl">Tu objetivo: ' + nObjTxt(d.obj) + ', es decir, comer de <b>' + nMil(inLo) + ' a ' + nMil(inHi) + ' kcal</b>.' +
-    (hoy && d.s.kcal < inLo ? ' Te faltan unas <b>' + nMil(inLo - d.s.kcal) + ' kcal</b>.' : '') + info("balance") + '</p>';
-  if(d.g.media){
+  if(false){
     h += '<p class="expl">Hoy ' + esc(d.g.base) + ' lleva ' + nMil(d.g.real) + ' kcal y el día sigue. Para el balance uso la media de tus últimos días completos.</p>';
   }
 
@@ -3450,14 +3471,18 @@ function nGastoHTML(){
   var f = nut.gdia || nSel(), hoy = f === nHoy(), g = nGasto(f), w = nut.integ.whoop;
   var fila = nut.gasto.filter(function(x){ return x.fecha === f && x.pasos; })[0];
   var h = '<div class="card" style="margin-top:10px"><div class="com-h">' + dibujoCom("gasto").replace("comdib", "com-ic") +
-    '<div><b>Gasto de calorías</b><small>' + (hoy ? "Hoy" : esc(nFechaLarga(f))) + ', lo que quema tu cuerpo</small></div></div>';
+    '<div><b>Gasto de calorías' + info("gastodia") + '</b><small>' + (hoy ? "Hoy" : esc(nFechaLarga(f))) + '</small></div>' +
+    (w ? '<button class="nsync" type="button" data-n="whoop-sync" aria-label="Actualizar WHOOP">' +
+      '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7M21 3v6h-6"/></svg>' +
+      (w.ultima_sync ? esc(new Date(w.ultima_sync).toLocaleTimeString("es-ES", {hour:"2-digit", minute:"2-digit"})) : "") + '</button>' : '') +
+    '</div>';
   var dias = [], max = 0, suma = 0, n = 0, i;
   for(i = 6; i >= 0; i--){
     var fi = nDia(i), gi = nGasto(fi);
     dias.push({f:fi, g:gi});
     if(!gi.fijo || gi.est) max = Math.max(max, gi.kcal);
   }
-  /* la misma media que usa el balance de hoy: los días completos de la última semana */
+  /* media de los días completos de la última semana */
   for(i = 1; i <= 7; i++){ var gm = nGasto(nDia(i)); if(!gm.fijo && !gm.parcial){ suma += gm.kcal; n++; } }
   h += '<div class="ngas"><div class="gran"><b>' + nMil(g.kcal) + '</b><span>kcal</span></div><div class="nbars">';
   dias.forEach(function(x){
@@ -3469,23 +3494,20 @@ function nGastoHTML(){
       '><i style="height:' + (vale && max ? Math.max(5, Math.round(x.g.kcal / max * 56)) : 3) + 'px"></i><small>' +
       "DLMXJVS".charAt(new Date(x.f + "T12:00:00").getDay()) + '</small></button>';
   });
-  h += '</div></div><p class="expl" style="font-size:12.5px; margin-top:4px">Toca un día de la semana para ver lo que gastaste.</p>';
-  if(g.est){
-    h += '<p class="expl">Un día normal tuyo: <b>' + nMil(g.base) + ' kcal</b>' +
-      (g.ent ? '. El entreno: <b>+' + nMil(g.ent) + ' kcal</b>' : (hoy ? '. El entreno se suma al cerrarlo' : '. Ese día no cerraste entreno')) + '.</p>';
-  }
-  h += '<p class="expl">' + (g.fijo
-    ? (g.est
-        ? "Sin pulsera lo estimo con tu sexo, edad, altura y peso (ponlos bien en Tus datos), más lo que cuesta cada entreno que cierras. Si conectas WHOOP o Apple Salud, manda su dato."
-        : "Usas el mantenimiento que pusiste en Tus datos. Conecta WHOOP o Apple Salud para tener el dato real.")
-    : "Fuente: " + esc(g.fuente) + (g.parcial ? ". El día sigue y la cifra irá subiendo" : "") + "." + (fila ? " " + nMil(fila.pasos) + " pasos." : "")) +
-    info("gasto") + '</p>';
-  if(n >= 2) h += '<p class="expl">Media de tus últimos ' + n + ' días completos: <b>' + nMil(suma / n) + ' kcal</b>.</p>';
-  if(w){
-    h += '<div class="nbtns"><button class="btn sm" data-n="whoop-sync">Actualizar WHOOP</button></div>' +
-      (w.ultima_sync ? '<p class="expl" style="font-size:12.5px">Último dato de WHOOP: ' +
-        esc(new Date(w.ultima_sync).toLocaleString("es-ES", {day:"numeric", month:"short", hour:"2-digit", minute:"2-digit"})) + '.</p>' : '');
-  }
+  h += '</div></div>';
+  var meta = [];
+  if(g.est) meta.push("Estimado: " + nMil(g.base) + (g.ent ? " + " + nMil(g.ent) + " del entreno" : ""));
+  else if(g.fijo) meta.push("Tu mantenimiento");
+  else meta.push(esc(g.fuente) + (fila ? " · " + nMil(fila.pasos) + " pasos" : ""));
+  if(n >= 2) meta.push("Media de " + n + " días: <b>" + nMil(suma / n) + "</b>");
+  h += '<div class="ngas-meta">' + meta.map(function(x){ return '<span>' + x + '</span>'; }).join("") + '</div>';
+  GLOSARIO.gastodia = {t:"Gasto de calorías",
+    d:(g.est ? "No tienes pulsera conectada, así que lo estimo: un día normal tuyo según sexo, edad, altura y peso (ponlos bien en Tus datos), más lo que cuesta cada entreno que cierras. "
+      : g.fijo ? "Usas el mantenimiento que pusiste en Tus datos. "
+      : "Es lo que mide " + g.fuente + ". " + (g.parcial ? "Hoy va subiendo hasta que te duermes. " : "")) +
+      "Toca un día de la semana para ver su gasto. La media es la de tus últimos días completos. " +
+      (w ? "WHOOP se actualiza solo cada hora, y con el botón de arriba lo traes en el momento."
+         : "Conecta WHOOP o Apple Salud en Tus datos y conexiones para tener el dato real.")};
   return h + '</div>';
 }
 
@@ -3868,14 +3890,12 @@ function guiaComHTML(kg){
       "La media hora tras entrenar es un mito.",
       "Si no llegas con comida, mira la proteína en polvo en Suplementos."]) + '</div></div>';
   h += comidaCicloHTML(kg);
-  h += '<div class="sect"><div class="banner"><b>Ojo</b><span>No es consejo médico. Con el riñón delicado, ' +
-    'medicación o embarazo, pregunta antes a tu médico.</span></div></div>';
+  h += avisoPie(false);
   return h;
 }
 
 function supHTML(kg){
-  var h = '<div class="sect"><div class="eyebrow">Suplementos, aparte de la comida</div>' +
-    '<p class="expl" style="margin:0 0 10px">No sustituyen a comer bien. Solo estos compensan, y por este orden.</p>';
+  var h = '<div class="sect"><div class="eyebrow">Suplementos, por orden' + info("suple") + '</div>';
 
   h += '<div class="card">' + ilus("creatina") + comCab("crea", "Creatina", "La única que compensa") +
     '<div class="gran"><b>5 g</b><span>al día</span></div>' +
@@ -3892,7 +3912,7 @@ function supHTML(kg){
 
   h += '<div class="card" style="margin-top:10px">' + ilus("proteina_polvo") + comCab("prote", "Proteína en polvo", "Solo si no llegas con comida") +
     '<div class="gran"><b>1 batido</b><span>al día como mucho</span></div>' +
-    '<p class="expl">Es comida en polvo, no magia. Sirve para llegar a tu proteína del día cuando con el plato no alcanzas.</p>' +
+
     comPlegable("Cómo elegir un batido", [
       "Suero de leche, whey. Aislada si la leche te sienta pesada.",
       "Al menos 20 g de proteína por cada 30 g de producto.",
@@ -3920,9 +3940,13 @@ function supHTML(kg){
 
   h += '<div class="sect"><p class="expl" style="margin:0"><b>Lo demás, no lo necesitas.</b> ' +
     'Quemagrasas, aminoácidos y boosters son dinero tirado para un natural.</p></div>';
-  h += '<div class="sect"><div class="banner"><b>Ojo</b><span>No es consejo médico. Con el riñón delicado, ' +
-    'medicación o embarazo, pregunta antes a tu médico.</span></div></div>';
+  h += avisoPie(true);
   return h;
+}
+
+/* nota única al pie de Suplementos y Guía: médico y afiliados, explicado en la i */
+function avisoPie(afil){
+  return '<p class="pie-nota">No es consejo médico' + (afil && AFILIADO ? ' · enlaces de afiliado' : '') + info(afil ? "suplepie" : "medico") + '</p>';
 }
 
 /* qué comer según el bloque del plan: la base es la misma todo el año y lo
@@ -3942,10 +3966,8 @@ function comidaCicloHTML(kg){
       (GIMG[k] ? '<img class="ilu-169" src="img/guia/' + GIMG[k] + '.webp" alt="" loading="lazy">' : '') + '<ul>' +
       items.map(function(x){ return '<li>' + x + '</li>'; }).join("") + '</ul></div></details>';
   }
-  var h = '<div class="sect"><div class="card"><div class="com-h"><div><b>Qué comer en cada ciclo</b>' +
-    '<small>Para crecer, recuperarte antes y no lesionarte</small></div></div>' +
-    '<p class="expl">La base es la misma todo el año: comer un poco más de lo que gastas, proteína repartida y dormir. ' +
-    'Lo que cambia por ciclo son los hidratos y el margen de calorías. Cifras con tus ' + nf(kg) + ' kg de Ajustes.</p>';
+  var h = '<div class="sect"><div class="card"><div class="com-h"><div><b>Qué comer en cada ciclo' + info("guiacom") + '</b>' +
+    '<small>Para crecer, recuperarte antes y no lesionarte</small></div></div>';
   h += bloque(1, "Todo el año, la base", [
     "Un poco más de lo que gastas: un 5 a 20 % por encima de mantenimiento. Cuanto más tiempo lleves entrenando, más cerca del 5 %." + info("superavit"),
     "Si tu peso lleva meses parado, lo que comes ahora es tu mantenimiento. Súmale el superávit a eso.",
@@ -3971,14 +3993,14 @@ function comidaCicloHTML(kg){
   h += bloque(5, "Semana de descarga y cierre", [
     "No hagas dieta en la descarga: mantén la proteína y baja un poco los hidratos si tienes menos hambre. La descarga es para recuperar, no para compensar.",
     "El cierre al 80 % vuelve a ser volumen: hidratos otra vez a 4 o 5 g por kilo."]);
-  h += '<p class="expl" style="margin:10px 0 0; font-size:12.5px">Fuentes: ' +
+  h += '<details class="fold"><summary>Fuentes</summary><div class="in"><p class="note" style="margin:0">' +
     '<a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6680710/" target="_blank" rel="noopener">Iraki y Helms 2019</a>, ' +
     'nutrición fuera de temporada para culturistas; ' +
     '<a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10620361/" target="_blank" rel="noopener">Helms 2023</a>, ' +
     'superávit pequeño frente a grande; ' +
     '<a href="https://pubmed.ncbi.nlm.nih.gov/28615996/" target="_blank" rel="noopener">posición de la ISSN sobre creatina</a>; ' +
     '<a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC5183725/" target="_blank" rel="noopener">Shaw 2017</a>, gelatina y colágeno.</p>' +
-    '</div></div>';
+    '</div></details></div></div>';
   return h;
 }
 
@@ -4181,7 +4203,10 @@ function vAjustes(){
   g4 += '<div class="sect"><div class="eyebrow">Versión</div><div class="card">' +
     '<p class="expl" style="margin:0 0 10px">Tienes la del ' + VERSION + '.</p>' +
     '<button class="btn" data-actualiza="1">Buscar actualización</button>' +
-    '<p class="expl" id="ver-estado" style="margin:8px 0 0"></p></div></div>';
+    '<p class="expl" id="ver-estado" style="margin:8px 0 0"></p>' +
+    '<details class="fold"><summary>Créditos</summary><div class="in"><p class="note" style="margin:0">' +
+    'Los pesos son una guía: manda la técnica. Fotos de ejercicios de free-exercise-db. ' +
+    'El David, foto de Jörg Bittner Unna, CC BY 3.0.</p></div></details></div></div>';
   g4 += '<div class="sect"><button class="btn" id="ver-bienv">Ver otra vez la bienvenida</button></div>';
 
   var I = {
@@ -5144,10 +5169,7 @@ Promise.all([cap("db"), cap("user")]).then(function(res){
   });
 })["catch"](function(){ cuenta.sync = "local"; render(); });
 
-document.getElementById("foot").textContent =
-  "Los pesos son una guía: manda la técnica. "
-  + "Fotos de free-exercise-db. El David, foto de Jörg Bittner Unna, CC BY 3.0. "
-  + "Versión del " + VERSION + ".";
+document.getElementById("foot").hidden = true;
 })();
 </script>
 </body>
